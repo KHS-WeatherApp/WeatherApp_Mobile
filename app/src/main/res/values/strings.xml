@@ -1,0 +1,4 @@
+<resources>
+    <!--설치 시 앱 명칭 -->
+    <string name="app_name">kH_StudyProjects_ WeatherApp</string>
+</resources>
