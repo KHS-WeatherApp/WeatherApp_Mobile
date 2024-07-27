@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav"
+    app:startDestination="@id/particulateMatterMain">
+
+    <fragment
+        android:id="@+id/particulateMatterMain"
+        android:name="com.example.kh_studyprojects_weatherapp.particulatematter.ParticulateMatterMain"
+        android:label="fragment_particulate_matter_main"
+        tools:layout="@layout/fragment_particulate_matter_main" />
+    <fragment
+        android:id="@+id/settingMain"
+        android:name="com.example.kh_studyprojects_weatherapp.setting.SettingMain"
+        android:label="fragment_setting_main"
+        tools:layout="@layout/fragment_setting_main" />
+    <fragment
+        android:id="@+id/weatherMain"
+        android:name="com.example.kh_studyprojects_weatherapp.weather.WeatherMain"
+        android:label="fragment_weather_main"
+        tools:layout="@layout/fragment_weather_main" />
+</navigation>
