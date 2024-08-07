@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/particulateMatterMain"
-        android:name="com.example.kh_studyprojects_weatherapp.particulatematter.ParticulateMatterMain"
+        android:name="com.example.kh_studyprojects_weatherapp.particulatematter.ParticulateMatterFragment"
         android:label="fragment_particulate_matter_main"
-        tools:layout="@layout/fragment_particulate_matter_main" />
+        tools:layout="@layout/particulate_matter_fragment" />
     <fragment
         android:id="@+id/settingMain"
-        android:name="com.example.kh_studyprojects_weatherapp.setting.SettingMain"
+        android:name="com.example.kh_studyprojects_weatherapp.setting.SettingFragment"
         android:label="fragment_setting_main"
-        tools:layout="@layout/fragment_setting_main" />
+        tools:layout="@layout/setting_fragment" />
     <fragment
         android:id="@+id/weatherMain"
-        android:name="com.example.kh_studyprojects_weatherapp.weather.WeatherMain"
+        android:name="com.example.kh_studyprojects_weatherapp.weather.WeatherFragment"
         android:label="fragment_weather_main"
-        tools:layout="@layout/fragment_weather_main" />
+        tools:layout="@layout/weather_fragment" />
 </navigation>

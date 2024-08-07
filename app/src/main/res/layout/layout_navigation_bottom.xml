@@ -92,7 +92,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="14dp"
-                    android:src="@drawable/nav_weather_icon"/>
+                    android:src="@drawable/nav_particulate_matter_icon"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

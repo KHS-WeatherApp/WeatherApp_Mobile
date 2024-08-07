@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.kh_studyprojects_weatherapp.R
 
-class WeatherMain : Fragment() {
+class WeatherFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +18,7 @@ class WeatherMain : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_weather_main, container, false)
+        return inflater.inflate(R.layout.weather_fragment, container, false)
     }
 
 }
