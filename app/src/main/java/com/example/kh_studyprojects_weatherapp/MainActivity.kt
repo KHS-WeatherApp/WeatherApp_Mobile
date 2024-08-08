@@ -5,13 +5,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
+import com.example.kh_studyprojects_weatherapp.databinding.MainActivityBinding
 
 // 사용하지 않는 변수, 변경된 파라미터 이름 등에 대한 컴파일러 경고를 억제합니다.
 class MainActivity : AppCompatActivity() {
 
     // 뷰 바인딩을 위한 널 가능한(private) 변수를 선언합니다.
-    private var _binding: ActivityMainBinding? = null
+    private var _binding: MainActivityBinding? = null
     // _binding 변수에 대한 널이 아닌 접근자를 제공합니다.
     private val binding get() = _binding!!
 
