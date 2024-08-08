@@ -3,21 +3,50 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav"
-    app:startDestination="@id/particulateMatterMain">
-
+    app:startDestination="@id/weatherFragment">
     <fragment
-        android:id="@+id/particulateMatterMain"
-        android:name="com.example.kh_studyprojects_weatherapp.particulatematter.ParticulateMatterFragment"
-        android:label="fragment_particulate_matter_main"
-        tools:layout="@layout/particulate_matter_fragment" />
-    <fragment
-        android:id="@+id/settingMain"
-        android:name="com.example.kh_studyprojects_weatherapp.setting.SettingFragment"
-        android:label="fragment_setting_main"
-        tools:layout="@layout/setting_fragment" />
-    <fragment
-        android:id="@+id/weatherMain"
+        android:id="@+id/weatherFragment"
         android:name="com.example.kh_studyprojects_weatherapp.weather.WeatherFragment"
-        android:label="fragment_weather_main"
-        tools:layout="@layout/weather_fragment" />
+        android:label="weather_fragment"
+        tools:layout="@layout/weather_fragment" >
+        <action
+            android:id="@+id/action_weatherFragment_to_settingFragment"
+            app:destination="@id/settingFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_to_particulateMatterFragment"
+            app:destination="@id/particulateMatterFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_self2"
+            app:destination="@id/weatherFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.example.kh_studyprojects_weatherapp.setting.SettingFragment"
+        android:label="setting_fragment"
+        tools:layout="@layout/setting_fragment" >
+        <action
+            android:id="@+id/action_settingFragment_to_weatherFragment"
+            app:destination="@id/weatherFragment" />
+        <action
+            android:id="@+id/action_settingFragment_to_particulateMatterFragment"
+            app:destination="@id/particulateMatterFragment" />
+        <action
+            android:id="@+id/action_settingFragment_self2"
+            app:destination="@id/settingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/particulateMatterFragment"
+        android:name="com.example.kh_studyprojects_weatherapp.particulatematter.ParticulateMatterFragment"
+        android:label="particulate_matter_fragment"
+        tools:layout="@layout/particulate_matter_fragment" >
+        <action
+            android:id="@+id/action_particulateMatterFragment_to_weatherFragment"
+            app:destination="@id/weatherFragment" />
+        <action
+            android:id="@+id/action_particulateMatterFragment_to_settingFragment"
+            app:destination="@id/settingFragment" />
+        <action
+            android:id="@+id/action_particulateMatterFragment_self2"
+            app:destination="@id/particulateMatterFragment" />
+    </fragment>
 </navigation>
