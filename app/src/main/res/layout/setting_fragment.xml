@@ -13,10 +13,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="30dp"
-        android:text="@string/setting_fragment" />
+        android:text="@string/setting_fragment"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/included_navigation_bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <include
-        android:id="@+id/layout_navigation_bottom"
+        android:id="@+id/included_navigation_bottom"
         layout="@layout/layout_navigation_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

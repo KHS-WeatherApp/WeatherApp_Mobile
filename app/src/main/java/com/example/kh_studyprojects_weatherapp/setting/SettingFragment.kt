@@ -21,7 +21,7 @@ class SettingFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.weather_fragment, container, false)
+        val view = inflater.inflate(R.layout.setting_fragment, container, false)
 
         //cl01 클릭 시 날씨 화면 전환
         view.findViewById<LinearLayout>(R.id.cl01).setOnClickListener{
