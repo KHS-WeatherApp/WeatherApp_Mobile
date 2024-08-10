@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_100"
+        android:layout_height="@dimen/dp_90"
         android:background="#7ECEFC"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -15,13 +16,14 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_75"
+            android:layout_height="0dp"
             android:background="@color/white"
+            app:layout_constraintHeight_percent="0.65"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -30,66 +32,82 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <!--날씨-->
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl01"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/dp_9"
-                android:layout_weight="3"
-                android:background="@drawable/shape_radius_top_r_l_01"
-                android:orientation="horizontal">
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.85"
+                app:layout_constraintWidth_percent="0.425"
+                android:background="@drawable/shape_radius_top_r_l_01_effect"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/cl02"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="14dp"
+                    android:layout_margin="13dp"
                     android:src="@drawable/nav_weather_icon" />
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!--설정-->
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl02"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                app:layout_constraintWidth_percent="0.15"
+                app:layout_constraintEnd_toStartOf="@id/cl03"
+                app:layout_constraintStart_toEndOf="@id/cl01"
+                app:layout_constraintTop_toTopOf="parent">
+
+<!--                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.6" />-->
 
                 <!--구모양 설정-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="55dp"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginRight="0dp"
-                    android:background="@drawable/shape_oval_01">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl02_01"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/shape_oval_01_effect"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="1">
 
                     <TextView
-                        android:id="@+id/tv_setting"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center_horizontal|top"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:text=". . ."
                         android:textSize="28dp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
+                        android:textStyle="bold"
+                        tools:ignore="MissingConstraints" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!--미세-->
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl03"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/dp_9"
-                android:layout_weight="3"
-                android:background="@drawable/shape_radius_top_r_l_01"
-                android:orientation="horizontal">
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.85"
+                app:layout_constraintWidth_percent="0.425"
+                android:background="@drawable/shape_radius_top_r_l_01_effect"
+                app:layout_constraintStart_toEndOf="@id/cl02"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="14dp"
+                    android:layout_margin="7dp"
                     android:src="@drawable/nav_particulate_matter_icon" />
-            </LinearLayout>
-        </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

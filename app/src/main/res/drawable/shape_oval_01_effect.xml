@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#C7CFFF">
+
+    <item android:id="@android:id/mask">
+        <!-- Ripple 효과가 적용될 때 mask로 사용할 shape -->
+        <shape android:shape="oval">
+            <solid android:color="#C7CFFF" />
+        </shape>
+    </item>
+
+    <item android:id="@android:id/background">
+        <!-- 기본 배경으로 사용할 타원형 shape -->
+        <shape android:shape="oval">
+            <solid android:color="@color/white" />
+            <stroke
+                android:width="6dp"
+                android:color="#7ECEFC" />
+        </shape>
+    </item>
+</ripple>

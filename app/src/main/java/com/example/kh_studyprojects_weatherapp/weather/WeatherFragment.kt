@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -27,17 +28,17 @@ class WeatherFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.weather_fragment, container, false)
 
-        view.findViewById<LinearLayout>(R.id.cl01).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.cl01).setOnClickListener {
                 Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                 it.findNavController().navigate(R.id.action_weatherFragment_self2)
         }
 
-        view.findViewById<TextView>(R.id.tv_setting).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.cl02_01).setOnClickListener {
                 Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
         }
 
-        view.findViewById<LinearLayout>(R.id.cl03).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.cl03).setOnClickListener {
                 Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                 it.findNavController().navigate(R.id.action_weatherFragment_to_particulateMatterFragment)
         }
