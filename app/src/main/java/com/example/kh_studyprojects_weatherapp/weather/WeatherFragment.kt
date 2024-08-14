@@ -35,7 +35,7 @@ class WeatherFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.weather_fragment, container, false)
 
-        view.findViewById<ConstraintLayout>(R.id.cl01).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.cl_nav01).setOnClickListener {
                 Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                 it.findNavController().navigate(R.id.action_weatherFragment_self2)
         }
@@ -45,7 +45,7 @@ class WeatherFragment : Fragment() {
                it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
         }
 
-        view.findViewById<ConstraintLayout>(R.id.cl03).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.cl_nav03).setOnClickListener {
                 Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                 it.findNavController().navigate(R.id.action_weatherFragment_to_particulateMatterFragment)
         }

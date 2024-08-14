@@ -33,14 +33,14 @@
 
             <!--날씨-->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl01"
+                android:id="@+id/cl_nav01"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintHeight_percent="0.85"
                 app:layout_constraintWidth_percent="0.425"
                 android:background="@drawable/shape_radius_top_r_l_01_effect"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/cl02"
+                app:layout_constraintEnd_toStartOf="@+id/c_nav02"
                 app:layout_constraintBottom_toBottomOf="parent">
 
                 <ImageView
@@ -52,12 +52,12 @@
 
             <!--설정-->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl02"
+                android:id="@+id/cl_nav02"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintWidth_percent="0.15"
-                app:layout_constraintEnd_toStartOf="@id/cl03"
-                app:layout_constraintStart_toEndOf="@id/cl01"
+                app:layout_constraintEnd_toStartOf="@id/cl_nav03"
+                app:layout_constraintStart_toEndOf="@id/cl_nav01"
                 app:layout_constraintTop_toTopOf="parent">
 
 <!--                <androidx.constraintlayout.widget.Guideline
@@ -92,13 +92,13 @@
 
             <!--미세-->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cl03"
+                android:id="@+id/cl_nav03"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintHeight_percent="0.85"
                 app:layout_constraintWidth_percent="0.425"
                 android:background="@drawable/shape_radius_top_r_l_01_effect"
-                app:layout_constraintStart_toEndOf="@id/cl02"
+                app:layout_constraintStart_toEndOf="@id/cl_nav02"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 

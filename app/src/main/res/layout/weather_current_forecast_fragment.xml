@@ -6,8 +6,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".weather.WeatherCurrentForecast"
-    android:background="@android:color/transparent">
+    android:background="@color/weather">
+<!--    android:background="@android:color/transparent">-->
 
+    <!--사이드 메뉴 버튼-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_regional_settings_btn"
         android:layout_width="match_parent"
@@ -17,8 +19,8 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:layout_width="@dimen/dp_20"
-            android:layout_height="@dimen/dp_20"
+            android:layout_width="@dimen/dp_30"
+            android:layout_height="@dimen/dp_30"
             android:background="@drawable/regional_settings_btn"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -26,6 +28,7 @@
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!--상단 지역 표기-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_place_name"
         android:layout_width="match_parent"
@@ -40,23 +43,303 @@
             android:gravity="center"
             android:text="서울"
             android:textStyle="bold"
-            android:textColor ="@color/black"
-            android:textSize="@dimen/dp_30"
+            android:textColor ="@color/white"
+            android:textSize="@dimen/dp_40"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cl_place_name">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl01"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
+            <!--날씨 이미지 , 온도 표기-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl03"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/cl04">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_img"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/cl_temperature"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <ImageView
+                            android:layout_width="@dimen/dp_80"
+                            android:layout_height="@dimen/dp_80"
+                            android:src="@drawable/nav_weather_icon"
+                            tools:ignore="MissingConstraints" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="@dimen/dp_10"
+                        app:layout_constraintStart_toEndOf="@id/cl_img"
+                        app:layout_constraintEnd_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="-10°"
+                            android:textColor ="@color/white"
+                            android:textSize="@dimen/dp_65"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--날씨 상태 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl04"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cl03"
+                app:layout_constraintBottom_toTopOf="@id/cl05">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="맑음"
+                    android:textColor ="@color/white"
+                    android:textSize="@dimen/dp_15"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--전일 온도비교 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl05"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cl04"
+                app:layout_constraintBottom_toTopOf="@id/cl06">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="어제보다 4° 높아요"
+                    android:textStyle="bold"
+                    android:textColor ="@color/white"
+                    android:textSize="@dimen/dp_15"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--전일 온도비교 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl06"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cl05"
+                app:layout_constraintBottom_toBottomOf="parent">
+                
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl07"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/cl08"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/tv01"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="최저 : "
+                        android:textColor ="@color/white"
+                        android:textSize="@dimen/dp_15"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/tv02"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tv02"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="29"
+                        android:textColor ="@color/white"
+                        android:textSize="@dimen/dp_15"
+                        app:layout_constraintStart_toEndOf="@id/tv01"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl08"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/dp_10"
+                    app:layout_constraintStart_toEndOf="@id/cl07"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/tv03"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="최고 : "
+                        android:textColor ="@color/white"
+                        android:textSize="@dimen/dp_15"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/tv04"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                    <TextView
+                        android:id="@+id/tv04"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="32"
+                        android:textColor ="@color/white"
+                        android:textSize="@dimen/dp_15"
+                        app:layout_constraintStart_toEndOf="@id/tv03"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl02"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            
+<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent">-->
+
+                <!--추천 옷-->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl09"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/cl10">
+
+                    <ImageView
+                        android:layout_width="@dimen/dp_110"
+                        android:layout_height="@dimen/dp_110"
+                        android:src="@drawable/clothes01"
+                        tools:ignore="MissingConstraints" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl10"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cl09"
+                    app:layout_constraintBottom_toTopOf="@id/cl11">
+
+                    <TextView
+                        android:id="@+id/tv05"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="추천 옷 : "
+                        android:textColor ="@color/white"
+                        android:textSize="@dimen/dp_15"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/tv06"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tv06"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="반팔티"
+                        android:textColor ="@color/white"
+                        android:textSize="@dimen/dp_15"
+                        app:layout_constraintStart_toEndOf="@id/tv05"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl11"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cl10"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/tv07"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="체감온도 : "
+                        android:textColor ="@color/white"
+                        android:textSize="@dimen/dp_15"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/tv08"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tv08"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="38°"
+                        android:textColor ="@color/white"
+                        android:textSize="@dimen/dp_15"
+                        app:layout_constraintStart_toEndOf="@id/tv07"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+<!--                </androidx.constraintlayout.widget.ConstraintLayout>-->
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
