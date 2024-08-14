@@ -5,18 +5,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".weather.WeatherFragment"
-    android:background="#7ECEFC">
+    android:background="@color/weather">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="30dp"
-        android:text="@string/weather_fragment"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/included_navigation_bottom"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/included_navigation_bottom">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/weather_current_forecast_fragment"
+                layout="@layout/weather_current_forecast_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/test"
+                />
+
+            <TextView
+                android:id="@+id/test"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="30dp"
+                android:text="@string/weather_fragment"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weather_current_forecast_fragment"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
     <include
         android:id="@+id/included_navigation_bottom"

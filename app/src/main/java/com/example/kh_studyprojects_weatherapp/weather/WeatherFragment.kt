@@ -14,6 +14,13 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.kh_studyprojects_weatherapp.R
 
+/*
+클래스명
+weather_current forecast01
+weather_hourly forecast02
+weather_daily forecast03
+weather_detailed 04
+*/
 class WeatherFragment : Fragment() {
     private lateinit var weatherInfoTextView: TextView
 
