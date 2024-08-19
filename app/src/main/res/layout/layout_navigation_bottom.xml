@@ -69,7 +69,7 @@
 
                 <!--구모양 설정-->
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/clNav01"
+                    android:id="@+id/clNavOval"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:background="@drawable/shape_oval_01_effect"

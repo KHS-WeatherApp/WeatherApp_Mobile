@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -35,20 +36,30 @@ class WeatherFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.weather_fragment, container, false)
 
-        view.findViewById<ConstraintLayout>(R.id.cl_nav01).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.clNav01).setOnClickListener {
                 Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                 it.findNavController().navigate(R.id.action_weatherFragment_self2)
         }
 
-        view.findViewById<ConstraintLayout>(R.id.cl02_01).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.clNavOval).setOnClickListener {
                 Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
         }
 
-        view.findViewById<ConstraintLayout>(R.id.cl_nav03).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.clNav03).setOnClickListener {
                 Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
                 it.findNavController().navigate(R.id.action_weatherFragment_to_particulateMatterFragment)
         }
+
+//        val includedLayout = view.findViewById<ConstraintLayout>(R.id.weather_hourly_forecast_fragment)
+//        val switchOrientation = includedLayout?.findViewById<Switch>(R.id.switchOrientation)
+//        switchOrientation?.setOnCheckedChangeListener { _, isChecked ->
+//            if (isChecked) {
+//                Toast.makeText(context, "세로 모드 적용", Toast.LENGTH_SHORT).show()
+//            } else {
+//                Toast.makeText(context, "가로 모드 적용", Toast.LENGTH_SHORT).show()
+//            }
+//        }
         return view
 
     }

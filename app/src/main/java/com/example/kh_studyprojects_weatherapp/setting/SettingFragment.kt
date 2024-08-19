@@ -25,19 +25,19 @@ class SettingFragment : Fragment() {
         val view = inflater.inflate(R.layout.setting_fragment, container, false)
 
         //cl01 클릭 시 날씨 화면 전환
-        view.findViewById<ConstraintLayout>(R.id.cl_nav01).setOnClickListener{
+        view.findViewById<ConstraintLayout>(R.id.clNav01).setOnClickListener{
             it.findNavController().navigate(R.id.action_settingFragment_to_weatherFragment)
             Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
         //tv_setting 클릭 시 설정 화면 전환
-        view.findViewById<ConstraintLayout>(R.id.cl02_01).setOnClickListener{
+        view.findViewById<ConstraintLayout>(R.id.clNavOval).setOnClickListener{
             it.findNavController().navigate(R.id.action_settingFragment_self2)
             Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
         //cl03 클릭 시 미세먼지 화면 전환
-        view.findViewById<ConstraintLayout>(R.id.cl_nav03).setOnClickListener{
+        view.findViewById<ConstraintLayout>(R.id.clNav03).setOnClickListener{
             it.findNavController().navigate(R.id.action_settingFragment_to_particulateMatterFragment)
             Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
