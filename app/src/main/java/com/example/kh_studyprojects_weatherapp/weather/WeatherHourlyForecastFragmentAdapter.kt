@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemHorizontalBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 
-class WeatherHourlyForecastFragmentAdapter(val context: Context,var isVertical: Boolean = false) :
+class WeatherHourlyForecastFragmentAdapter(val context: Context) :
     RecyclerView.Adapter<WeatherHourlyForecastFragmentAdapter.ViewHolder>(){
 
 //    private var items: ArrayList<WeatherHourlyForecastFragmentDto>? = null
@@ -28,23 +28,27 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context,var isVertical: 
     )
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         Log.d("RecyclerView", "Creating view holder")
-        val inflater = LayoutInflater.from(context)
-        val binding = if (isVertical) {
-            WeatherHourlyForecastItemVerticalBinding.inflate(inflater, parent, false)
-        } else {
-            WeatherHourlyForecastItemHorizontalBinding.inflate(inflater, parent, false)
-        }
+        val binding = WeatherHourlyForecastItemVerticalBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.d("RecyclerView", "Binding view holder for position $position")
-        holder.bindItems(items[position], position)
+        items?.let {
+            val item = it[position]
+            holder.apply {
+                bindItems(item, position)
+                itemView.tag = item
+            }
+        }
     }
 
     override fun getItemCount(): Int {
         Log.d("RecyclerView", "Item count: ${items.size}")
-        return items.size
+        items?.let {
+            return it.size
+        }
+        return 0
     }
 
 
@@ -54,38 +58,22 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context,var isVertical: 
 
 
     class ViewHolder(
-        private val binding: Any // 두 종류의 바인딩을 처리하기 위한 일반적인 타입
-    ) : RecyclerView.ViewHolder((binding as? WeatherHourlyForecastItemHorizontalBinding)?.root ?: (binding as WeatherHourlyForecastItemVerticalBinding).root) {
+        view:WeatherHourlyForecastItemVerticalBinding,
+    ) : RecyclerView.ViewHolder(view.root) {
+        var tvPmPa : TextView = view.tvPmPa
+        var tvHour : TextView = view.tvHour
+        var probability : TextView = view.probability
+        var precipitation : TextView = view.precipitation
+        var temperature  : TextView = view.temperature
+
+        var parent:View = view.root
 
         fun bindItems(item: WeatherHourlyForecastFragmentDto, pos: Int) {
-            when (binding) {
-                is WeatherHourlyForecastItemHorizontalBinding -> {
-                    bindHorizontal(binding, item)
-                }
-                is WeatherHourlyForecastItemVerticalBinding -> {
-                    bindVertical(binding, item)
-                }
-            }
-        }
-
-        private fun bindHorizontal(binding: WeatherHourlyForecastItemHorizontalBinding, item: WeatherHourlyForecastFragmentDto) {
-            binding.apply {
-                tvPmPa.text = item.tvPmPa
-                tvHour.text = item.tvHour
-                probability.text = item.probability
-                precipitation.text = item.precipitation
-                temperature.text = item.temperature
-            }
-        }
-
-        private fun bindVertical(binding: WeatherHourlyForecastItemVerticalBinding, item: WeatherHourlyForecastFragmentDto) {
-            binding.apply {
-                tvPmPa.text = item.tvPmPa               // AM,PM
-                tvHour.text = item.tvHour               // 시간
-                probability.text = item.probability     // 강수확률
-                precipitation.text = item.precipitation // 강수량
-                temperature.text = item.temperature     // 온도
-            }
+            tvPmPa.text = item.tvPmPa
+            tvHour.text = item.tvHour
+            probability.text = item.probability
+            precipitation.text = item.precipitation
+            temperature.text = item.temperature
         }
     }
 }
