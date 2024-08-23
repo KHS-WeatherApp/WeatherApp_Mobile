@@ -17,20 +17,20 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
     // 초기 데이터를 가진 아이템 리스트를 MutableList로 선언
     var items: MutableList<WeatherHourlyForecastFragmentDto> = mutableListOf(
         // 초기 데이터 리스트
-        WeatherHourlyForecastFragmentDto("AM", "1시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "2시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "3시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "4시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "5시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("AM", "7시", "75%", "1.1mm", "75")
+        WeatherHourlyForecastFragmentDto("오전", "1시", "", "", "30°"),
+        WeatherHourlyForecastFragmentDto("", "2시", "", "", "30°"),
+        WeatherHourlyForecastFragmentDto("", "3시", "", "", "31°"),
+        WeatherHourlyForecastFragmentDto("", "4시", "", "", "29°"),
+        WeatherHourlyForecastFragmentDto("", "5시", "", "", "26°"),
+        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "28°"),
+        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "28°"),
+        WeatherHourlyForecastFragmentDto("오후", "6시", "75%", "1.1mm", "26°"),
+        WeatherHourlyForecastFragmentDto("", "6시", "", "", "75"),
+        WeatherHourlyForecastFragmentDto("", "6시", "", "", "75"),
+        WeatherHourlyForecastFragmentDto("", "6시", "", "", "75"),
+        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "75"),
+        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "75"),
+        WeatherHourlyForecastFragmentDto("오후", "7시", "75%", "1.1mm", "75")
     )
 
     // 뷰 타입 상수를 companion object로 선언

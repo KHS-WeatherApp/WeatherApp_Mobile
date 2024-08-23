@@ -19,8 +19,8 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:layout_width="@dimen/dp_30"
-            android:layout_height="@dimen/dp_30"
+            android:layout_width="@dimen/dp_20"
+            android:layout_height="@dimen/dp_20"
             android:background="@drawable/regional_settings_btn"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,6 +33,7 @@
         android:id="@+id/cl_place_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_15"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cl_regional_settings_btn">
@@ -44,16 +45,16 @@
             android:text="서울"
             android:textStyle="bold"
             android:textColor ="@color/white"
-            android:textSize="@dimen/dp_40"
+            android:textSize="@dimen/dp_35"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_15"
+        android:layout_marginLeft="@dimen/dp_10"
         android:layout_marginRight="@dimen/dp_10"
-        android:layout_marginTop="@dimen/dp_10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cl_place_name">
@@ -69,7 +70,7 @@
             <!--날씨 이미지 , 온도 표기-->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl03"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -78,7 +79,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent">
@@ -122,7 +123,7 @@
             <!--날씨 상태 -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl04"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -141,7 +142,7 @@
             <!--전일 온도비교 -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl05"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -161,7 +162,7 @@
             <!--전일 온도비교 -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl06"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -170,7 +171,7 @@
                 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/cl07"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/cl08"
@@ -193,7 +194,7 @@
                         android:id="@+id/tv02"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="29"
+                        android:text="29°"
                         android:textColor ="@color/white"
                         android:textSize="@dimen/dp_15"
                         app:layout_constraintStart_toEndOf="@id/tv01"
@@ -204,7 +205,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/cl08"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="@dimen/dp_10"
                     app:layout_constraintStart_toEndOf="@id/cl07"
@@ -227,7 +228,7 @@
                         android:id="@+id/tv04"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="32"
+                        android:text="32°"
                         android:textColor ="@color/white"
                         android:textSize="@dimen/dp_15"
                         app:layout_constraintStart_toEndOf="@id/tv03"
