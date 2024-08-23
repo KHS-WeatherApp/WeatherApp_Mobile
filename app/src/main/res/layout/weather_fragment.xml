@@ -35,12 +35,12 @@
                 />
 
             <!--날씨 시간별 예보-->
-            <fragment
+            <FrameLayout
                 android:id="@+id/weather_hourly_forecast_fragment"
-                tools:layout="@layout/weather_hourly_forecast_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_10"
+                tools:layout="@layout/weather_hourly_forecast_fragment"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/weather_current_forecast_fragment"

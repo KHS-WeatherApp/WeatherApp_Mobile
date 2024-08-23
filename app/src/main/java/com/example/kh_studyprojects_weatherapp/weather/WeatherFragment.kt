@@ -53,15 +53,14 @@ class WeatherFragment : Fragment() {
                 it.findNavController().navigate(R.id.action_weatherFragment_to_particulateMatterFragment)
         }
 
-//        val includedLayout = view.findViewById<ConstraintLayout>(R.id.weather_hourly_forecast_fragment)
-//        val switchOrientation = includedLayout?.findViewById<Switch>(R.id.switchOrientation)
-//        switchOrientation?.setOnCheckedChangeListener { _, isChecked ->
-//            if (isChecked) {
-//                Toast.makeText(context, "세로 모드 적용", Toast.LENGTH_SHORT).show()
-//            } else {
-//                Toast.makeText(context, "가로 모드 적용", Toast.LENGTH_SHORT).show()
-//            }
-//        }
+        // WeatherHourlyForecastFragment 동적 추가
+        if (savedInstanceState == null) {
+            val fragment = WeatherHourlyForecastFragment()
+            childFragmentManager.beginTransaction()
+                .replace(R.id.weather_hourly_forecast_fragment, fragment)
+                .commit()
+        }
+
         return view
 
     }
