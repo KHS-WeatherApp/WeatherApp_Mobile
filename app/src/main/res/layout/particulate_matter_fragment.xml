@@ -20,15 +20,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/clHourly02"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_300"
-        android:layout_marginTop="@dimen/dp_5"
-        tools:listitem="@layout/weather_hourly_forecast_item_vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <include
         android:id="@+id/included_navigation_bottom"

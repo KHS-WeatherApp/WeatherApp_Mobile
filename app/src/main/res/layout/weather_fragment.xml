@@ -35,9 +35,9 @@
                 />
 
             <!--날씨 시간별 예보-->
-            <include
+            <fragment
                 android:id="@+id/weather_hourly_forecast_fragment"
-                layout="@layout/weather_hourly_forecast_fragment"
+                tools:layout="@layout/weather_hourly_forecast_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_10"

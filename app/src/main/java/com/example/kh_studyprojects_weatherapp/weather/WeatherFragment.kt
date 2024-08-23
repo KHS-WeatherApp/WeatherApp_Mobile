@@ -22,6 +22,8 @@ weather_hourly forecast02
 weather_daily forecast03
 weather_detailed 04
 */
+
+/*날씨 화면 최상단 네비게이션 연결된 메인 */
 class WeatherFragment : Fragment() {
     private lateinit var weatherInfoTextView: TextView
 

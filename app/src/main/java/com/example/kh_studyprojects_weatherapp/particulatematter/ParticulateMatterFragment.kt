@@ -20,7 +20,6 @@ class ParticulateMatterFragment : Fragment() {
 
     private var _binding: ParticulateMatterFragmentBinding? = null
     private val binding get() = _binding!!
-    private lateinit var adapter: WeatherHourlyForecastFragmentAdapter2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,10 +32,6 @@ class ParticulateMatterFragment : Fragment() {
     ): View? {
         _binding = ParticulateMatterFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        adapter = WeatherHourlyForecastFragmentAdapter2(requireContext())
-        binding.clHourly02.adapter = adapter
-        // 여기에 LinearLayoutManager를 설정합니다.
-        binding.clHourly02.layoutManager = LinearLayoutManager(context)
 
 
         //cl01 클릭 시 날씨 화면 전환

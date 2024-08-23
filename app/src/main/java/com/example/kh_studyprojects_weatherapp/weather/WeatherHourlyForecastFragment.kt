@@ -31,26 +31,26 @@ class WeatherHourlyForecastFragment : Fragment() {
 
 
         // 스위치 리스너 설정
-//        binding.switchOrientation.setOnCheckedChangeListener { _, isChecked ->
-//            Log.d("SwitchTest", "Switch is now: ${if (isChecked) "Checked" else "Unchecked"}")
-////            Toast.makeText(
-////                requireContext(),
-////                if (isChecked) "세로 모드 적용1" else "가로 모드 적용2",
-////                Toast.LENGTH_SHORT
-////            ).show()
-////            adapter.isVertical = isChecked
-//            adapter.notifyDataSetChanged()
-//
-//            // 토스트 메시지 띄우기
-//            if (isChecked) {
-//                Toast.makeText(context, "세로 모드 적용01", Toast.LENGTH_SHORT).show()
-//                binding.clHourly02.layoutManager = LinearLayoutManager(context) // 세로 방향
-//            } else {
-//                Toast.makeText(context, "가로 모드 적용01", Toast.LENGTH_SHORT).show()
-//                binding.clHourly02.layoutManager =
-//                    LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) // 가로 방향
-//            }
-//        }
+        binding.switchOrientation.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("SwitchTest", "Switch is now: ${if (isChecked) "Checked" else "Unchecked"}")
+            Toast.makeText(
+                requireContext(),
+                if (isChecked) "세로 모드 적용 완료" else "가로 모드 적용 완료",
+                Toast.LENGTH_SHORT
+            ).show()
+//            adapter.isVertical = isChecked
+            adapter.notifyDataSetChanged()
+
+            // 토스트 메시지 띄우기
+            if (isChecked) {
+                Toast.makeText(context, "세로 모드 적용01", Toast.LENGTH_SHORT).show()
+                binding.clHourly02.layoutManager = LinearLayoutManager(context) // 세로 방향
+            } else {
+                Toast.makeText(context, "가로 모드 적용01", Toast.LENGTH_SHORT).show()
+                binding.clHourly02.layoutManager =
+                    LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) // 가로 방향
+            }
+        }
         return root
     }
 }

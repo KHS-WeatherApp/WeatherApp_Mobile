@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.kh_studyprojects_weatherapp.R
 
-
+/*날씨 화면 현재 날씨 및 온도, 추천 옷*/
 class WeatherCurrentForecast : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
