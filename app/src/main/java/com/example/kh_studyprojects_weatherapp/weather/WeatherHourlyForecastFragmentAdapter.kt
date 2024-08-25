@@ -4,7 +4,9 @@ import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemHorizontalBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 
@@ -17,20 +19,30 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
     // 초기 데이터를 가진 아이템 리스트를 MutableList로 선언
     var items: MutableList<WeatherHourlyForecastFragmentDto> = mutableListOf(
         // 초기 데이터 리스트
-        WeatherHourlyForecastFragmentDto("오전", "1시", "", "", "30°"),
-        WeatherHourlyForecastFragmentDto("", "2시", "", "", "30°"),
-        WeatherHourlyForecastFragmentDto("", "3시", "", "", "31°"),
-        WeatherHourlyForecastFragmentDto("", "4시", "", "", "29°"),
-        WeatherHourlyForecastFragmentDto("", "5시", "", "", "26°"),
-        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "28°"),
-        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "28°"),
-        WeatherHourlyForecastFragmentDto("오후", "6시", "75%", "1.1mm", "26°"),
-        WeatherHourlyForecastFragmentDto("", "6시", "", "", "75"),
-        WeatherHourlyForecastFragmentDto("", "6시", "", "", "75"),
-        WeatherHourlyForecastFragmentDto("", "6시", "", "", "75"),
-        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "75"),
-        WeatherHourlyForecastFragmentDto("오후", "7시", "75%", "1.1mm", "75")
+        WeatherHourlyForecastFragmentDto("오전", "1시", "", "", "10"),
+        WeatherHourlyForecastFragmentDto("", "2시", "", "", "14"),
+        WeatherHourlyForecastFragmentDto("", "3시", "", "", "15"),
+        WeatherHourlyForecastFragmentDto("", "4시", "", "", "16"),
+        WeatherHourlyForecastFragmentDto("", "5시", "", "", "19"),
+        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "20"),
+        WeatherHourlyForecastFragmentDto("", "7시", "75%", "1.1mm", "19"),
+        WeatherHourlyForecastFragmentDto("", "8시", "75%", "1.1mm", "23"),
+        WeatherHourlyForecastFragmentDto("", "9시", "", "", "25"),
+        WeatherHourlyForecastFragmentDto("", "10시", "", "", "27"),
+        WeatherHourlyForecastFragmentDto("", "11시", "", "", "30"),
+        WeatherHourlyForecastFragmentDto("오후", "12시", "75%", "1.1mm", "32"),
+        WeatherHourlyForecastFragmentDto("", "1시", "75%", "1.1mm", "33"),
+        WeatherHourlyForecastFragmentDto("", "2시", "75%", "1.1mm", "33"),
+        WeatherHourlyForecastFragmentDto("", "3시", "75%", "1.1mm", "30"),
+        WeatherHourlyForecastFragmentDto("", "4시", "75%", "1.1mm", "27"),
+        WeatherHourlyForecastFragmentDto("", "5시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastFragmentDto("", "7시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastFragmentDto("", "8시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastFragmentDto("", "9시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastFragmentDto("", "10시", "75%", "1.1mm", "24"),
+        WeatherHourlyForecastFragmentDto("", "11시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastFragmentDto("오전", "12시", "75%", "1.1mm", "25")
     )
 
     // 뷰 타입 상수를 companion object로 선언
@@ -60,7 +72,7 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
                 val binding = WeatherHourlyForecastItemHorizontalBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
-                HorizontalViewHolder(binding)
+                HorizontalViewHolder(binding, parent.context) // context 전달
             }
         }
     }
@@ -83,7 +95,8 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
 
     // 가로 모드 ViewHolder 클래스
     class HorizontalViewHolder(
-        private val binding: WeatherHourlyForecastItemHorizontalBinding
+        private val binding: WeatherHourlyForecastItemHorizontalBinding,
+        private val context: Context // context를 매개변수로 받음
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // bindItems() 메서드에서 가로 모드 뷰에 데이터를 바인딩
@@ -93,7 +106,39 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
                 tvHour.text = item.tvHour               // 시간 텍스트 설정
                 probability.text = item.probability     // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation // 강수량 텍스트 설정
-                temperature.text = item.temperature     // 온도 텍스트 설정
+                temperature.text = "${item.temperature}°"     // 온도 텍스트 설정
+
+                // item.temperature를 Int로 변환하여 마진 설정
+                val temperatureInt = item.temperature!!.toInt()
+                val layoutParams = clHourlyItem06.layoutParams as ConstraintLayout.LayoutParams
+
+                // 온도 마진 속성
+                layoutParams.topMargin = when {
+                    temperatureInt >= 30 -> context.resources.getDimensionPixelSize(R.dimen.dp_10)
+                    temperatureInt >= 28 -> context.resources.getDimensionPixelSize(R.dimen.dp_20)
+                    temperatureInt >= 26 -> context.resources.getDimensionPixelSize(R.dimen.dp_30)
+                    temperatureInt >= 24 -> context.resources.getDimensionPixelSize(R.dimen.dp_40)
+                    temperatureInt >= 22 -> context.resources.getDimensionPixelSize(R.dimen.dp_50)
+                    temperatureInt >= 20 -> context.resources.getDimensionPixelSize(R.dimen.dp_60)
+                    temperatureInt >= 18 -> context.resources.getDimensionPixelSize(R.dimen.dp_70)
+                    temperatureInt >= 16 -> context.resources.getDimensionPixelSize(R.dimen.dp_80)
+                    temperatureInt >= 14 -> context.resources.getDimensionPixelSize(R.dimen.dp_90)
+                    temperatureInt >= 12 -> context.resources.getDimensionPixelSize(R.dimen.dp_100)
+                    temperatureInt >= 10 -> context.resources.getDimensionPixelSize(R.dimen.dp_110)
+                    else -> 0
+                }
+                clHourlyItem06.layoutParams = layoutParams
+
+                // 온도 배경 설정
+                temperature.setBackgroundResource(
+                    when {
+                        temperatureInt >= 30 -> R.drawable.shape_radius_01_temperature_30
+                        temperatureInt >= 20 -> R.drawable.shape_radius_01_temperature_20
+                        temperatureInt >= 15 -> R.drawable.shape_radius_01_temperature_15
+                        temperatureInt >= 10 -> R.drawable.shape_radius_01_temperature_10
+                        else -> 0 // 기본 배경이 필요하다면 여기에 설정
+                    }
+                )
             }
         }
     }
