@@ -65,7 +65,7 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
                 val binding = WeatherHourlyForecastItemVerticalBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
-                VerticalViewHolder(binding)
+                VerticalViewHolder(binding, parent.context)
             }
             else -> {
                 // 가로 모드 레이아웃 바인딩 생성 및 ViewHolder 반환
@@ -102,11 +102,11 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
         // bindItems() 메서드에서 가로 모드 뷰에 데이터를 바인딩
         fun bindItems(item: WeatherHourlyForecastFragmentDto) {
             binding.apply {
-                tvPmPa.text = item.tvPmPa               // AM/PM 텍스트 설정
-                tvHour.text = item.tvHour               // 시간 텍스트 설정
-                probability.text = item.probability     // 강수 확률 텍스트 설정
-                precipitation.text = item.precipitation // 강수량 텍스트 설정
-                temperature.text = "${item.temperature}°"     // 온도 텍스트 설정
+                tvPmPa.text = item.tvPmPa                   // AM/PM 텍스트 설정
+                tvHour.text = item.tvHour                   // 시간 텍스트 설정
+                probability.text = item.probability         // 강수 확률 텍스트 설정
+                precipitation.text = item.precipitation     // 강수량 텍스트 설정
+                temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
 
                 // item.temperature를 Int로 변환하여 마진 설정
                 val temperatureInt = item.temperature!!.toInt()
@@ -145,7 +145,8 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
 
     // 세로 모드 ViewHolder 클래스
     class VerticalViewHolder(
-        private val binding: WeatherHourlyForecastItemVerticalBinding
+        private val binding: WeatherHourlyForecastItemVerticalBinding,
+        private val context: Context // context를 매개변수로 받음
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // bindItems() 메서드에서 세로 모드 뷰에 데이터를 바인딩
@@ -156,6 +157,38 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
                 probability.text = item.probability     // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation // 강수량 텍스트 설정
                 temperature.text = item.temperature     // 온도 텍스트 설정
+
+                // item.temperature를 Int로 변환하여 마진 설정
+                val temperatureInt = item.temperature!!.toInt()
+                val layoutParams = vi01.layoutParams
+
+                // 온도 넓이 속성
+                layoutParams.width = when {
+                    temperatureInt >= 30 -> context.resources.getDimensionPixelSize(R.dimen.dp_160)
+                    temperatureInt >= 28 -> context.resources.getDimensionPixelSize(R.dimen.dp_150)
+                    temperatureInt >= 26 -> context.resources.getDimensionPixelSize(R.dimen.dp_140)
+                    temperatureInt >= 24 -> context.resources.getDimensionPixelSize(R.dimen.dp_130)
+                    temperatureInt >= 22 -> context.resources.getDimensionPixelSize(R.dimen.dp_120)
+                    temperatureInt >= 20 -> context.resources.getDimensionPixelSize(R.dimen.dp_110)
+                    temperatureInt >= 18 -> context.resources.getDimensionPixelSize(R.dimen.dp_100)
+                    temperatureInt >= 16 -> context.resources.getDimensionPixelSize(R.dimen.dp_90)
+                    temperatureInt >= 14 -> context.resources.getDimensionPixelSize(R.dimen.dp_80)
+                    temperatureInt >= 12 -> context.resources.getDimensionPixelSize(R.dimen.dp_70)
+                    temperatureInt >= 10 -> context.resources.getDimensionPixelSize(R.dimen.dp_60)
+                    else -> 0
+                }
+                vi01.layoutParams = layoutParams
+
+                // 온도 배경 설정
+                temperature.setBackgroundResource(
+                    when {
+                        temperatureInt >= 30 -> R.drawable.shape_radius_01_temperature_30
+                        temperatureInt >= 20 -> R.drawable.shape_radius_01_temperature_20
+                        temperatureInt >= 15 -> R.drawable.shape_radius_01_temperature_15
+                        temperatureInt >= 10 -> R.drawable.shape_radius_01_temperature_10
+                        else -> 0
+                    }
+                )
             }
         }
     }

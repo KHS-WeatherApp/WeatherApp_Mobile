@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!-- 파이썬으로 만듬
+    for i in range(0, 2001, 1):
+        value = i * 0.5
+        value2 = "{:.1f}".format(value).rstrip("0").rstrip(".")
+        print('<dimen name="sp_{}">{}sp</dimen>'.format(value2, value2))
+    -->
     <!--sp-->
     <dimen name="sp_0">0sp</dimen>
     <dimen name="sp_0.5">0.5sp</dimen>
