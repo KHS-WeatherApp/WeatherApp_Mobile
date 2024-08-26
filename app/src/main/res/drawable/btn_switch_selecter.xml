@@ -12,8 +12,8 @@
     <item android:state_checked="false">
     <shape android:shape="rectangle">
         <corners android:radius="15dp" />
-        <size android:width="37dp" android:height="16dp" />
         <solid android:color="#e0e0e0" />
+        <size android:width="37dp" android:height="16dp" />
     </shape>
     </item>
 
