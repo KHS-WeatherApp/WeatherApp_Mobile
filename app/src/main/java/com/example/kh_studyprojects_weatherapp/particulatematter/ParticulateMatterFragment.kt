@@ -5,16 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.ParticulateMatterFragmentBinding
-import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastFragmentBinding
-import com.example.kh_studyprojects_weatherapp.weather.WeatherHourlyForecastFragmentAdapter
 
 class ParticulateMatterFragment : Fragment() {
 

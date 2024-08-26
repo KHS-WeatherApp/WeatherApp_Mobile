@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastFragmentBinding
 
@@ -14,7 +13,7 @@ class WeatherHourlyForecastFragment : Fragment() {
 
     private var _binding: WeatherHourlyForecastFragmentBinding? = null // 뷰 바인딩 객체를 위한 변수를 선언 (null 허용)
     private val binding get() = _binding!! // 안전하게 접근할 수 있도록 get()을 통해 _binding의 값을 사용
-    private lateinit var adapter: WeatherHourlyForecastFragmentAdapter // 리사이클러뷰의 어댑터를 늦은 초기화(Lateinit) 방식으로 선언
+    private lateinit var adapter: WeatherHourlyForecastAdapter // 리사이클러뷰의 어댑터를 늦은 초기화(Lateinit) 방식으로 선언
 
     // Fragment가 생성될 때 호출되는 메서드로, UI를 초기화하고 구성하는 작업을 수행
     override fun onCreateView(
@@ -27,7 +26,7 @@ class WeatherHourlyForecastFragment : Fragment() {
         val root: View = binding.root  // 바인딩된 뷰의 루트(View) 객체
 
         // 어댑터 초기화 - 가로 모드로 초기화 (isVertical=false)
-        adapter = WeatherHourlyForecastFragmentAdapter(requireContext(), isVertical = false)
+        adapter = WeatherHourlyForecastAdapter(requireContext(), isVertical = false)
         // RecyclerView의 레이아웃 매니저를 가로 모드로 설정
         binding.clHourly02.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         // RecyclerView에 어댑터를 연결

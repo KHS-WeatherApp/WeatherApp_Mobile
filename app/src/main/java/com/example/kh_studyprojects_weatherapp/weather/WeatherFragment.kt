@@ -53,13 +53,21 @@ class WeatherFragment : Fragment() {
                 it.findNavController().navigate(R.id.action_weatherFragment_to_particulateMatterFragment)
         }
 
-        // WeatherHourlyForecastFragment 동적 추가
+        //  동적 추가
         if (savedInstanceState == null) {
-            val fragment = WeatherHourlyForecastFragment()
+            // Hourly Forecast Fragment 추가
+            val hourlyFragment = WeatherHourlyForecastFragment()
             childFragmentManager.beginTransaction()
-                .replace(R.id.weather_hourly_forecast_fragment, fragment)
+                .replace(R.id.weather_hourly_forecast_fragment, hourlyFragment)
+                .commit()
+
+            // Daily Forecast Fragment 추가
+            val dailyFragment = WeatherDailyForecastFragment()
+            childFragmentManager.beginTransaction()
+//                .replace(R.id.weather_daily_forecast_fragment, dailyFragment)
                 .commit()
         }
+
 
         return view
 

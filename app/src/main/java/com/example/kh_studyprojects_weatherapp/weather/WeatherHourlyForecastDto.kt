@@ -1,6 +1,6 @@
 package com.example.kh_studyprojects_weatherapp.weather
 
-class WeatherHourlyForecastFragmentDto (
+class WeatherHourlyForecastDto (
     val tvPmPa: String?,
     val tvHour: String?,
     val probability: String?,

@@ -1,7 +1,6 @@
 package com.example.kh_studyprojects_weatherapp.weather
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -11,38 +10,38 @@ import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecast
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 
 // RecyclerView 어댑터 클래스
-class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical: Boolean = false) :
+class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean = false) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 //    private var items: ArrayList<WeatherHourlyForecastFragmentDto>? = null
 
     // 초기 데이터를 가진 아이템 리스트를 MutableList로 선언
-    var items: MutableList<WeatherHourlyForecastFragmentDto> = mutableListOf(
+    var items: MutableList<WeatherHourlyForecastDto> = mutableListOf(
         // 초기 데이터 리스트
-        WeatherHourlyForecastFragmentDto("오전", "1시", "", "", "10"),
-        WeatherHourlyForecastFragmentDto("", "2시", "", "", "14"),
-        WeatherHourlyForecastFragmentDto("", "3시", "", "", "15"),
-        WeatherHourlyForecastFragmentDto("", "4시", "", "", "16"),
-        WeatherHourlyForecastFragmentDto("", "5시", "", "", "19"),
-        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "20"),
-        WeatherHourlyForecastFragmentDto("", "7시", "75%", "1.1mm", "19"),
-        WeatherHourlyForecastFragmentDto("", "8시", "75%", "1.1mm", "23"),
-        WeatherHourlyForecastFragmentDto("", "9시", "", "", "25"),
-        WeatherHourlyForecastFragmentDto("", "10시", "", "", "27"),
-        WeatherHourlyForecastFragmentDto("", "11시", "", "", "30"),
-        WeatherHourlyForecastFragmentDto("오후", "12시", "75%", "1.1mm", "32"),
-        WeatherHourlyForecastFragmentDto("", "1시", "75%", "1.1mm", "33"),
-        WeatherHourlyForecastFragmentDto("", "2시", "75%", "1.1mm", "33"),
-        WeatherHourlyForecastFragmentDto("", "3시", "75%", "1.1mm", "30"),
-        WeatherHourlyForecastFragmentDto("", "4시", "75%", "1.1mm", "27"),
-        WeatherHourlyForecastFragmentDto("", "5시", "75%", "1.1mm", "25"),
-        WeatherHourlyForecastFragmentDto("", "6시", "75%", "1.1mm", "25"),
-        WeatherHourlyForecastFragmentDto("", "7시", "75%", "1.1mm", "25"),
-        WeatherHourlyForecastFragmentDto("", "8시", "75%", "1.1mm", "25"),
-        WeatherHourlyForecastFragmentDto("", "9시", "75%", "1.1mm", "25"),
-        WeatherHourlyForecastFragmentDto("", "10시", "75%", "1.1mm", "24"),
-        WeatherHourlyForecastFragmentDto("", "11시", "75%", "1.1mm", "25"),
-        WeatherHourlyForecastFragmentDto("오전", "12시", "75%", "1.1mm", "25")
+        WeatherHourlyForecastDto("오전", "1시", "", "", "10"),
+        WeatherHourlyForecastDto("", "2시", "", "", "14"),
+        WeatherHourlyForecastDto("", "3시", "", "", "15"),
+        WeatherHourlyForecastDto("", "4시", "", "", "16"),
+        WeatherHourlyForecastDto("", "5시", "", "", "19"),
+        WeatherHourlyForecastDto("", "6시", "75%", "1.1mm", "20"),
+        WeatherHourlyForecastDto("", "7시", "75%", "1.1mm", "19"),
+        WeatherHourlyForecastDto("", "8시", "75%", "1.1mm", "23"),
+        WeatherHourlyForecastDto("", "9시", "", "", "25"),
+        WeatherHourlyForecastDto("", "10시", "", "", "27"),
+        WeatherHourlyForecastDto("", "11시", "", "", "30"),
+        WeatherHourlyForecastDto("오후", "12시", "75%", "1.1mm", "32"),
+        WeatherHourlyForecastDto("", "1시", "75%", "1.1mm", "33"),
+        WeatherHourlyForecastDto("", "2시", "75%", "1.1mm", "33"),
+        WeatherHourlyForecastDto("", "3시", "75%", "1.1mm", "30"),
+        WeatherHourlyForecastDto("", "4시", "75%", "1.1mm", "27"),
+        WeatherHourlyForecastDto("", "5시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastDto("", "6시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastDto("", "7시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastDto("", "8시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastDto("", "9시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastDto("", "10시", "75%", "1.1mm", "24"),
+        WeatherHourlyForecastDto("", "11시", "75%", "1.1mm", "25"),
+        WeatherHourlyForecastDto("오전", "12시", "75%", "1.1mm", "25")
     )
 
     // 뷰 타입 상수를 companion object로 선언
@@ -100,7 +99,7 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // bindItems() 메서드에서 가로 모드 뷰에 데이터를 바인딩
-        fun bindItems(item: WeatherHourlyForecastFragmentDto) {
+        fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvPmPa.text = item.tvPmPa                   // AM/PM 텍스트 설정
                 tvHour.text = item.tvHour                   // 시간 텍스트 설정
@@ -150,7 +149,7 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // bindItems() 메서드에서 세로 모드 뷰에 데이터를 바인딩
-        fun bindItems(item: WeatherHourlyForecastFragmentDto) {
+        fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvPmPa.text = item.tvPmPa               // AM/PM 텍스트 설정
                 tvHour.text = item.tvHour               // 시간 텍스트 설정
