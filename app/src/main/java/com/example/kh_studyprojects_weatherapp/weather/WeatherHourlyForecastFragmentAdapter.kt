@@ -156,7 +156,7 @@ class WeatherHourlyForecastFragmentAdapter(val context: Context, var isVertical:
                 tvHour.text = item.tvHour               // 시간 텍스트 설정
                 probability.text = item.probability     // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation // 강수량 텍스트 설정
-                temperature.text = item.temperature     // 온도 텍스트 설정
+                temperature.text = "${item.temperature}°"     // 온도 텍스트 설정
 
                 // item.temperature를 Int로 변환하여 마진 설정
                 val temperatureInt = item.temperature!!.toInt()

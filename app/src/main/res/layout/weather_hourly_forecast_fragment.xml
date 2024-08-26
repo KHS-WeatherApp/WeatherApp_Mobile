@@ -83,6 +83,24 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
+<!--                -->
+<!--                <Switch-->
+<!--                    android:id="@+id/switchOrientation"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginRight="@dimen/dp_10"-->
+<!--                    android:checked="false"-->
+<!--                    android:switchMinWidth="56dp"-->
+<!--                    android:text="세로로 보기"-->
+<!--                    android:textSize="@dimen/dp_12"-->
+<!--                    android:textColor="@color/weatherRadiusBackground"-->
+<!--                    android:textOff="OFF"-->
+<!--                    android:textOn="ON"-->
+<!--                    android:track="@drawable/btn_switch_selecter"-->
+<!--                    android:thumb="@drawable/btn_switch_thumb"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"/>-->
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
