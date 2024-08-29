@@ -64,7 +64,7 @@ class WeatherFragment : Fragment() {
             // Daily Forecast Fragment 추가
             val dailyFragment = WeatherDailyForecastFragment()
             childFragmentManager.beginTransaction()
-//                .replace(R.id.weather_daily_forecast_fragment, dailyFragment)
+                .replace(R.id.weather_daily_forecast_fragment, dailyFragment)
                 .commit()
         }
 

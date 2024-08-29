@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherDailyForecastFragmentBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastFragmentBinding
@@ -24,6 +25,9 @@ class WeatherDailyForecastFragment : Fragment() {
         _binding = WeatherDailyForecastFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        adapter = WeatherDailyForecastAdapter(requireContext())
+        binding.clDaily02.layoutManager = LinearLayoutManager(context)
+        binding.clDaily02.adapter = adapter
 
         return root
     }
