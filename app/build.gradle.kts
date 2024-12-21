@@ -48,6 +48,12 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)   // 네비게이션 프래그먼트를 위한 라이브러리를 포함합니다.
     implementation(libs.androidx.navigation.ui.ktx)         // 레이아웃 제약 조건을 위한 라이브러리를 포함합니다.
 
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp.core)
+    implementation(libs.okhttp.logging)
+
     testImplementation(libs.junit)                          // JUnit 테스트 프레임워크를 포함합니다.
     androidTestImplementation(libs.androidx.junit)          // 안드로이드 JUnit 테스트를 위한 라이브러리를 포함합니다.
     androidTestImplementation(libs.androidx.espresso.core)  // UI 테스트를 위한 Espresso 코어 라이브러리를 포함합니다.

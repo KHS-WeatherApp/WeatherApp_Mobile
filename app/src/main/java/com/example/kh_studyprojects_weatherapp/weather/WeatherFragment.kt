@@ -5,71 +5,83 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.example.kh_studyprojects_weatherapp.R
+import com.example.kh_studyprojects_weatherapp.weather.api.WeatherRepository
+import com.example.kh_studyprojects_weatherapp.weather.viewmodel.WeatherState
+import com.example.kh_studyprojects_weatherapp.weather.viewmodel.WeatherViewModel
+import kotlinx.coroutines.launch
 
-/*
-클래스명
-weather_current forecast01
-weather_hourly forecast02
-weather_daily forecast03
-weather_detailed 04
-*/
-
-/*날씨 화면 최상단 네비게이션 연결된 메인 */
+// weather/WeatherFragment.kt
 class WeatherFragment : Fragment() {
+    private val viewModel: WeatherViewModel by viewModels()
     private lateinit var weatherInfoTextView: TextView
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val view = inflater.inflate(R.layout.weather_fragment, container, false)
+        setupNavigation(view)
+        setupChildFragments(savedInstanceState)
+        return view
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 날씨 데이터 관찰
+        viewModel.weatherState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is WeatherState.Loading -> {
+                    // 로딩 처리
+                }
+                is WeatherState.Success -> {
+                    Toast.makeText(context, "날씨 정보를 성공적으로 가져왔습니다.", Toast.LENGTH_SHORT).show()
+                    // UI 업데이트
+                }
+                is WeatherState.Error -> {
+                    Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        // 날씨 데이터 요청
+        viewModel.fetchWeatherData()
+    }
+
+    private fun setupNavigation(view: View) {
         view.findViewById<ConstraintLayout>(R.id.clNav01).setOnClickListener {
-                Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-                it.findNavController().navigate(R.id.action_weatherFragment_self2)
+            Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
+            it.findNavController().navigate(R.id.action_weatherFragment_self2)
         }
 
         view.findViewById<ConstraintLayout>(R.id.clNavOval).setOnClickListener {
-                Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-               it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
+            Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
+            it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
         }
 
         view.findViewById<ConstraintLayout>(R.id.clNav03).setOnClickListener {
-                Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-                it.findNavController().navigate(R.id.action_weatherFragment_to_particulateMatterFragment)
+            Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
+            it.findNavController().navigate(R.id.action_weatherFragment_to_particulateMatterFragment)
         }
+    }
 
-        //  동적 추가
+    private fun setupChildFragments(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
-            // Hourly Forecast Fragment 추가
-            val hourlyFragment = WeatherHourlyForecastFragment()
             childFragmentManager.beginTransaction()
-                .replace(R.id.weather_hourly_forecast_fragment, hourlyFragment)
+                .replace(R.id.weather_hourly_forecast_fragment, WeatherHourlyForecastFragment())
                 .commit()
 
-            // Daily Forecast Fragment 추가
-            val dailyFragment = WeatherDailyForecastFragment()
             childFragmentManager.beginTransaction()
-                .replace(R.id.weather_daily_forecast_fragment, dailyFragment)
+                .replace(R.id.weather_daily_forecast_fragment, WeatherDailyForecastFragment())
                 .commit()
         }
-
-
-        return view
-
     }
 }
