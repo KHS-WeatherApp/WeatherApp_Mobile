@@ -1,0 +1,164 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FirstFragment"
+    android:background="@color/app_background_color">
+
+    <!-- ScrollView 추가 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/navigation_bar"
+        android:fillViewport="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 상단 '일별 예보' 타이틀 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/tran_backgroud_top"
+                android:padding="10dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:text="일별 예보"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp" /> <!-- 추가 여백 -->
+            </LinearLayout>
+            <!-- 하단 흰색 줄 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.7dp"
+                android:background="#33EEF2F9"/>
+            <!-- RecyclerView for weather data -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:overScrollMode="never"
+                android:nestedScrollingEnabled="false"/> <!-- 간격 제거 -->
+
+            <!-- Buttons container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/tran_backgroud_bu"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"> <!-- 버튼 컨테이너 배경 추가 -->
+
+                <Button
+                    android:id="@+id/show_yesterday_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:padding="12dp"
+                    android:text="어제 날씨"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    tools:backgroundTint="@null" />
+
+                <Button
+                    android:id="@+id/show_15_days_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:padding="12dp"
+                    android:text="15일 예보 보기"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    tools:backgroundTint="@null" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Navigation bar -->
+    <LinearLayout
+        android:id="@+id/navigation_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="6"
+        android:paddingHorizontal="0dp">
+
+        <!-- Left icon container -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2.6"
+            android:gravity="center"
+            android:background="@drawable/rounded_top">
+
+            <ImageButton
+                android:id="@+id/icon_left"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_marginBottom="2dp"
+                android:src="@drawable/ic_left_wea"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"/>
+        </LinearLayout>
+
+        <!-- Center circular button -->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.8">
+
+            <!-- White covering background -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/white"/>
+
+            <!-- Center circular button -->
+            <ImageButton
+                android:id="@+id/icon_center_button"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_marginBottom="-20dp"
+                android:background="@drawable/circle_background"
+                android:padding="5dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_center_icon" />
+        </RelativeLayout>
+
+        <!-- Right icon container -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2.6"
+            android:gravity="center"
+            android:background="@drawable/rounded_top">
+
+            <ImageButton
+                android:id="@+id/icon_right"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_marginBottom="2dp"
+                android:src="@drawable/ic_right_face"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

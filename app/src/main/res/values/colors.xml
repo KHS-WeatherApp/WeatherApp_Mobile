@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="background_color">#547F98</color> <!-- 배경색 -->
+    <color name="app_background_color">#7ECEFC</color>
+    <color name="button_color">#5E89AA</color> <!-- 버튼 배경색 -->
+    <color name="white">#FFFFFF</color> <!-- 흰색 -->
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
 </resources>
