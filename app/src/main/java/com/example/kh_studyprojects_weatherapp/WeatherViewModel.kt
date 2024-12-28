@@ -20,6 +20,9 @@ class WeatherViewModel : ViewModel() {
     private var fullWeatherData: List<WeatherData> = emptyList()
     private val repository = WeatherRepository()
 
+    private var lastFetchTime: Long = 0
+    private val FETCH_INTERVAL = 1000 * 60 * 30 // 30분
+
     // 어제 데이터를 토글하는 변수
     private var isYesterdayShown = false
 
@@ -30,30 +33,35 @@ class WeatherViewModel : ViewModel() {
 
     fun fetchWeatherData(params: Map<String, Any>) {
         Log.d(TAG, "fetchWeatherData called with params: $params") // 함수 호출 로그
+        val currentTime = System.currentTimeMillis()
 
-        viewModelScope.launch {
-            try {
-                repository.getWeatherData(
-                    params,
-                    onSuccess = { rawData ->
-                        Log.d(TAG, "API call succeeded with rawData: $rawData") // 성공 로그
-                        fullWeatherData = processWeatherData(rawData)
-                        Log.d(TAG, "Processed weather data: $fullWeatherData") // 데이터 처리 로그
+        if (currentTime - lastFetchTime > FETCH_INTERVAL || weatherData.value.isNullOrEmpty()) {
+            viewModelScope.launch {
+                try {
+                    repository.getWeatherData(
+                        params,
+                        onSuccess = { rawData ->
+                            Log.d(TAG, "API call succeeded with rawData: $rawData") // 성공 로그
+                            fullWeatherData = processWeatherData(rawData)
+                            Log.d(TAG, "Processed weather data: $fullWeatherData")
+                            Log.d(TAG, "받아온 전체 데이터 크기: ${fullWeatherData.size}") // 데이터 처리 로그
 
-                        // 기본적으로 오늘부터 10일치 데이터 보여주기
-                        val subList = fullWeatherData.subList(1, 11)
-                        _weatherData.postValue(subList)
-                        Log.d(TAG, "Weather data posted: $subList") // 데이터 포스트 로그
-                    },
-                    onFailure = { error ->
-                        Log.e(TAG, "API call failed with error: ${error.message}", error) // 실패 로그
-                        // 에러 처리 로직 추가
-                    }
-                )
-            } catch (e: Exception) {
-                Log.e(TAG, "Exception in fetchWeatherData: ${e.message}", e) // 예외 로그
+                            // 기본적으로 오늘부터 10일치 데이터 보여주기
+                            val subList = fullWeatherData.subList(1, 11)
+                            _weatherData.postValue(subList)
+                            lastFetchTime = currentTime
+                            Log.d(TAG, "Weather data posted: $subList") // 데이터 포스트 로그
+                        },
+                        onFailure = { error ->
+                            Log.e(TAG, "API call failed with error: ${error.message}", error) // 실패 로그
+                            // 에러 처리 로직 추가
+                        }
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "Exception in fetchWeatherData: ${e.message}", e) // 예외 로그
+                }
             }
-        }
+        }    
     }
 
     fun showYesterdayWeather() {
@@ -69,18 +77,29 @@ class WeatherViewModel : ViewModel() {
             _weatherData.postValue(currentData.drop(1))
         }
     }
-
+    
     fun toggle15DaysWeather() {
-        val currentData = _weatherData.value ?: emptyList()
         is15DaysShown = !is15DaysShown
-
+    
         if (is15DaysShown) {
-            // 추가 5일 데이터를 보여줌 (오늘부터 10일 이후 데이터)
-            val additionalData = fullWeatherData.subList(11, fullWeatherData.size)
-            _weatherData.postValue(currentData + additionalData)
+            // 안전하게 데이터 크기 확인
+            val maxDays = minOf(16, fullWeatherData.size)
+            // 오늘부터 최대 15일치 데이터 보여주기 (어제 데이터 제외)
+            val fifteenDaysData = fullWeatherData.subList(1, maxDays).map { 
+                it.copy(isVisible = true)  // 모든 아이템을 보이도록 설정
+            }
+            _weatherData.postValue(fifteenDaysData)
+            
+            // 로그 추가
+            Log.d(TAG, "15일 데이터 전체: ${fifteenDaysData.joinToString("\n")}")
+            Log.d(TAG, "15일 데이터 표시: 데이터 크기 = ${fifteenDaysData.size}")
         } else {
-            // 추가 데이터를 제거하고 기본 10일로 돌아가기
-            _weatherData.postValue(fullWeatherData.subList(1, 11))
+            // 기본 10일로 돌아가기
+            val maxDays = minOf(11, fullWeatherData.size)
+            _weatherData.postValue(fullWeatherData.subList(1, maxDays))
+            
+            // 로그 추가
+            Log.d(TAG, "기본 데이터 표시: 데이터 크기 = ${maxDays - 1}")
         }
     }
 
