@@ -23,7 +23,7 @@ class WeatherRepositoryImpl : WeatherRepository {
                     "apparent_temperature_max,apparent_temperature_min,sunrise,sunset," +
                     "uv_index_max,precipitation_sum,precipitation_probability_max," +
                     "wind_speed_10m_max&" +
-                    "timezone=auto&past_days=1&forecast_days=14"
+                    "timezone=auto&past_days=1&forecast_days=15"
             )
 
             val response = weatherApiService.getWeatherInfo(request)
