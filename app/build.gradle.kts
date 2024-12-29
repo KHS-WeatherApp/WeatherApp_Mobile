@@ -27,11 +27,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8 // 소스 코드의 자바 호환성 버전을 지정합니다.
-        targetCompatibility = JavaVersion.VERSION_1_8 // 타겟 자바 호환성 버전을 지정합니다.
+        sourceCompatibility = JavaVersion.VERSION_17 // 소스 코드의 자바 호환성 버전을 지정합니다.
+        targetCompatibility = JavaVersion.VERSION_17 // 타겟 자바 호환성 버전을 지정합니다.
     }
     kotlinOptions {
-        jvmTarget = "1.8" // 코틀린 코드의 JVM 타겟 버전을 지정합니다.
+        jvmTarget = "17" // 코틀린 코드의 JVM 타겟 버전을 지정합니다.
     }
     buildFeatures {
         viewBinding = true // 뷰 바인딩을 활성화합니다. XML 레이아웃과 코드를 더 쉽게 연결할 수 있습니다.
