@@ -40,12 +40,32 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)                  // 안드로이드 KTX 코어 라이브러리를 포함합니다.
-    implementation(libs.androidx.appcompat)                 // 앱 호환성을 위한 AppCompat 라이브러리를 포함합니다.
-    implementation(libs.material)                           // 구글의 Material 디자인 컴포넌트를 포함합니다.
-    implementation(libs.androidx.activity)                  // 안드로이드 액티비티 관련 라이브러리를 포함합니다.
-    implementation(libs.androidx.constraintlayout)          // 레이아웃 제약 조건을 위한 라이브러리를 포함합니다.
-    testImplementation(libs.junit)                          // JUnit 테스트 프레임워크를 포함합니다.
-    androidTestImplementation(libs.androidx.junit)          // 안드로이드 JUnit 테스트를 위한 라이브러리를 포함합니다.
-    androidTestImplementation(libs.androidx.espresso.core)  // UI 테스트를 위한 Espresso 코어 라이브러리를 포함합니다.
+    // 안드로이드 기본 의존성
+    implementation(libs.androidx.core.ktx)              // 코틀린 안드로이드 확장 기능
+    implementation(libs.androidx.appcompat)             // 하위 버전 호환성 지원
+    implementation(libs.androidx.activity)              // 액티비티 관련 기능
+    implementation(libs.androidx.constraintlayout)      // 제약 레이아웃
+    implementation(libs.material)                       // 머티리얼 디자인 컴포넌트
+
+    // 네비게이션 컴포넌트
+    implementation(libs.androidx.navigation.fragment.ktx)  // 네비게이션 프래그먼트 기능
+    implementation(libs.androidx.navigation.ui.ktx)        // 네비게이션 UI 컴포넌트
+
+    // 네트워크 통신
+    // Retrofit
+    implementation(libs.retrofit)                       // REST API 통신 라이브러리
+    implementation(libs.retrofit.gson.converter)        // JSON 변환기
+    implementation(libs.gson)                           // JSON 파싱 라이브러리
+
+    // OkHttp
+    implementation(libs.okhttp)                        // HTTP 클라이언트
+    implementation(libs.okhttp.logging)                // HTTP 요청/응답 로깅
+
+    // 테스트
+    // 단위 테스트
+    testImplementation(libs.junit)                     // 단위 테스트 프레임워크
+
+    // 안드로이드 테스트
+    androidTestImplementation(libs.androidx.junit)      // 안드로이드 테스트 지원
+    androidTestImplementation(libs.androidx.espresso.core) // UI 테스트 프레임워크
 }
