@@ -1,11 +1,11 @@
-package com.example.kh_studyprojects_weatherapp
+package com.example.kh_studyprojects_weatherapp.presentation
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
 
 // 사용하지 않는 변수, 변경된 파라미터 이름 등에 대한 컴파일러 경고를 억제합니다.
