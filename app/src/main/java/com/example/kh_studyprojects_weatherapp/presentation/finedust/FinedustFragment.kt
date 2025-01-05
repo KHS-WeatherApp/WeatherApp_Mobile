@@ -10,9 +10,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.findNavController
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.FinedustFragmentBinding
-import com.example.kh_studyprojects_weatherapp.databinding.ParticulateMatterFragmentBinding
 
-class ParticulateMatterFragment : Fragment() {
+class FinedustFragment : Fragment() {
 
     private var _binding: FinedustFragmentBinding? = null
     private val binding get() = _binding!!
@@ -32,19 +31,19 @@ class ParticulateMatterFragment : Fragment() {
 
         //cl01 클릭 시 날씨 화면 전환
         root.findViewById<ConstraintLayout>(R.id.clNav01).setOnClickListener{
-            it.findNavController().navigate(R.id.action_particulateMatterFragment_to_weatherFragment)
+            it.findNavController().navigate(R.id.)
             Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
         //tv_setting 클릭 시 설정 화면 전환
         root.findViewById<ConstraintLayout>(R.id.clNavOval).setOnClickListener{
-            it.findNavController().navigate(R.id.action_particulateMatterFragment_to_settingFragment)
+            it.findNavController().navigate(R.id.)
             Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
         //cl03 클릭 시 미세먼지 화면 전환
         root.findViewById<ConstraintLayout>(R.id.clNav03).setOnClickListener{
-            it.findNavController().navigate(R.id.action_particulateMatterFragment_self2)
+            it.findNavController().navigate(R.id.)
             Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 

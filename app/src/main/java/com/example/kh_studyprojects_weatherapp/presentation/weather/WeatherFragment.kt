@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 // weather/WeatherFragment.kt
 class WeatherFragment : Fragment() {
-    private val viewModel: WeatherViewModel by viewModels()
+//    private val viewModel: WeatherViewModel by viewModels()
     private lateinit var weatherInfoTextView: TextView
 
     override fun onCreateView(
@@ -28,8 +28,8 @@ class WeatherFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.weather_fragment, container, false)
-        setupNavigation(view)
-        setupChildFragments(savedInstanceState)
+//        setupNavigation(view)
+//        setupChildFragments(savedInstanceState)
         return view
     }
 
@@ -57,22 +57,22 @@ class WeatherFragment : Fragment() {
     }*/
 
     /*네비게이션*/
-    /*private fun setupNavigation(view: View) {
+    private fun setupNavigation(view: View) {
         view.findViewById<ConstraintLayout>(R.id.clNav01).setOnClickListener {
             Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-            it.findNavController().navigate(R.id.action_weatherFragment_self2)
+            it.findNavController().navigate(R.id.)
         }
 
         view.findViewById<ConstraintLayout>(R.id.clNavOval).setOnClickListener {
             Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-            it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
+            it.findNavController().navigate(R.id.)
         }
 
         view.findViewById<ConstraintLayout>(R.id.clNav03).setOnClickListener {
             Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
-            it.findNavController().navigate(R.id.action_weatherFragment_to_particulateMatterFragment)
+            it.findNavController().navigate(R.id.)
         }
-    }*/
+    }
 
     /*프레그먼트 동기화*/
    /* private fun setupChildFragments(savedInstanceState: Bundle?) {

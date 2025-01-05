@@ -5,6 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+
+    <!--참고용 옛날 김효동의 흔적 -->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_90"
@@ -38,7 +41,7 @@
                 android:layout_height="0dp"
                 app:layout_constraintHeight_percent="0.85"
                 app:layout_constraintWidth_percent="0.425"
-                android:background="@drawable/shape_radius_top_r_l_01_effect"
+                android:background="@drawable/sh_nav_round_t_lr_effect01"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/clNav02"
                 app:layout_constraintBottom_toBottomOf="parent">
@@ -47,7 +50,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="13dp"
-                    android:src="@drawable/nav_weather_icon" />
+                    android:src="@drawable/ic_nav_weatherimg" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!--설정-->
@@ -72,7 +75,7 @@
                     android:id="@+id/clNavOval"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:background="@drawable/shape_oval_01_effect"
+                    android:background="@drawable/sh_nav_circle_effect01"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -97,7 +100,7 @@
                 android:layout_height="0dp"
                 app:layout_constraintHeight_percent="0.85"
                 app:layout_constraintWidth_percent="0.425"
-                android:background="@drawable/shape_radius_top_r_l_01_effect"
+                android:background="@drawable/sh_nav_round_t_lr_effect01"
                 app:layout_constraintStart_toEndOf="@id/clNav02"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
@@ -106,7 +109,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="7dp"
-                    android:src="@drawable/nav_particulate_matter_icon" />
+                    android:src="@drawable/ic_nav_finedustimg" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

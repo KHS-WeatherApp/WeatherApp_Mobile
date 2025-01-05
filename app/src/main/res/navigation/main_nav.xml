@@ -1,6 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_nav">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav"
+    app:startDestination="@id/weatherFragment">
+    <fragment
+        android:id="@+id/weatherFragment"
+        android:name="com.example.kh_studyprojects_weatherapp.weather.WeatherFragment"
+        android:label="weather_fragment"
+        tools:layout="@layout/weather_fragment" >
 
+        <action
+            android:id="@+id/action_weatherFragment_self3"
+            app:destination="@id/weatherFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_to_settingFragment2"
+            app:destination="@id/settingFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_to_finedustFragment"
+            app:destination="@id/finedustFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.example.kh_studyprojects_weatherapp.setting.SettingFragment"
+        android:label="setting_fragment"
+        tools:layout="@layout/setting_fragment" >
+
+        <action
+            android:id="@+id/action_settingFragment_self2"
+            app:destination="@id/settingFragment" />
+        <action
+            android:id="@+id/action_settingFragment_to_weatherFragment2"
+            app:destination="@id/weatherFragment" />
+        <action
+            android:id="@+id/action_settingFragment_to_finedustFragment"
+            app:destination="@id/finedustFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/finedustFragment"
+        android:name="com.example.kh_studyprojects_weatherapp.finedust.FinedustFragment"
+        android:label="particulate_matter_fragment"
+        tools:layout="@layout/finedust_fragment" >
+
+
+        <action
+            android:id="@+id/action_finedustFragment_self"
+            app:destination="@id/finedustFragment" />
+        <action
+            android:id="@+id/action_finedustFragment_to_settingFragment"
+            app:destination="@id/settingFragment" />
+        <action
+            android:id="@+id/action_finedustFragment_to_weatherFragment"
+            app:destination="@id/weatherFragment" />
+    </fragment>
 </navigation>
