@@ -11,10 +11,10 @@
         tools:layout="@layout/weather_fragment" >
 
         <action
-            android:id="@+id/action_weatherFragment_self3"
+            android:id="@+id/action_weatherFragment_self"
             app:destination="@id/weatherFragment" />
         <action
-            android:id="@+id/action_weatherFragment_to_settingFragment2"
+            android:id="@+id/action_weatherFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
         <action
             android:id="@+id/action_weatherFragment_to_finedustFragment"
@@ -27,10 +27,10 @@
         tools:layout="@layout/setting_fragment" >
 
         <action
-            android:id="@+id/action_settingFragment_self2"
+            android:id="@+id/action_settingFragment_self"
             app:destination="@id/settingFragment" />
         <action
-            android:id="@+id/action_settingFragment_to_weatherFragment2"
+            android:id="@+id/action_settingFragment_to_weatherFragment"
             app:destination="@id/weatherFragment" />
         <action
             android:id="@+id/action_settingFragment_to_finedustFragment"

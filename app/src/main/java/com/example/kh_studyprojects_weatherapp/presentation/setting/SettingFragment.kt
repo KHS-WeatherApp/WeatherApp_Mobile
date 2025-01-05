@@ -26,19 +26,19 @@ class SettingFragment : Fragment() {
 
         //cl01 클릭 시 날씨 화면 전환
         view.findViewById<ConstraintLayout>(R.id.clNav01).setOnClickListener{
-            it.findNavController().navigate(R.id.)
+            it.findNavController().navigate(R.id.action_settingFragment_to_weatherFragment)
             Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
         //tv_setting 클릭 시 설정 화면 전환
         view.findViewById<ConstraintLayout>(R.id.clNavOval).setOnClickListener{
-            it.findNavController().navigate(R.id.action_settingFragment_self2)
+            it.findNavController().navigate(R.id.action_settingFragment_self)
             Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
         //cl03 클릭 시 미세먼지 화면 전환
         view.findViewById<ConstraintLayout>(R.id.clNav03).setOnClickListener{
-            it.findNavController().navigate(R.id.)
+            it.findNavController().navigate(R.id.action_settingFragment_to_finedustFragment)
             Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
