@@ -9,11 +9,12 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.findNavController
 import com.example.kh_studyprojects_weatherapp.R
+import com.example.kh_studyprojects_weatherapp.databinding.FinedustFragmentBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ParticulateMatterFragmentBinding
 
 class ParticulateMatterFragment : Fragment() {
 
-    private var _binding: ParticulateMatterFragmentBinding? = null
+    private var _binding: FinedustFragmentBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +26,7 @@ class ParticulateMatterFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = ParticulateMatterFragmentBinding.inflate(inflater, container, false)
+        _binding = FinedustFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
 
