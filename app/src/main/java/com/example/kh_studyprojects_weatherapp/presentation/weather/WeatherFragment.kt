@@ -25,7 +25,7 @@ class WeatherFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.weather_fragment, container, false)
-//        setupNavigation(view)
+        setupNavigation(view)
 //        setupChildFragments(savedInstanceState)
         return view
     }
