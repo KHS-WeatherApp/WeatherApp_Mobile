@@ -1,0 +1,10 @@
+<resources>
+    <!--설치 시 앱 명칭 -->
+    <string name="app_name">kH_StudyProjects_ WeatherApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="weather_fragment">날씨 화면 테스트 </string>
+    <string name="setting_fragment">설정 화면 테스트 </string>
+    <string name="pm_fragment">미세 화면 테스트 </string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

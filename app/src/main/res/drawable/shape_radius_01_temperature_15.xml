@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!--배경색 설정-->
+    <solid android:color="@color/temperature15" />
+
+    <!-- 모서리 둥글기 설정 -->
+<!--    <corners android:radius="@dimen/dp_30"/>-->
+    <corners
+        android:radius="@dimen/dp_15"/>
+    <!--테두리 설정-->
+<!--    <stroke-->
+<!--        android:width="@dimen/dp_10"-->
+<!--        android:color="@color/weather_radius" />-->
+</shape>

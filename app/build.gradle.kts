@@ -62,13 +62,13 @@ dependencies {
     implementation(libs.retrofit)                       // Retrofit 핵심 라이브러리
     implementation(libs.gson)                           // JSON 파싱을 위한 Gson
     implementation(libs.retrofit.gson.converter)        // Retrofit Gson 컨버터
+    // OkHttp 관련 의존성
+    implementation(libs.okhttp)                         // OkHttp 클라이언트
+    implementation(libs.loggingInterceptor)            // OkHttp 로깅 인터셉터
 
     // 테스트 관련 의존성
     testImplementation(libs.junit)                      // 단위 테스트
     androidTestImplementation(libs.androidx.junit)      // 안드로이드 테스트
     androidTestImplementation(libs.androidx.espresso.core) // UI 테스트
 
-    // OkHttp 관련 의존성
-    implementation(libs.okhttp)                         // OkHttp 클라이언트
-    implementation(libs.loggingInterceptor)            // OkHttp 로깅 인터셉터
 }

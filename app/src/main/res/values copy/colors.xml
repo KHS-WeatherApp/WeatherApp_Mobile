@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background_color">#547F98</color> <!-- 배경색 -->
-    <color name="app_background_color">#7ECEFC</color>
-    <color name="button_color">#5E89AA</color> <!-- 버튼 배경색 -->
     <color name="weather">#7ECEFC</color> <!--날씨 화면 기본 배경색-->
     <color name="weather_radius">#7FC6EF</color> <!--날씨 화면 기본 배경색-->
     <color name="weatherRadiusBackground">#6563FF</color>
