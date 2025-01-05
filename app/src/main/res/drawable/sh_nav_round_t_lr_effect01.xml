@@ -21,8 +21,6 @@
             <solid android:color="@color/white" />
 
             <corners
-                android:bottomLeftRadius="5dp"
-                android:bottomRightRadius="5dp"
                 android:topLeftRadius="15dp"
                 android:topRightRadius="15dp" />
             <stroke
