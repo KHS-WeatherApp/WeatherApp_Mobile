@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">kh_studyprojects_weatherapp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="weather_button">날씨 화면</string>
+    <string name="settings_button">설정 화면</string>
+    <string name="air_quality_button">미세 화면</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
