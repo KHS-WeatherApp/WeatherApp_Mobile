@@ -1,5 +1,5 @@
 
-package com.example.kh_studyprojects_weatherapp.setting
+package com.example.kh_studyprojects_weatherapp.presentation.setting
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

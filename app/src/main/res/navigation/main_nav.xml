@@ -6,7 +6,7 @@
     app:startDestination="@id/weatherFragment">
     <fragment
         android:id="@+id/weatherFragment"
-        android:name="com.example.kh_studyprojects_weatherapp.weather.WeatherFragment"
+        android:name="com.example.kh_studyprojects_weatherapp.presentation.weather.WeatherFragment"
         android:label="weather_fragment"
         tools:layout="@layout/weather_fragment" >
 
@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.example.kh_studyprojects_weatherapp.setting.SettingFragment"
+        android:name="com.example.kh_studyprojects_weatherapp.presentation.setting.SettingFragment"
         android:label="setting_fragment"
         tools:layout="@layout/setting_fragment" >
 
@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/finedustFragment"
-        android:name="com.example.kh_studyprojects_weatherapp.finedust.FinedustFragment"
+        android:name="com.example.kh_studyprojects_weatherapp.presentation.finedust.FinedustFragment"
         android:label="particulate_matter_fragment"
         tools:layout="@layout/finedust_fragment" >
 

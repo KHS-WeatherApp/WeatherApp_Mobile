@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.weather
+package com.example.kh_studyprojects_weatherapp.presentation.weather
 
 import android.os.Bundle
 import android.util.Log
@@ -13,9 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.example.kh_studyprojects_weatherapp.R
-import com.example.kh_studyprojects_weatherapp.weather.api.WeatherRepository
-import com.example.kh_studyprojects_weatherapp.weather.viewmodel.WeatherState
-import com.example.kh_studyprojects_weatherapp.weather.viewmodel.WeatherViewModel
 import kotlinx.coroutines.launch
 
 // weather/WeatherFragment.kt
