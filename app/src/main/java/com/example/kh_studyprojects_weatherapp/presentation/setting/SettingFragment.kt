@@ -42,7 +42,6 @@ class SettingFragment : Fragment() {
             Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
-        // Inflate the layout for this fragment
         return view
     }
 

@@ -42,7 +42,6 @@
         android:label="particulate_matter_fragment"
         tools:layout="@layout/finedust_fragment" >
 
-
         <action
             android:id="@+id/action_finedustFragment_self"
             app:destination="@id/finedustFragment" />
