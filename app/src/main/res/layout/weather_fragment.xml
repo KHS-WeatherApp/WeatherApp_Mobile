@@ -7,16 +7,41 @@
     tools:context=".presentation.weather.WeatherFragment"
     android:background="@color/weather">
 
-    <TextView
+    <!--스크롤 뷰-->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/sv01"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="30dp"
-        android:text="@string/weather_fragment"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/included_navigation_bottom"
+        android:layout_height="0dp"
+        android:scrollbars="none"
+        android:layout_margin="@dimen/dp_15"
+        android:layout_marginRight="@dimen/dp_15"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/included_navigation_bottom">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--날씨 현재 예보-->
+
+
+            <!--날씨 시간별 예보-->
+            <FrameLayout
+                android:id="@+id/weather_hourly_forecast_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_40"
+                tools:layout="@layout/weather_hourly_forecast_fragment"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <include
     android:id="@+id/included_navigation_bottom"
