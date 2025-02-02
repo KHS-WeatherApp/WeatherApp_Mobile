@@ -55,17 +55,17 @@ class WeatherFragment : Fragment() {
 
     /*네비게이션*/
     private fun setupNavigation(view: View) {
-        view.findViewById<ConstraintLayout>(R.id.clNav01).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.nav_weather).setOnClickListener {
             Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
             it.findNavController().navigate(R.id.action_weatherFragment_self)
         }
 
-        view.findViewById<ConstraintLayout>(R.id.clNavOval).setOnClickListener {
+        view.findViewById<TextView>(R.id.nav_setting).setOnClickListener {
             Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
             it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
         }
 
-        view.findViewById<ConstraintLayout>(R.id.clNav03).setOnClickListener {
+        view.findViewById<ConstraintLayout>(R.id.nav_findust).setOnClickListener {
             Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
             it.findNavController().navigate(R.id.action_weatherFragment_to_finedustFragment)
         }

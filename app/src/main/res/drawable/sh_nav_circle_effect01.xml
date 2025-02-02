@@ -10,12 +10,22 @@
     </item>
 
     <item android:id="@android:id/background">
-        <!-- 기본 배경으로 사용할 타원형 shape -->
-        <shape android:shape="oval">
-            <solid android:color="@color/white" />
-            <stroke
-                android:width="6dp"
-                android:color="#7ECEFC" />
-        </shape>
+        <layer-list>
+            <!-- 아래쪽 흰색 배경을 먼저 그립니다 -->
+            <item android:bottom="35dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/weather" />
+                </shape>
+            </item>
+            <!-- 그 위에 원형 테두리를 그립니다 -->
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="@color/white" />
+                    <stroke
+                        android:width="6dp"
+                        android:color="#7ECEFC" />
+                </shape>
+            </item>
+        </layer-list>
     </item>
 </ripple>
