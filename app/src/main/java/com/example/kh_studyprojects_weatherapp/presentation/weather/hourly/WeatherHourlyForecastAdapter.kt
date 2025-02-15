@@ -10,14 +10,19 @@ import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecast
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 
 // RecyclerView 어댑터 클래스
-class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean = false) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class WeatherHourlyForecastAdapter(
+    private val context: Context,
+    var isVertical: Boolean = false
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-//    private var items: ArrayList<WeatherHourlyForecastFragmentDto>? = null
+    // 뷰 타입 상수
+    companion object {
+        const val VIEW_TYPE_HORIZONTAL = 0
+        const val VIEW_TYPE_VERTICAL = 1
+    }
 
-    // 초기 데이터를 가진 아이템 리스트를 MutableList로 선언
-    var items: MutableList<WeatherHourlyForecastDto> = mutableListOf(
-        // 초기 데이터 리스트
+    // 아이템 리스트를 List로 변경 (불변성 유지)
+    private val items: List<WeatherHourlyForecastDto> = listOf(
         WeatherHourlyForecastDto("오전", "1시", "", "", "10"),
         WeatherHourlyForecastDto("", "2시", "", "", "14"),
         WeatherHourlyForecastDto("", "3시", "", "", "15"),
@@ -44,19 +49,17 @@ class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean
         WeatherHourlyForecastDto("오전", "12시", "75%", "1.1mm", "25")
     )
 
-    // 뷰 타입 상수를 companion object로 선언
-    companion object {
-        const val VIEW_TYPE_HORIZONTAL = 0  // 가로 모드 뷰 타입
-        const val VIEW_TYPE_VERTICAL = 1    // 세로 모드 뷰 타입
+    // ViewHolder 재사용을 위한 설정
+    init {
+        setHasStableIds(true)
     }
 
-    // getItemViewType() 메서드에서 아이템의 뷰 타입을 반환
-    override fun getItemViewType(position: Int): Int {
-        // isVertical 값에 따라 세로 모드 또는 가로 모드 뷰 타입을 반환
-        return if (isVertical) VIEW_TYPE_VERTICAL else VIEW_TYPE_HORIZONTAL
-    }
+    // 각 아이템의 고유 ID 반환
+    override fun getItemId(position: Int): Long = position.toLong()
 
-    // onCreateViewHolder() 메서드에서 각 뷰 타입에 맞는 ViewHolder를 생성
+    override fun getItemViewType(position: Int): Int =
+        if (isVertical) VIEW_TYPE_VERTICAL else VIEW_TYPE_HORIZONTAL
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_VERTICAL -> {
@@ -64,14 +67,14 @@ class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean
                 val binding = WeatherHourlyForecastItemVerticalBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
-                VerticalViewHolder(binding, parent.context)
+                VerticalViewHolder(binding, context)
             }
             else -> {
                 // 가로 모드 레이아웃 바인딩 생성 및 ViewHolder 반환
                 val binding = WeatherHourlyForecastItemHorizontalBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
-                HorizontalViewHolder(binding, parent.context) // context 전달
+                HorizontalViewHolder(binding, context)
             }
         }
     }
@@ -87,18 +90,18 @@ class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean
         }
     }
 
-    // getItemCount() 메서드에서 리스트의 아이템 수를 반환
-    override fun getItemCount(): Int {
-        return items.size  // 아이템 리스트의 크기를 반환
-    }
+    override fun getItemCount(): Int = items.size
 
-    // 가로 모드 ViewHolder 클래스
+    // ViewHolder 클래스들에서 layoutParams 캐싱
     class HorizontalViewHolder(
         private val binding: WeatherHourlyForecastItemHorizontalBinding,
-        private val context: Context // context를 매개변수로 받음
+        private val context: Context
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        // bindItems() 메서드에서 가로 모드 뷰에 데이터를 바인딩
+        // 레이아웃 파라미터 캐싱
+        private val temperatureLayoutParams = binding.temperature.layoutParams as ConstraintLayout.LayoutParams
+        private val resources = context.resources
+
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvPmPa.text = item.tvPmPa                   // AM/PM 텍스트 설정
@@ -107,38 +110,37 @@ class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
 
-                // item.temperature를 Int로 변환하여 마진 설정
+                // 온도에 따른 마진 설정
                 val temperatureInt = item.temperature!!.toInt()
-                
-                // temperature TextView의 상단 마진 설정
-                val layoutParams = temperature.layoutParams as ConstraintLayout.LayoutParams
-                layoutParams.topMargin = when {
-                    temperatureInt >= 30 -> context.resources.getDimensionPixelSize(R.dimen.dp_10)
-                    temperatureInt >= 28 -> context.resources.getDimensionPixelSize(R.dimen.dp_20)
-                    temperatureInt >= 26 -> context.resources.getDimensionPixelSize(R.dimen.dp_30)
-                    temperatureInt >= 24 -> context.resources.getDimensionPixelSize(R.dimen.dp_40)
-                    temperatureInt >= 22 -> context.resources.getDimensionPixelSize(R.dimen.dp_50)
-                    temperatureInt >= 20 -> context.resources.getDimensionPixelSize(R.dimen.dp_60)
-                    temperatureInt >= 18 -> context.resources.getDimensionPixelSize(R.dimen.dp_70)
-                    temperatureInt >= 16 -> context.resources.getDimensionPixelSize(R.dimen.dp_80)
-                    temperatureInt >= 14 -> context.resources.getDimensionPixelSize(R.dimen.dp_90)
-                    temperatureInt >= 12 -> context.resources.getDimensionPixelSize(R.dimen.dp_100)
-                    temperatureInt >= 10 -> context.resources.getDimensionPixelSize(R.dimen.dp_110)
-                    else -> context.resources.getDimensionPixelSize(R.dimen.dp_10)
-                }
-                temperature.layoutParams = layoutParams
+                temperatureLayoutParams.topMargin = getMarginForTemperature(temperatureInt)
+                temperature.layoutParams = temperatureLayoutParams
 
                 // 온도 배경 설정
-                temperature.setBackgroundResource(
-                    when {
-                        temperatureInt >= 30 -> R.drawable.sh_hourly_round_temperature_30
-                        temperatureInt >= 20 -> R.drawable.sh_hourly_round_temperature_20
-                        temperatureInt >= 15 -> R.drawable.sh_hourly_round_temperature_15
-                        temperatureInt >= 10 -> R.drawable.sh_hourly_round_temperature_10
-                        else -> R.drawable.sh_hourly_round_temperature_10 // 기본 배경 설정
-                    }
-                )
+                temperature.setBackgroundResource(getBackgroundForTemperature(temperatureInt))
             }
+        }
+
+        private fun getMarginForTemperature(temp: Int): Int = when {
+            temp >= 30 -> resources.getDimensionPixelSize(R.dimen.dp_10)
+            temp >= 28 -> resources.getDimensionPixelSize(R.dimen.dp_20)
+            temp >= 26 -> resources.getDimensionPixelSize(R.dimen.dp_30)
+            temp >= 24 -> resources.getDimensionPixelSize(R.dimen.dp_40)
+            temp >= 22 -> resources.getDimensionPixelSize(R.dimen.dp_50)
+            temp >= 20 -> resources.getDimensionPixelSize(R.dimen.dp_60)
+            temp >= 18 -> resources.getDimensionPixelSize(R.dimen.dp_70)
+            temp >= 16 -> resources.getDimensionPixelSize(R.dimen.dp_80)
+            temp >= 14 -> resources.getDimensionPixelSize(R.dimen.dp_90)
+            temp >= 12 -> resources.getDimensionPixelSize(R.dimen.dp_100)
+            temp >= 10 -> resources.getDimensionPixelSize(R.dimen.dp_110)
+            else -> resources.getDimensionPixelSize(R.dimen.dp_10)
+        }
+
+        private fun getBackgroundForTemperature(temp: Int): Int = when {
+            temp >= 30 -> R.drawable.sh_hourly_round_temperature_30
+            temp >= 20 -> R.drawable.sh_hourly_round_temperature_20
+            temp >= 15 -> R.drawable.sh_hourly_round_temperature_15
+            temp >= 10 -> R.drawable.sh_hourly_round_temperature_10
+            else -> R.drawable.sh_hourly_round_temperature_10
         }
     }
 

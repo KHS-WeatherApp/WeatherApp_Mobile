@@ -27,10 +27,15 @@ class WeatherHourlyForecastFragment : Fragment() {
 
         // 어댑터 초기화 - 가로 모드로 초기화 (isVertical=false)
         adapter = WeatherHourlyForecastAdapter(requireContext(), isVertical = false)
-        // RecyclerView의 레이아웃 매니저를 가로 모드로 설정
-        binding.clHourly02.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        // RecyclerView에 어댑터를 연결
-        binding.clHourly02.adapter = adapter
+
+        // RecyclerView 설정
+        binding.clHourly02.apply {
+            setHasFixedSize(true)  // 고정 사이즈 설정
+            itemAnimator = null    // 애니메이션 비활성화
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) // RecyclerView의 레이아웃 매니저를 가로 모드로 설정
+            adapter = this@WeatherHourlyForecastFragment.adapter
+            setItemViewCacheSize(24)  // 캐시 사이즈 증가
+        }
 
         // 스위치(토글 버튼) 리스너 설정
         binding.switchOrientation.setOnCheckedChangeListener { _, isChecked ->
