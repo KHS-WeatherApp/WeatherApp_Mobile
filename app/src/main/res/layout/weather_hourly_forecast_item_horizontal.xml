@@ -82,7 +82,7 @@
             <ImageView
                 android:layout_width="@dimen/dp_33"
                 android:layout_height="@dimen/dp_33"
-                android:src="@drawable/nav_weather_icon"
+                android:src="@drawable/ic_nav_weatherimg"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -136,7 +136,7 @@
             <ImageView
                 android:layout_width="@dimen/dp_33"
                 android:layout_height="@dimen/dp_33"
-                android:src="@drawable/clothes01"
+                android:src="@drawable/ic_com_clothes_01"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

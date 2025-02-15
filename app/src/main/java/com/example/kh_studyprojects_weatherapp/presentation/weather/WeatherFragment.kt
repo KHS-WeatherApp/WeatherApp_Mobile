@@ -32,10 +32,9 @@ class WeatherFragment : Fragment() {
         // 메인 레이아웃 바인딩 초기화
         _binding = WeatherFragmentBinding.inflate(inflater, container, false)
         
-        // 하단 네비게이션 바인딩 초기화
-        _navigationBinding = LayoutNavigationBottomBinding.bind(
-            binding.root.findViewById(R.id.layout_navigation_bottom)
-        )
+        // 만약 하단 네비게이션 뷰가 별도의 레이아웃 파일인 경우 inflate() 사용
+        _navigationBinding = LayoutNavigationBottomBinding.inflate(inflater, container, false)
+        // 이후, 필요에 따라 _navigationBinding.root를 메인 레이아웃의 적절한 위치에 추가해야 함.
         
         // 네비게이션 클릭 리스너 설정
         setupNavigation()
