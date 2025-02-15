@@ -51,7 +51,7 @@
         android:gravity="center"
         android:padding="10dp">
 
-        <Button
+        <android.widget.Button
             android:id="@+id/btn_weather_yesterday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
             android:textSize="16sp"
             tools:backgroundTint="@null" />
 
-        <Button
+        <android.widget.Button
             android:id="@+id/btn_weather_forecast"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
