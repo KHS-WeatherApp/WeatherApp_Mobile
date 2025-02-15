@@ -109,9 +109,9 @@ class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean
 
                 // item.temperature를 Int로 변환하여 마진 설정
                 val temperatureInt = item.temperature!!.toInt()
-                val layoutParams = clHourlyItem06.layoutParams as ConstraintLayout.LayoutParams
-
-                // 온도 마진 속성
+                
+                // temperature TextView의 상단 마진 설정
+                val layoutParams = temperature.layoutParams as ConstraintLayout.LayoutParams
                 layoutParams.topMargin = when {
                     temperatureInt >= 30 -> context.resources.getDimensionPixelSize(R.dimen.dp_10)
                     temperatureInt >= 28 -> context.resources.getDimensionPixelSize(R.dimen.dp_20)
@@ -124,9 +124,9 @@ class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean
                     temperatureInt >= 14 -> context.resources.getDimensionPixelSize(R.dimen.dp_90)
                     temperatureInt >= 12 -> context.resources.getDimensionPixelSize(R.dimen.dp_100)
                     temperatureInt >= 10 -> context.resources.getDimensionPixelSize(R.dimen.dp_110)
-                    else -> 0
+                    else -> context.resources.getDimensionPixelSize(R.dimen.dp_10)
                 }
-                clHourlyItem06.layoutParams = layoutParams
+                temperature.layoutParams = layoutParams
 
                 // 온도 배경 설정
                 temperature.setBackgroundResource(
@@ -135,7 +135,7 @@ class WeatherHourlyForecastAdapter(val context: Context, var isVertical: Boolean
                         temperatureInt >= 20 -> R.drawable.sh_hourly_round_temperature_20
                         temperatureInt >= 15 -> R.drawable.sh_hourly_round_temperature_15
                         temperatureInt >= 10 -> R.drawable.sh_hourly_round_temperature_10
-                        else -> 0 // 기본 배경이 필요하다면 여기에 설정
+                        else -> R.drawable.sh_hourly_round_temperature_10 // 기본 배경 설정
                     }
                 )
             }

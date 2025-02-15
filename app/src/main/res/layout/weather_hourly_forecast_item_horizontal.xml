@@ -4,169 +4,88 @@
     android:layout_width="@dimen/dp_50"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/weather_radius">
-    <!--    android:background="@android:color/transparent">-->
+    android:background="@color/weather_radius"
+    android:layout_marginHorizontal="@dimen/dp_3">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!--오전/오후-->
+    <TextView
+        android:id="@+id/tvPmPa"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/dp_3"
-        android:layout_marginRight="@dimen/dp_3"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_5"
+        android:textColor="@color/white"
+        android:text="오전"
+        android:textSize="@dimen/dp_12"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!--시간-->
+    <TextView
+        android:id="@+id/tvHour"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="5시"
+        android:textStyle="bold"
+        android:textSize="@dimen/dp_17"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tvPmPa"/>
+
+    <!--날씨 img-->
+    <ImageView
+        android:id="@+id/imgWeather"
+        android:layout_width="@dimen/dp_33"
+        android:layout_height="@dimen/dp_33"
+        android:layout_marginTop="@dimen/dp_5"
+        android:src="@drawable/ic_nav_weatherimg"
+        android:contentDescription="날씨 아이콘"
+        app:layout_constraintTop_toBottomOf="@id/tvHour"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!--강수 확률과 강수량-->
+    <TextView
+        android:id="@+id/probability"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="75%"
+        android:textSize="@dimen/dp_12"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/imgWeather"/>
 
-        <!--오전/오후-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_hourly_item01"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_5"
-            android:layout_marginBottom="@dimen/dp_5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/cl_hourly_item02">
+    <TextView
+        android:id="@+id/precipitation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1.1mm"
+        android:textSize="@dimen/dp_10"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/probability"/>
 
-            <TextView
-                android:id="@+id/tvPmPa"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:text="오전"
-                android:textSize="@dimen/dp_12"
-                android:gravity="center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--옷차림 추천 아이콘-->
+    <ImageView
+        android:id="@+id/imgClothes"
+        android:layout_width="@dimen/dp_33"
+        android:layout_height="@dimen/dp_33"
+        android:layout_marginTop="@dimen/dp_4"
+        android:src="@drawable/ic_com_clothes_01"
+        android:contentDescription="추천 옷차림 아이콘"
+        app:layout_constraintTop_toBottomOf="@id/precipitation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!--시간-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_hourly_item02"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_hourly_item01"
-            app:layout_constraintBottom_toTopOf="@id/cl_hourly_item03">
+    <!--온도-->
+    <TextView
+        android:id="@+id/temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginHorizontal="@dimen/dp_3"
+        android:paddingVertical="@dimen/dp_4"
+        android:background="@drawable/sh_hourly_round_temperature_30"
+        android:text="21"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/imgClothes"/>
 
-            <TextView
-                android:id="@+id/tvHour"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:text="5시"
-                android:textStyle="bold"
-                android:textSize="@dimen/dp_17"
-                android:gravity="center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <!--날씨 img-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_hourly_item03"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_5"
-            android:layout_marginBottom="@dimen/dp_1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_hourly_item02"
-            app:layout_constraintBottom_toTopOf="@id/cl_hourly_item04">
-
-            <ImageView
-                android:layout_width="@dimen/dp_33"
-                android:layout_height="@dimen/dp_33"
-                android:src="@drawable/ic_nav_weatherimg"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="MissingConstraints" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_hourly_item04"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_hourly_item03"
-            app:layout_constraintBottom_toTopOf="@id/cl_hourly_item05">
-
-            <TextView
-                android:id="@+id/probability"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="75%"
-                android:textSize="@dimen/dp_12"
-                android:gravity="center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/precipitation"/>
-
-            <TextView
-                android:id="@+id/precipitation"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="1.1mm"
-                android:textSize="@dimen/dp_10"
-                android:gravity="center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/probability"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_hourly_item05"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_hourly_item04"
-            app:layout_constraintBottom_toTopOf="@id/cl_hourly_item06">
-
-            <ImageView
-                android:layout_width="@dimen/dp_33"
-                android:layout_height="@dimen/dp_33"
-                android:src="@drawable/ic_com_clothes_01"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="MissingConstraints" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_hourly_item06"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_10"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_hourly_item05">
-<!--            app:layout_constraintBottom_toBottomOf="parent">-->
-
-            <TextView
-                android:id="@+id/temperature"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/dp_4"
-                android:paddingBottom="@dimen/dp_4"
-                android:layout_marginLeft="@dimen/dp_3"
-                android:layout_marginRight="@dimen/dp_3"
-                android:background="@drawable/sh_hourly_round_temperature_30"
-                android:text="21"
-                android:textStyle="bold"
-                android:gravity="center"
-                tools:ignore="MissingConstraints" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
