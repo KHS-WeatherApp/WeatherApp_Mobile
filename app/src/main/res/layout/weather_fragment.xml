@@ -6,49 +6,44 @@
     android:layout_height="match_parent"
     tools:context=".presentation.weather.WeatherFragment"
     android:background="@color/weather">
-
     <!--스크롤 뷰-->
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/sv01"
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:scrollbars="none"
-        android:layout_margin="@dimen/dp_15"
-        android:layout_marginRight="@dimen/dp_15"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/included_navigation_bottom">
+        app:layout_constraintBottom_toTopOf="@id/layout_navigation_bottom">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!--날씨 현재 예보-->
-
-
-            <!--날씨 시간별 예보-->
-            <FrameLayout
+            <!-- 시간별 예보 프래그먼트 -->
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/weather_hourly_forecast_fragment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_40"
-                tools:layout="@layout/weather_hourly_forecast_fragment"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                android:layout_height="wrap_content"/>
 
+            <!-- 일별 예보 프래그먼트 -->
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/weather_daily_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
 
+
+
     <include
-    android:id="@+id/included_navigation_bottom"
-    layout="@layout/layout_navigation_bottom"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintBottom_toBottomOf="parent"/>
+        android:id="@+id/layout_navigation_bottom"
+        layout="@layout/layout_navigation_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

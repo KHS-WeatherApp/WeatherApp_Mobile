@@ -11,6 +11,7 @@ import androidx.navigation.findNavController
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherFragmentBinding
 import com.example.kh_studyprojects_weatherapp.databinding.LayoutNavigationBottomBinding
+import com.example.kh_studyprojects_weatherapp.presentation.weather.daily.WeatherDailyFragment
 import com.example.kh_studyprojects_weatherapp.weather.hourly.WeatherHourlyForecastFragment
 
 /**
@@ -21,7 +22,7 @@ class WeatherFragment : Fragment() {
     // 메인 레이아웃 바인딩
     private var _binding: WeatherFragmentBinding? = null
     private val binding get() = _binding!!
-    
+
     // 하단 네비게이션 레이아웃 바인딩
     private var _navigationBinding: LayoutNavigationBottomBinding? = null
     private val navigationBinding get() = _navigationBinding!!
@@ -37,7 +38,7 @@ class WeatherFragment : Fragment() {
         _binding = WeatherFragmentBinding.inflate(inflater, container, false)
 
         // 하단 네비게이션 바인딩 초기화
-        _navigationBinding = LayoutNavigationBottomBinding.bind(binding.includedNavigationBottom.root)
+        _navigationBinding = LayoutNavigationBottomBinding.inflate(inflater, container, false)
 
         // 네비게이션 클릭 리스너 설정
         setupNavigation()
@@ -47,7 +48,7 @@ class WeatherFragment : Fragment() {
 
     /*override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         // 날씨 데이터 관찰
         viewModel.weatherState.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -95,6 +96,11 @@ class WeatherFragment : Fragment() {
             childFragmentManager.beginTransaction()
                 .replace(R.id.weather_hourly_forecast_fragment, WeatherHourlyForecastFragment())
                 .commit()
+
+            // 일별 예보 프래그먼트 추가
+            childFragmentManager.beginTransaction()
+            .replace(R.id.weather_daily_container, WeatherDailyFragment())
+            .commit()
         }
     }
 

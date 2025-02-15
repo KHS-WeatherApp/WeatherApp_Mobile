@@ -3,8 +3,11 @@ package com.example.kh_studyprojects_weatherapp.data.repository.weather
 import com.example.kh_studyprojects_weatherapp.data.api.weather.RetrofitInstance
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.data.api.weather.WeatherRequest
+import javax.inject.Inject
 
-class WeatherRepositoryImpl : WeatherRepository {
+class WeatherRepositoryImpl @Inject constructor(
+    // 필요한 의존성들
+) : WeatherRepository {
     private val weatherApiService = RetrofitInstance.weatherApiService
 
     override suspend fun getWeatherInfo(

@@ -14,4 +14,7 @@
     <color name="temperature20">#EDD061</color>
     <color name="temperature15">#C2D07A</color>
     <color name="temperature10">#B6EEFF</color>
+
+    <!--날씨 일별 예보 화면-->
+    <color name="weather_daily_button_color">#5E89AA</color> <!-- 버튼 배경색 -->
 </resources>

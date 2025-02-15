@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="@drawable/sh_day_all_view_bg_01"
+    tools:visibility="gone">
+
+    <!-- 날짜와 날씨 정보 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:paddingStart="1dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingEnd="8dp">
+            <!-- 요일 텍스트 -->
+            <TextView
+                android:id="@+id/text_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="어제"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 날씨 정보와 온도 범위 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical">
+
+        <!-- 두 번째 레이아웃: 오른쪽 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end|center_vertical"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="15dp">
+
+            <!-- 최저 온도 -->
+            <TextView
+                android:id="@+id/text_min_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12°"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"/>
+
+            <!-- 온도 슬라이더 -->
+            <View
+                android:id="@+id/view_temperature_slider"
+                android:layout_width="60dp"
+                android:layout_height="8dp"
+                android:layout_marginHorizontal="8dp"
+                android:background="@drawable/icon_load_bar"/>
+
+            <!-- 최고 온도 -->
+            <TextView
+                android:id="@+id/text_max_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16°"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"/>
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout> 
