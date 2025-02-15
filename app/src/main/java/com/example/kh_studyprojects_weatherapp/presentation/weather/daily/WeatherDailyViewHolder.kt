@@ -5,18 +5,18 @@ import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyTodayBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyYesterdayBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyOtherBinding
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyItem
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyDto
 
 sealed class WeatherDailyViewHolder(
     private val binding: androidx.viewbinding.ViewBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    abstract fun bind(item: WeatherDailyItem)
+    abstract fun bind(item: WeatherDailyDto)
 
     class Today(
         private val binding: ItemWeatherDailyTodayBinding
     ) : WeatherDailyViewHolder(binding) {
-        override fun bind(item: WeatherDailyItem) {
+        override fun bind(item: WeatherDailyDto) {
             binding.apply {
                 textWeek.text = item.week
                 textPrecipitation.text = item.precipitation
@@ -32,7 +32,7 @@ sealed class WeatherDailyViewHolder(
     class Other(
         private val binding: ItemWeatherDailyOtherBinding
     ) : WeatherDailyViewHolder(binding) {
-        override fun bind(item: WeatherDailyItem) {
+        override fun bind(item: WeatherDailyDto) {
             binding.apply {
                 textWeek.text = item.week
                 textDate.text = item.date
@@ -49,7 +49,7 @@ sealed class WeatherDailyViewHolder(
     class Yesterday(
         private val binding: ItemWeatherDailyYesterdayBinding
     ) : WeatherDailyViewHolder(binding) {
-        override fun bind(item: WeatherDailyItem) {
+        override fun bind(item: WeatherDailyDto) {
             binding.apply {
                 textWeek.text = item.week
                 textMinTemp.text = item.minTemp

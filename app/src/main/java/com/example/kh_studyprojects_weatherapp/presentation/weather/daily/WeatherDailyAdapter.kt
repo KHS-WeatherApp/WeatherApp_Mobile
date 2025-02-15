@@ -7,20 +7,20 @@ import androidx.recyclerview.widget.DiffUtil
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyOtherBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyTodayBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyYesterdayBinding
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyItem
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyDto
 
-class WeatherDailyAdapter : ListAdapter<WeatherDailyItem, WeatherDailyViewHolder>(DiffCallback()) {
+class WeatherDailyAdapter : ListAdapter<WeatherDailyDto, WeatherDailyViewHolder>(DiffCallback()) {
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherDailyViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return when (WeatherDailyItem.Type.values()[viewType]) {
-            WeatherDailyItem.Type.TODAY -> WeatherDailyViewHolder.Today(
+        return when (WeatherDailyDto.Type.values()[viewType]) {
+            WeatherDailyDto.Type.TODAY -> WeatherDailyViewHolder.Today(
                 ItemWeatherDailyTodayBinding.inflate(inflater, parent, false)
             )
-            WeatherDailyItem.Type.YESTERDAY -> WeatherDailyViewHolder.Yesterday(
+            WeatherDailyDto.Type.YESTERDAY -> WeatherDailyViewHolder.Yesterday(
                 ItemWeatherDailyYesterdayBinding.inflate(inflater, parent, false)
             )
-            WeatherDailyItem.Type.OTHER -> WeatherDailyViewHolder.Other(
+            WeatherDailyDto.Type.OTHER -> WeatherDailyViewHolder.Other(
                 ItemWeatherDailyOtherBinding.inflate(inflater, parent, false)
             )
         }
@@ -32,11 +32,11 @@ class WeatherDailyAdapter : ListAdapter<WeatherDailyItem, WeatherDailyViewHolder
 
     override fun getItemViewType(position: Int) = getItem(position).type.ordinal
 
-    private class DiffCallback : DiffUtil.ItemCallback<WeatherDailyItem>() {
-        override fun areItemsTheSame(oldItem: WeatherDailyItem, newItem: WeatherDailyItem) =
+    private class DiffCallback : DiffUtil.ItemCallback<WeatherDailyDto>() {
+        override fun areItemsTheSame(oldItem: WeatherDailyDto, newItem: WeatherDailyDto) =
             oldItem.date == newItem.date && oldItem.type == newItem.type
 
-        override fun areContentsTheSame(oldItem: WeatherDailyItem, newItem: WeatherDailyItem) =
+        override fun areContentsTheSame(oldItem: WeatherDailyDto, newItem: WeatherDailyDto) =
             oldItem == newItem
     }
 }
