@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyItem
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -21,8 +21,8 @@ class WeatherDailyViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
-    private val _weatherItems = MutableStateFlow<List<WeatherDailyItem>>(emptyList())
-    val weatherItems: StateFlow<List<WeatherDailyItem>> = _weatherItems.asStateFlow()
+    private val _weatherItems = MutableStateFlow<List<WeatherDailyDto>>(emptyList())
+    val weatherItems: StateFlow<List<WeatherDailyDto>> = _weatherItems.asStateFlow()
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -36,7 +36,7 @@ class WeatherDailyViewModel @Inject constructor(
 
     fun toggleYesterdayWeather() {
         _weatherItems.value = _weatherItems.value.map { item ->
-            if (item.type == WeatherDailyItem.Type.YESTERDAY) {
+            if (item.type == WeatherDailyDto.Type.YESTERDAY) {
                 item.copy(isVisible = !item.isVisible)
             } else item
         }
@@ -44,7 +44,7 @@ class WeatherDailyViewModel @Inject constructor(
     
     fun toggle15DaysWeather() {
         _weatherItems.value = _weatherItems.value.map { item ->
-            if (item.type == WeatherDailyItem.Type.OTHER) {
+            if (item.type == WeatherDailyDto.Type.OTHER) {
                 item.copy(isVisible = !item.isVisible)
             } else item
         }
@@ -88,7 +88,7 @@ class WeatherDailyViewModel @Inject constructor(
         }
     }
 
-    private fun convertToWeatherDailyItems(weatherData: Map<String, Any>): List<WeatherDailyItem> {
+    private fun convertToWeatherDailyItems(weatherData: Map<String, Any>): List<WeatherDailyDto> {
         return try {
             // daily 데이터 가져오기
             val dailyData = weatherData["daily"] as? Map<*, *>
@@ -114,8 +114,8 @@ class WeatherDailyViewModel @Inject constructor(
 
             buildList {
                 // 어제 날씨
-                add(WeatherDailyItem(
-                    type = WeatherDailyItem.Type.YESTERDAY,
+                add(WeatherDailyDto(
+                    type = WeatherDailyDto.Type.YESTERDAY,
                     week = "어제",
                     date = dates[0].toString(),
                     precipitation = "${precipitations[0]}mm",
@@ -127,8 +127,8 @@ class WeatherDailyViewModel @Inject constructor(
                 ))
 
                 // 오늘 날씨
-                add(WeatherDailyItem(
-                    type = WeatherDailyItem.Type.TODAY,
+                add(WeatherDailyDto(
+                    type = WeatherDailyDto.Type.TODAY,
                     week = "오늘",
                     date = dates[1].toString(),
                     precipitation = "${precipitations[1]}mm",
@@ -141,8 +141,8 @@ class WeatherDailyViewModel @Inject constructor(
 
                 // 다음 날씨들
                 for (i in 2 until minOf(dates.size, 16)) {
-                    add(WeatherDailyItem(
-                        type = WeatherDailyItem.Type.OTHER,
+                    add(WeatherDailyDto(
+                        type = WeatherDailyDto.Type.OTHER,
                         week = getDayOfWeek(dates[i].toString()),
                         date = formatDate(dates[i].toString()),
                         precipitation = "${precipitations[i]}mm",

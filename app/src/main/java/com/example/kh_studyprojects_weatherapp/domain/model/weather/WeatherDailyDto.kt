@@ -1,6 +1,6 @@
 package com.example.kh_studyprojects_weatherapp.domain.model.weather
 
-data class WeatherDailyItem(
+data class WeatherDailyDto(
     val type: Type,
     val week: String,
     val date: String,
