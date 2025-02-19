@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#4D344A6D"/> <!-- 회색 배경색에 투명도 80% (CC) -->
+    <solid android:color="@color/weathercontainerBackground"/> <!-- 회색 배경색에 투명도 80% (CC) -->
     <corners
         android:topLeftRadius="10dp"
         android:topRightRadius="10dp"

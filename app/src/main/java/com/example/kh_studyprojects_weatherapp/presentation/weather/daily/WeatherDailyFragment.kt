@@ -21,7 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class WeatherDailyFragment : Fragment() {
     private var _binding: WeatherDailyIncludeBinding? = null
     private val binding get() = _binding!!
-    
+
     private val viewModel: WeatherDailyViewModel by viewModels {
         WeatherDailyViewModelFactory(WeatherRepositoryImpl.getInstance())
     }
@@ -33,18 +33,19 @@ class WeatherDailyFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = WeatherDailyIncludeBinding.inflate(inflater, container, false)
+        setupButtons()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         // RecyclerView 설정
         binding.weatherDailyRecyclerView.apply {
             adapter = this@WeatherDailyFragment.adapter
             layoutManager = LinearLayoutManager(context)
         }
-    
+
         // ViewModel의 데이터 관찰
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

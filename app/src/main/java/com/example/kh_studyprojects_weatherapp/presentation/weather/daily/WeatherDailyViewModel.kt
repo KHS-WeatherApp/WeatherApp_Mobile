@@ -30,24 +30,12 @@ class WeatherDailyViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    init {
-        fetchWeatherData() // 초기 데이터 로드
-    }
+    private var fullWeatherData: List<WeatherDailyDto> = emptyList()
+    private var isYesterdayShown = false
+    private var is15DaysShown = false
 
-    fun toggleYesterdayWeather() {
-        _weatherItems.value = _weatherItems.value.map { item ->
-            if (item.type == WeatherDailyDto.Type.YESTERDAY) {
-                item.copy(isVisible = !item.isVisible)
-            } else item
-        }
-    }
-    
-    fun toggle15DaysWeather() {
-        _weatherItems.value = _weatherItems.value.map { item ->
-            if (item.type == WeatherDailyDto.Type.OTHER) {
-                item.copy(isVisible = !item.isVisible)
-            } else item
-        }
+    init {
+        fetchWeatherData(37.5665, 126.9780) // 초기 데이터 로드 (서울 좌표)
     }
 
     fun fetchWeatherData(latitude: Double, longitude: Double) {
@@ -58,11 +46,9 @@ class WeatherDailyViewModel @Inject constructor(
                     .onSuccess { response ->
                         val data = response as? Map<String, Any>
                         if (data != null) {
-                            // 디버깅을 위한 로그 추가
-                            println("Weather API Response: $data")
-                            val items = convertToWeatherDailyItems(data)
-                            println("Converted Items: $items")
-                            _weatherItems.value = items
+                            fullWeatherData = convertToWeatherDailyItems(data)
+                            // 기본적으로 오늘부터 10일치 데이터만 보여주기
+                            _weatherItems.value = fullWeatherData.subList(1, minOf(11, fullWeatherData.size))
                             _error.value = null
                         } else {
                             _error.value = "날씨 데이터 형식이 올바르지 않습니다"
@@ -70,21 +56,40 @@ class WeatherDailyViewModel @Inject constructor(
                         }
                     }
                     .onFailure { exception ->
-                        // 실패 원인 상세 로깅
-                        println("API Error: ${exception.message}")
-                        exception.printStackTrace()
                         _error.value = exception.message ?: "알 수 없는 오류가 발생했습니다"
                         _weatherItems.value = emptyList()
                     }
             } catch (e: Exception) {
-                // 예외 상세 로깅
-                println("Exception: ${e.message}")
-                e.printStackTrace()
                 _error.value = e.message
                 _weatherItems.value = emptyList()
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    fun toggleYesterdayWeather() {
+        val currentData = _weatherItems.value
+        isYesterdayShown = !isYesterdayShown
+
+        _weatherItems.value = if (isYesterdayShown) {
+            // 어제 데이터를 추가
+            listOf(fullWeatherData[0]) + currentData
+        } else {
+            // 어제 데이터 제거
+            currentData.filter { it.type != WeatherDailyDto.Type.YESTERDAY }
+        }
+    }
+
+    fun toggle15DaysWeather() {
+        is15DaysShown = !is15DaysShown
+
+        _weatherItems.value = if (is15DaysShown) {
+            // 15일치 데이터 보여주기 (어제 데이터 제외)
+            fullWeatherData.subList(1, minOf(16, fullWeatherData.size))
+        } else {
+            // 기본 10일로 돌아가기
+            fullWeatherData.subList(1, minOf(11, fullWeatherData.size))
         }
     }
 
@@ -189,27 +194,5 @@ class WeatherDailyViewModel @Inject constructor(
 
     fun errorShown() {
         _error.value = null
-    }
-
-    private fun fetchWeatherData() {
-        viewModelScope.launch {
-            try {
-                // 기본 위치값 설정 (예: 서울)
-                val latitude = 37.5665
-                val longitude = 126.9780
-                
-                weatherRepository.getWeatherInfo(latitude, longitude)
-                    .onSuccess { result ->
-                        _weatherItems.value = convertToWeatherDailyItems(result)
-                    }
-                    .onFailure { exception ->
-                        println("Error fetching weather data: ${exception.message}")
-                        _weatherItems.value = emptyList()
-                    }
-            } catch (e: Exception) {
-                println("Error fetching weather data: ${e.message}")
-                _weatherItems.value = emptyList()
-            }
-        }
     }
 } 
