@@ -3,7 +3,6 @@
     android:color="#C7CFFF">
 
     <item android:id="@android:id/mask">
-        <!-- Ripple 효과가 적용될 때 mask로 사용할 shape -->
         <shape android:shape="oval">
             <solid android:color="#C7CFFF" />
         </shape>
@@ -11,13 +10,7 @@
 
     <item android:id="@android:id/background">
         <layer-list>
-            <!-- 아래쪽 흰색 배경을 먼저 그립니다 -->
-            <item android:bottom="35dp">
-                <shape android:shape="rectangle">
-                    <solid android:color="@color/weather" />
-                </shape>
-            </item>
-            <!-- 그 위에 원형 테두리를 그립니다 -->
+            <!-- 위에 그릴 원형 -->
             <item>
                 <shape android:shape="oval">
                     <solid android:color="@color/white" />

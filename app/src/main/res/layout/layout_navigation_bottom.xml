@@ -3,80 +3,86 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="@dimen/dp_90"
+    android:background="@color/weather"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent">
 
+    <!--날씨-->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_90"
-        android:background="@color/weather"
+        android:id="@+id/nav_weather"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/sh_nav_round_t_lr_effect01"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-        <!--날씨-->
+        app:layout_constraintEnd_toStartOf="@+id/clNav02"
+        app:layout_constraintHeight_percent="0.85"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.425">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="13dp"
+            android:src="@drawable/ic_nav_weatherimg" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--설정-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clNav02"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/nav_findust"
+        app:layout_constraintStart_toEndOf="@id/nav_weather"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.15">
+
+        <!--구모양 설정-->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/nav_weather"
+            android:id="@+id/nav_setting02"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/sh_nav_round_t_lr_effect01"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/clNav02"
-            app:layout_constraintHeight_percent="0.85"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintWidth_percent="0.425">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="13dp"
-                android:src="@drawable/ic_nav_weatherimg" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!--설정-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clNav02"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
             android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/nav_findust"
-            app:layout_constraintStart_toEndOf="@id/nav_weather"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.15">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!--구모양 설정-->
-            <TextView
-                android:id="@+id/nav_setting"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="@drawable/sh_nav_circle_effect01"
-                android:gravity="center"
-                android:text="●  ●  ●"
-                android:textSize="@dimen/dp_7.5"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="1" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!--미세-->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/nav_findust"
+        <TextView
+            android:id="@+id/nav_setting"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/sh_nav_round_t_lr_effect01"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/sh_nav_circle_effect01"
+            android:gravity="center"
+            android:text="●  ●  ●"
+            android:textSize="@dimen/dp_7.5"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.85"
-            app:layout_constraintStart_toEndOf="@id/clNav02"
-            app:layout_constraintWidth_percent="0.425">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="1" />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="7dp"
-                android:src="@drawable/ic_nav_finedustimg" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--미세-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/nav_findust"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/sh_nav_round_t_lr_effect01"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.85"
+        app:layout_constraintStart_toEndOf="@id/clNav02"
+        app:layout_constraintWidth_percent="0.425">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="7dp"
+            android:src="@drawable/ic_nav_finedustimg" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
