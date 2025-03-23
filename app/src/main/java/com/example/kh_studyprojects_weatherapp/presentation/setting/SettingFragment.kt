@@ -50,19 +50,19 @@ class SettingFragment : Fragment() {
         // 날씨 화면 전환 버튼
         navigationBinding.navWeather.setOnClickListener {
             it.findNavController().navigate(R.id.action_settingFragment_to_weatherFragment)
-            Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
         // 설정 화면 전환 버튼 (현재 화면 새로고침)
         navigationBinding.navSetting.setOnClickListener {
             it.findNavController().navigate(R.id.action_settingFragment_self)
-            Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
 
         // 미세먼지 화면 전환 버튼
         navigationBinding.navFindust.setOnClickListener {
             it.findNavController().navigate(R.id.action_settingFragment_to_finedustFragment)
-            Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
