@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.weather.hourly
+package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemHorizontalBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourlyForecastDto
 
 // RecyclerView 어댑터 클래스
 class WeatherHourlyForecastAdapter(

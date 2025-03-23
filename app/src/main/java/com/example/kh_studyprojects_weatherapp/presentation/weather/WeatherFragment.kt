@@ -12,7 +12,7 @@ import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherFragmentBinding
 import com.example.kh_studyprojects_weatherapp.databinding.LayoutNavigationBottomBinding
 import com.example.kh_studyprojects_weatherapp.presentation.weather.daily.WeatherDailyFragment
-import com.example.kh_studyprojects_weatherapp.weather.hourly.WeatherHourlyForecastFragment
+import com.example.kh_studyprojects_weatherapp.presentation.weather.hourly.WeatherHourlyForecastFragment
 
 /**
  * 날씨 정보를 표시하는 Fragment

@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.weather.hourly
+package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
 import android.os.Bundle
 import android.util.Log

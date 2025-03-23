@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".weather.hourly.WeatherHourlyForecastFragment"
+    tools:context="presentation.weather.hourly.WeatherHourlyForecastFragment"
     android:background="@drawable/sh_hourly_round_01">
 
     <ImageView
