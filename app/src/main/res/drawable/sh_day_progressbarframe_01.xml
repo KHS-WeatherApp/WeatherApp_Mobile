@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 높이가 8dp이면, 반은 4dp로 둥글게 -->
+    <corners android:radius="4dp" />
+    <!-- 전체 배경색 (0~최저, 최고~max 구간에 보일 색) -->
+    <solid android:color="@color/col_day_progressbar_01" />
+</shape>

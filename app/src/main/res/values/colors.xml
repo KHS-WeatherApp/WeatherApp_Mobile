@@ -19,4 +19,8 @@
 
     <!--날씨 일별 예보 화면-->
     <color name="weather_daily_button_color">#5E89AA</color> <!-- 버튼 배경색 -->
+    <color name="col_day_progressbar_01">#668FAE</color> <!-- 온도 processBar 배경색 -->
+    <color name="col_day_progressbar_02">#87CBD1</color> <!-- 온도 processBar 온도색 시작점 -->
+    <color name="col_day_progressbar_03">#B1CF86</color> <!-- 온도 processBar 온도색 끝점 -->
+    <color name="col_day_progressbar_04">#9DCDAE</color> <!-- 온도 processBar 온도색 -->
 </resources>

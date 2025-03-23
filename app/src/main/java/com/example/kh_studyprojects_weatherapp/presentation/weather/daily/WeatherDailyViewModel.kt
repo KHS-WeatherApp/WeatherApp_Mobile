@@ -117,6 +117,14 @@ class WeatherDailyViewModel @Inject constructor(
                 return emptyList()
             }
 
+            val lowestTemp = (minTemps.mapNotNull { 
+                it.toString().replace("°", "").toDoubleOrNull() 
+            }.minOrNull() ?: -18.0) - 2.0  // 최저 온도에서 2도 더 낮게
+                        
+            val highestTemp = (maxTemps.mapNotNull { 
+                it.toString().replace("°", "").toDoubleOrNull() 
+            }.maxOrNull() ?: 38.0) + 2.0  // 최고 온도에서 2도 더 높게
+
             buildList {
                 // 어제 날씨
                 add(WeatherDailyDto(
@@ -128,7 +136,9 @@ class WeatherDailyViewModel @Inject constructor(
                     minTemp = "${minTemps[0]}°",
                     maxTemp = "${maxTemps[0]}°",
                     weatherCode = (weatherCodes[0] as? Number)?.toInt() ?: 0,
-                    isVisible = true
+                    isVisible = true,
+                    globalMinTemp = lowestTemp,
+                    globalMaxTemp = highestTemp
                 ))
 
                 // 오늘 날씨
@@ -141,7 +151,9 @@ class WeatherDailyViewModel @Inject constructor(
                     minTemp = "${minTemps[1]}°",
                     maxTemp = "${maxTemps[1]}°",
                     weatherCode = (weatherCodes[1] as? Number)?.toInt() ?: 0,
-                    isVisible = true
+                    isVisible = true,
+                    globalMinTemp = lowestTemp,
+                    globalMaxTemp = highestTemp
                 ))
 
                 // 다음 날씨들
@@ -155,7 +167,9 @@ class WeatherDailyViewModel @Inject constructor(
                         minTemp = "${minTemps[i]}°",
                         maxTemp = "${maxTemps[i]}°",
                         weatherCode = (weatherCodes[i] as? Number)?.toInt() ?: 0,
-                        isVisible = true
+                        isVisible = true,
+                        globalMinTemp = lowestTemp,
+                        globalMaxTemp = highestTemp
                     ))
                 }
             }
