@@ -105,7 +105,7 @@ class WeatherHourlyForecastAdapter(
 
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
-                tvPmPa.text = item.tvPmPa                   // AM/PM 텍스트 설정
+                tvAmPm.text = item.tvAmPm                   // AM/PM 텍스트 설정
                 tvHour.text = item.tvHour                   // 시간 텍스트 설정
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
@@ -154,7 +154,7 @@ class WeatherHourlyForecastAdapter(
         // bindItems() 메서드에서 세로 모드 뷰에 데이터를 바인딩
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
-                tvPmPa.text = item.tvPmPa                   // AM/PM 텍스트 설정
+                tvAmPm.text = item.tvAmPm                   // AM/PM 텍스트 설정
                 tvHour.text = item.tvHour                   // 시간 텍스트 설정
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정

@@ -7,7 +7,7 @@
 
     <!--오전/오후-->
     <TextView
-        android:id="@+id/tvPmPa"
+        android:id="@+id/tvAmPm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_5"
@@ -27,7 +27,7 @@
         android:textStyle="bold"
         android:textSize="@dimen/dp_17"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/tvPmPa"/>
+        app:layout_constraintTop_toBottomOf="@id/tvAmPm"/>
 
     <!--날씨 img-->
     <ImageView

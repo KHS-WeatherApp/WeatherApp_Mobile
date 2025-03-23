@@ -8,7 +8,7 @@
 
     <!--오전/오후와 시간-->
     <TextView
-        android:id="@+id/tvPmPa"
+        android:id="@+id/tvAmPm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="오전"
@@ -29,7 +29,7 @@
         android:minWidth="@dimen/dp_31"
         android:gravity="end"
         android:textColor="@color/white"
-        app:layout_constraintStart_toEndOf="@id/tvPmPa"
+        app:layout_constraintStart_toEndOf="@id/tvAmPm"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
