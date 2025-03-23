@@ -1,0 +1,10 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 높이가 8dp이므로 radius=4dp 정도로 주면 pill 형태 -->
+    <corners android:radius="3dp" />
+
+    <gradient
+        android:startColor="@color/col_day_progressbar_02"
+        android:centerColor="@color/col_day_progressbar_04"
+        android:endColor="@color/col_day_progressbar_03"
+        android:angle="0"/>
+</shape>
