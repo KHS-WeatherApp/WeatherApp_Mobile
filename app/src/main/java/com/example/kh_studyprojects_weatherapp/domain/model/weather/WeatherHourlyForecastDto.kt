@@ -1,6 +1,6 @@
 package com.example.kh_studyprojects_weatherapp.domain.model.weather
 
-class WeatherHourlyForecastDto (
+data class WeatherHourlyForecastDto(
     val tvAmPm: String?,            // AM/PM
     val tvHour: String?,            // 시간
     val probability: String?,       // 강수 확률

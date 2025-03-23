@@ -6,14 +6,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastFragmentBinding
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class WeatherHourlyForecastFragment : Fragment() {
 
     private var _binding: WeatherHourlyForecastFragmentBinding? = null // 뷰 바인딩 객체를 위한 변수를 선언 (null 허용)
     private val binding get() = _binding!! // 안전하게 접근할 수 있도록 get()을 통해 _binding의 값을 사용
     private lateinit var adapter: WeatherHourlyForecastAdapter // 리사이클러뷰의 어댑터를 늦은 초기화(Lateinit) 방식으로 선언
+    private val viewModel: WeatherHourlyForecastViewModel by viewModels()
 
     // Fragment가 생성될 때 호출되는 메서드로, UI를 초기화하고 구성하는 작업을 수행
     override fun onCreateView(
@@ -51,6 +59,18 @@ class WeatherHourlyForecastFragment : Fragment() {
             adapter.isVertical = isChecked // 어댑터의 레이아웃 모드(isVertical)를 업데이트
             adapter.notifyDataSetChanged() // 어댑터에 데이터 변경 알림을 보내서 RecyclerView를 갱신
         }
+
+        // 데이터 관찰 및 어댑터에 제출
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.hourlyForecastItems.collect { items ->
+                    adapter.submitList(items)
+                }
+            }
+        }
+
+        // 데이터 가져오기
+        viewModel.fetchHourlyForecast()
 
         // 루트 뷰를 반환하여 Fragment의 UI를 화면에 표시
         return root
