@@ -44,7 +44,7 @@ class FinedustFragment : Fragment() {
         // 하단 네비게이션 바인딩 초기화
         // include된 레이아웃의 바인딩을 위해 root에서 해당 뷰를 찾아 바인딩
         _navigationBinding = LayoutNavigationBottomBinding.bind(
-            binding.root.findViewById(R.id.layout_navigation_bottom)
+            binding.root.findViewById(R.id.included_navigation_bottom)
         )
         
         // 네비게이션 클릭 리스너 설정

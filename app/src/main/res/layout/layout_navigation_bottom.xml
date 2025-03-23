@@ -24,7 +24,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="13dp"
+            android:layout_margin="7dp"
             android:src="@drawable/ic_nav_weatherimg" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -82,7 +82,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="7dp"
+            android:layout_margin="5dp"
             android:src="@drawable/ic_nav_finedustimg" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
