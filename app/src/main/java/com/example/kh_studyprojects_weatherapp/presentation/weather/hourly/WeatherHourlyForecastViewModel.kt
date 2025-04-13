@@ -44,6 +44,7 @@ class WeatherHourlyForecastViewModel @Inject constructor(
         val temperatures = hourlyData["temperature_2m"] as? List<Double> ?: return emptyList()
         val precipitationProbs = hourlyData["precipitation_probability"] as? List<Int> ?: return emptyList()
         val precipitations = hourlyData["precipitation"] as? List<Double> ?: return emptyList()
+        val weatherCodes = hourlyData["weather_code"] as? List<Int> ?: return emptyList()
 
         // 현재 시간 구하기
         val now = java.time.LocalDateTime.now()
@@ -71,8 +72,9 @@ class WeatherHourlyForecastViewModel @Inject constructor(
             val prob = if (precipitationProbs[currentIndex] > 0) "${precipitationProbs[currentIndex]}%" else ""
             val precip = if (precipitations[currentIndex] > 0) "${precipitations[currentIndex]}mm" else ""
             val temp = temperatures[currentIndex].toString()
+            val weatherCode = weatherCodes[currentIndex].toInt()
 
-            result.add(WeatherHourlyForecastDto(amPm, formattedHour, prob, precip, temp))
+            result.add(WeatherHourlyForecastDto(amPm, formattedHour, prob, precip, temp , weatherCode))
 
             currentIndex = (currentIndex + 1) % times.size
             hoursCount++

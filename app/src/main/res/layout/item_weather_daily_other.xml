@@ -115,7 +115,7 @@
                 android:orientation="horizontal"
                 android:gravity="end|center_vertical"
                 android:layout_alignParentEnd="true"
-                android:paddingEnd="5dp">
+                android:paddingEnd="2dp">
 
                 <!-- 최저 온도 -->
                 <TextView
@@ -155,6 +155,16 @@
                     android:text="16°"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"/>
+                <!-- 더보기 , 시간별 날씨보기란  -->
+                <ImageView
+                    android:id="@+id/day_expand_more_24_btn"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="1dp"
+                    android:src="@drawable/sh_day_btn_expand_more_24"
+                    android:contentDescription="더보기" />
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
@@ -162,4 +172,14 @@
         android:layout_width="match_parent"
         android:layout_height="0.7dp"
         android:background="#33EEF2F9" />
+    <FrameLayout
+        android:id="@+id/hourly_expanded_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+        
+        <include
+            android:id="@+id/hourly_forecast"
+            layout="@layout/item_weather_daily_tohourly_forecast"/>
+    </FrameLayout>
 </LinearLayout>

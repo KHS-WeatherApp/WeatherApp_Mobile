@@ -1,20 +1,23 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.daily
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyDto
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
-import kotlinx.coroutines.launch
-import java.time.DayOfWeek
-import java.time.LocalDate
-import kotlin.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @HiltViewModel
 class WeatherDailyViewModel @Inject constructor(
@@ -35,156 +38,150 @@ class WeatherDailyViewModel @Inject constructor(
     private var is15DaysShown = false
 
     init {
-        fetchWeatherData(37.5665, 126.9780) // 초기 데이터 로드 (서울 좌표)
+        fetchWeatherData(37.5606, 126.9433)
     }
 
     fun fetchWeatherData(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                Log.i("WeatherVM", "Start fetching weather data: lat=$latitude, lon=$longitude")
                 weatherRepository.getWeatherInfo(latitude, longitude)
                     .onSuccess { response ->
+                        Log.i("WeatherVM", "Weather data fetch success")
                         val data = response as? Map<String, Any>
                         if (data != null) {
                             fullWeatherData = convertToWeatherDailyItems(data)
-                            // 기본적으로 오늘부터 10일치 데이터만 보여주기
                             _weatherItems.value = fullWeatherData.subList(1, minOf(11, fullWeatherData.size))
                             _error.value = null
+                            Log.i("WeatherVM", "Parsed daily items: ${fullWeatherData.size}")
                         } else {
                             _error.value = "날씨 데이터 형식이 올바르지 않습니다"
                             _weatherItems.value = emptyList()
+                            Log.e("WeatherVM", "Invalid data format")
                         }
                     }
                     .onFailure { exception ->
                         _error.value = exception.message ?: "알 수 없는 오류가 발생했습니다"
                         _weatherItems.value = emptyList()
+                        Log.e("WeatherVM", "Weather data fetch failed", exception)
                     }
             } catch (e: Exception) {
                 _error.value = e.message
                 _weatherItems.value = emptyList()
+                Log.e("WeatherVM", "Exception in fetchWeatherData", e)
             } finally {
                 _isLoading.value = false
+                Log.i("WeatherVM", "Fetching weather data done")
             }
         }
     }
 
+
     fun toggleYesterdayWeather() {
         val currentData = _weatherItems.value
-
-        // 데이터가 없거나 어제 데이터가 없는 경우 예외 방지
-        if (fullWeatherData.isNullOrEmpty() || fullWeatherData.firstOrNull() == null) return
+        if (fullWeatherData.isEmpty() || fullWeatherData.firstOrNull() == null) return
 
         isYesterdayShown = !isYesterdayShown
 
         _weatherItems.value = if (isYesterdayShown) {
-            // 어제 데이터를 추가
             listOf(fullWeatherData[0]) + currentData
         } else {
-            // 어제 데이터 제거
             currentData.filter { it.type != WeatherDailyDto.Type.YESTERDAY }
         }
     }
 
     fun toggle15DaysWeather() {
-
-        // 데이터가 없으면 예외 방지
-        if (fullWeatherData.isNullOrEmpty()) return
+        if (fullWeatherData.isEmpty()) return
 
         is15DaysShown = !is15DaysShown
 
         _weatherItems.value = if (is15DaysShown) {
-            // 15일치 데이터 보여주기 (어제 데이터 제외)
             fullWeatherData.subList(1, minOf(16, fullWeatherData.size))
         } else {
-            // 기본 10일로 돌아가기
             fullWeatherData.subList(1, minOf(11, fullWeatherData.size))
         }
     }
 
-    private fun convertToWeatherDailyItems(weatherData: Map<String, Any>): List<WeatherDailyDto> {
-        return try {
-            // daily 데이터 가져오기
-            val dailyData = weatherData["daily"] as? Map<*, *>
-            if (dailyData == null) {
-                println("Daily data is null") // 디버깅용
-                return emptyList()
+    private fun convertToWeatherDailyItems(data: Map<String, Any>): List<WeatherDailyDto> {
+        val daily = data["daily"] as? Map<*, *> ?: return emptyList()
+        val hourly = data["hourly"] as? Map<*, *> ?: return emptyList()
+
+        val dailyTime = daily["time"] as? List<String> ?: return emptyList()
+        val maxTemps = daily["temperature_2m_max"] as? List<Double> ?: return emptyList()
+        val minTemps = daily["temperature_2m_min"] as? List<Double> ?: return emptyList()
+        val weatherCodes = daily["weather_code"] as? List<*> ?: return emptyList()
+        val precipitations = daily["precipitation_sum"] as? List<Double> ?: return emptyList()
+        val humidities = daily["precipitation_probability_max"] as? List<*> ?: return emptyList()
+
+        val hourlyTimes = hourly["time"] as? List<String> ?: return emptyList()
+        val hourlyTemps = hourly["temperature_2m"] as? List<Double> ?: return emptyList()
+        val hourlyPrecip = hourly["precipitation"] as? List<Double> ?: return emptyList()
+        //val hourlyProb = hourly["precipitation_probability"] as? List<Int> ?: return emptyList()
+        //val hourlyCodes = hourly["weather_code"] as? List<Int> ?: return emptyList()
+        val hourlyProbRaw = hourly["precipitation_probability"] as? List<*> ?: return emptyList()
+        val hourlyCodesRaw = hourly["weather_code"] as? List<*> ?: return emptyList()
+
+        val hourlyProb = hourlyProbRaw.map { (it as Number).toInt() }
+        val hourlyCodes = hourlyCodesRaw.map { (it as Number).toInt() }
+
+        val hourlyPerDay = hourlyTimes.groupBy { it.substring(0, 10) } // yyyy-MM-dd
+
+        val lowestTemp = (minTemps.minOrNull() ?: -18.0) - 2.0
+        val highestTemp = (maxTemps.maxOrNull() ?: 38.0) + 2.0
+
+        return dailyTime.mapIndexed { index, date ->
+
+            val hourlyDataList = hourlyPerDay[date]
+
+            if (hourlyDataList == null) {
+                Log.w("TodayViewHolder", "No hourly data for date: $date")
+            } else {
+                Log.i("TodayViewHolder", "Found hourly data (${hourlyDataList.size}) for date: $date")
             }
 
-            // 필요한 데이터 추출
-            val dates = dailyData["time"] as? List<*>
-            val maxTemps = dailyData["temperature_2m_max"] as? List<*>
-            val minTemps = dailyData["temperature_2m_min"] as? List<*>
-            val weatherCodes = dailyData["weather_code"] as? List<*>
-            val precipitations = dailyData["precipitation_sum"] as? List<*>
-            val humidities = dailyData["precipitation_probability_max"] as? List<*>
+            val hourlyForecast = hourlyDataList?.mapNotNull { timeStr ->
+                try {
+                    val idx = hourlyTimes.indexOf(timeStr)
 
-            // null 체크
-            if (dates == null || maxTemps == null || minTemps == null || 
-                weatherCodes == null || precipitations == null || humidities == null) {
-                println("Some required data is null") // 디버깅용
-                return emptyList()
-            }
-
-            val lowestTemp = (minTemps.mapNotNull { 
-                it.toString().replace("°", "").toDoubleOrNull() 
-            }.minOrNull() ?: -18.0) - 2.0  // 최저 온도에서 2도 더 낮게
-                        
-            val highestTemp = (maxTemps.mapNotNull { 
-                it.toString().replace("°", "").toDoubleOrNull() 
-            }.maxOrNull() ?: 38.0) + 2.0  // 최고 온도에서 2도 더 높게
-
-            buildList {
-                // 어제 날씨
-                add(WeatherDailyDto(
-                    type = WeatherDailyDto.Type.YESTERDAY,
-                    week = "어제",
-                    date = dates[0].toString(),
-                    precipitation = "${precipitations[0]}mm",
-                    humidity = "${(humidities?.get(0) as? Number)?.toInt() ?: 0}%",
-                    minTemp = "${minTemps[0]}°",
-                    maxTemp = "${maxTemps[0]}°",
-                    weatherCode = (weatherCodes[0] as? Number)?.toInt() ?: 0,
-                    isVisible = true,
-                    globalMinTemp = lowestTemp,
-                    globalMaxTemp = highestTemp
-                ))
-
-                // 오늘 날씨
-                add(WeatherDailyDto(
-                    type = WeatherDailyDto.Type.TODAY,
-                    week = "오늘",
-                    date = dates[1].toString(),
-                    precipitation = "${precipitations[1]}mm",
-                    humidity = "${(humidities?.get(1) as? Number)?.toInt() ?: 0}%",
-                    minTemp = "${minTemps[1]}°",
-                    maxTemp = "${maxTemps[1]}°",
-                    weatherCode = (weatherCodes[1] as? Number)?.toInt() ?: 0,
-                    isVisible = true,
-                    globalMinTemp = lowestTemp,
-                    globalMaxTemp = highestTemp
-                ))
-
-                // 다음 날씨들
-                for (i in 2 until minOf(dates.size, 16)) {
-                    add(WeatherDailyDto(
-                        type = WeatherDailyDto.Type.OTHER,
-                        week = getDayOfWeek(dates[i].toString()),
-                        date = formatDate(dates[i].toString()),
-                        precipitation = "${precipitations[i]}mm",
-                        humidity = "${(humidities?.get(i) as? Number)?.toInt() ?: 0}%",
-                        minTemp = "${minTemps[i]}°",
-                        maxTemp = "${maxTemps[i]}°",
-                        weatherCode = (weatherCodes[i] as? Number)?.toInt() ?: 0,
-                        isVisible = true,
-                        globalMinTemp = lowestTemp,
-                        globalMaxTemp = highestTemp
-                    ))
+                    val hour = LocalDateTime.parse(timeStr, DateTimeFormatter.ISO_DATE_TIME).hour
+                    WeatherHourlyForecastDto(
+                        tvAmPm = if (hour < 12) "오전" else "오후",
+                        tvHour = if (hour == 0 || hour == 12 ) "12" else (hour % 12).toString(),
+                        probability = "${hourlyProb.getOrNull(idx) ?: 0}%",
+                        precipitation = "${hourlyPrecip.getOrNull(idx) ?: 0.0}mm",
+                        temperature = "${hourlyTemps.getOrNull(idx) ?: 0.0}°",
+                        weatherCode = hourlyCodes.getOrNull(idx) ?: 0
+                    )
+                } catch (e: Exception) {
+                    Log.e("TodayViewHolder", "hourlyForecast error: $timeStr", e)
+                    null
                 }
+            } ?: emptyList()
+
+            Log.i("TodayViewHolder", "hourlyForecast size: ${hourlyForecast.size}")
+            hourlyForecast.forEachIndexed { i, it ->
+                Log.i("TodayViewHolder", "[$i] ${it.tvAmPm} ${it.tvHour}시 / ${it.temperature} / ${it.probability} / ${it.precipitation} / code=${it.weatherCode}")
             }
-        } catch (e: Exception) {
-            println("Conversion error: ${e.message}") // 디버깅용
-            e.printStackTrace()
-            emptyList()
+
+            WeatherDailyDto(
+                type = when (index) {
+                    0 -> WeatherDailyDto.Type.YESTERDAY
+                    1 -> WeatherDailyDto.Type.TODAY
+                    else -> WeatherDailyDto.Type.OTHER
+                },
+                week = if (index == 0) "어제" else if (index == 1) "오늘" else getDayOfWeek(date),
+                date = if (index == 0 || index == 1) date else formatDate(date),
+                precipitation = "${precipitations.getOrNull(index) ?: 0.0}mm",
+                humidity = "${(humidities?.get(index) as? Number)?.toInt() ?: 0}%",
+                minTemp = "${minTemps.getOrNull(index) ?: 0.0}°",
+                maxTemp = "${maxTemps.getOrNull(index) ?: 0.0}°",
+                weatherCode = (weatherCodes.getOrNull(index) as? Number)?.toInt() ?: 0,
+                isVisible = true,
+                globalMinTemp = lowestTemp,
+                globalMaxTemp = highestTemp,
+                hourlyForecast = hourlyForecast
+            )
         }
     }
 
@@ -217,4 +214,4 @@ class WeatherDailyViewModel @Inject constructor(
     fun errorShown() {
         _error.value = null
     }
-} 
+}

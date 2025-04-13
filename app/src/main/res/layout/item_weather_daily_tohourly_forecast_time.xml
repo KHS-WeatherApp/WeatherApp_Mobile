@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="12dp"> <!-- 배경 색상 지정 -->
+
+    <!-- 시간 텍스트 -->
+    <TextView
+        android:id="@+id/hourly_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="오전 6시"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:layout_marginEnd="8dp" />
+
+    <!-- 날씨 아이콘 -->
+    <ImageView
+        android:id="@+id/hourly_weather_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/weather_icon_fog"
+        android:layout_marginEnd="8dp" />
+
+    <!-- 강수 확률 + 강수량 -->
+    <TextView
+        android:id="@+id/hourly_precipitation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="80%·0.7mm"
+        android:textColor="#CCFFFFFF"
+        android:textSize="12sp"
+        android:layout_marginEnd="8dp" />
+
+    <!-- 온도 원형 뱃지 -->
+    <TextView
+        android:id="@+id/hourly_temp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:gravity="center"
+        android:text="5°"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" />
+</LinearLayout>
