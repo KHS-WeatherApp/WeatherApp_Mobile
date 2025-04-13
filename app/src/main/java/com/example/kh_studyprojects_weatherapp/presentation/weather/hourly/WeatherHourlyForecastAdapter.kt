@@ -101,6 +101,7 @@ class WeatherHourlyForecastAdapter(
             }
         }
 
+        // 온도에 따른 마진을 설정하는 메서드
         private fun getMarginForTemperature(temp: Double): Int = when {
             temp >= 30.0 -> resources.getDimensionPixelSize(R.dimen.dp_150)
             temp >= 29.0 -> resources.getDimensionPixelSize(R.dimen.dp_145)
@@ -136,6 +137,7 @@ class WeatherHourlyForecastAdapter(
             else -> resources.getDimensionPixelSize(R.dimen.dp_0)
         }
 
+        // 온도에 따른 배경 리소스를 설정하는 메서드
         private fun getBackgroundForTemperature(temp: Double): Int = when {
             temp >= 30.0 -> R.drawable.sh_hourly_round_temperature_30
             temp >= 25.0 -> R.drawable.sh_hourly_round_temperature_20
