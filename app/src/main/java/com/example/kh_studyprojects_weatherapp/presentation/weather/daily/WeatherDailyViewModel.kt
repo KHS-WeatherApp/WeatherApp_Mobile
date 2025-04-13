@@ -70,6 +70,10 @@ class WeatherDailyViewModel @Inject constructor(
 
     fun toggleYesterdayWeather() {
         val currentData = _weatherItems.value
+
+        // 데이터가 없거나 어제 데이터가 없는 경우 예외 방지
+        if (fullWeatherData.isNullOrEmpty() || fullWeatherData.firstOrNull() == null) return
+
         isYesterdayShown = !isYesterdayShown
 
         _weatherItems.value = if (isYesterdayShown) {
@@ -82,6 +86,10 @@ class WeatherDailyViewModel @Inject constructor(
     }
 
     fun toggle15DaysWeather() {
+
+        // 데이터가 없으면 예외 방지
+        if (fullWeatherData.isNullOrEmpty()) return
+
         is15DaysShown = !is15DaysShown
 
         _weatherItems.value = if (is15DaysShown) {
@@ -132,7 +140,7 @@ class WeatherDailyViewModel @Inject constructor(
                     week = "어제",
                     date = dates[0].toString(),
                     precipitation = "${precipitations[0]}mm",
-                    humidity = "${humidities[0]}%",
+                    humidity = "${(humidities?.get(0) as? Number)?.toInt() ?: 0}%",
                     minTemp = "${minTemps[0]}°",
                     maxTemp = "${maxTemps[0]}°",
                     weatherCode = (weatherCodes[0] as? Number)?.toInt() ?: 0,
@@ -147,7 +155,7 @@ class WeatherDailyViewModel @Inject constructor(
                     week = "오늘",
                     date = dates[1].toString(),
                     precipitation = "${precipitations[1]}mm",
-                    humidity = "${humidities[1]}%",
+                    humidity = "${(humidities?.get(1) as? Number)?.toInt() ?: 0}%",
                     minTemp = "${minTemps[1]}°",
                     maxTemp = "${maxTemps[1]}°",
                     weatherCode = (weatherCodes[1] as? Number)?.toInt() ?: 0,
@@ -163,7 +171,7 @@ class WeatherDailyViewModel @Inject constructor(
                         week = getDayOfWeek(dates[i].toString()),
                         date = formatDate(dates[i].toString()),
                         precipitation = "${precipitations[i]}mm",
-                        humidity = "${humidities[i]}%",
+                        humidity = "${(humidities?.get(i) as? Number)?.toInt() ?: 0}%",
                         minTemp = "${minTemps[i]}°",
                         maxTemp = "${maxTemps[i]}°",
                         weatherCode = (weatherCodes[i] as? Number)?.toInt() ?: 0,

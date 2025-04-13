@@ -40,7 +40,8 @@
         android:layout_height="wrap_content"
         android:overScrollMode="never"
         android:nestedScrollingEnabled="false"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+    </androidx.recyclerview.widget.RecyclerView>
 
     <!-- 버튼 컨테이너 -->
     <LinearLayout
