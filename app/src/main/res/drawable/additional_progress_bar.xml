@@ -1,0 +1,62 @@
+<!--<layer-list xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--    &lt;!&ndash; Background Layer &ndash;&gt;-->
+<!--    <item>-->
+<!--        <shape android:shape="rectangle"> &lt;!&ndash;직사각형&ndash;&gt;-->
+<!--            <corners android:radius="8dp"/>-->
+<!--            <solid android:color="@color/black"/>-->
+<!--            <size android:height="20dp"/>-->
+<!--        </shape>-->
+<!--    </item>-->
+<!--    &lt;!&ndash; Progress Layer &ndash;&gt;-->
+<!--    <item android:id="@android:id/progress">-->
+<!--        <shape android:shape="rectangle">-->
+<!--            <corners android:radius="8dp"/>-->
+<!--            <solid android:color="@color/white"/>-->
+<!--            <size android:height="16dp"/>-->
+<!--        </shape>-->
+<!--    </item>-->
+<!--</layer-list>-->
+
+<!--<layer-list xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--    &lt;!&ndash; Background Layer &ndash;&gt;-->
+<!--    <item>-->
+<!--        <shape android:shape="rectangle"> &lt;!&ndash; 직사각형 형태의 배경 &ndash;&gt;-->
+<!--            <corners android:radius="8dp"/> &lt;!&ndash; 모서리를 8dp로 둥글게 만듦 &ndash;&gt;-->
+<!--            <solid android:color="@color/black"/> &lt;!&ndash; 배경 색상을 검정색으로 설정 &ndash;&gt;-->
+<!--        </shape>-->
+<!--    </item>-->
+
+<!--    &lt;!&ndash; Progress Layer &ndash;&gt;-->
+<!--    <item android:id="@android:id/progress">-->
+<!--        <shape android:shape="rectangle"> &lt;!&ndash; 직사각형 형태의 진행 레이어 &ndash;&gt;-->
+<!--            <corners android:radius="8dp"/> &lt;!&ndash; 모서리를 8dp로 둥글게 만듦 &ndash;&gt;-->
+<!--            <solid android:color="#FFEB3B"/> &lt;!&ndash; 노란색으로 변경하여 명확한 대비 유지 &ndash;&gt;-->
+<!--        </shape>-->
+<!--    </item>-->
+<!--</layer-list>-->
+<!--
+중요 수정 사항:
+android:id="@android:id/progress": 이 ID는 필수적입니다. 이 ID가 없으면 ProgressBar는 진행 상태를 어디에 반영해야 할지 모르기 때문에, 진행 상태가 시각적으로 표시되지 않습니다.
+<clip> 태그 사용: <clip> 태그는 진행 상태를 반영할 수 있도록 클리핑(자르기)하는 역할을 합니다. 이를 통해 진행 상태에 따라 해당 레이어의 길이가 변할 수 있습니다.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background Layer -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <corners android:radius="50dp"/>  <!-- 완전한 라운드 모서리를 위해 큰 값 설정 -->
+            <solid android:color="#E0E0E0"/>  <!-- 배경색을 연한 회색으로 설정 -->
+            <size android:height="10dp"/>
+        </shape>
+    </item>
+
+    <!-- Progress Layer -->
+    <item android:id="@android:id/progress">
+        <scale android:scaleWidth="100%">
+            <shape android:shape="rectangle">
+                <corners android:radius="50dp"/>  <!-- 완전한 라운드 모서리를 위해 큰 값 설정 -->
+                <solid android:color="#90EE90"/>  <!-- 연한 초록색 -->
+                <size android:height="10dp"/>
+            </shape>
+        </scale>
+    </item>
+</layer-list>

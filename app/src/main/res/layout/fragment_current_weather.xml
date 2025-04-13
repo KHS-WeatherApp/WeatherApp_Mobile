@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/weather"
+    android:layout_marginBottom="@dimen/sp_20"
+    >
+
+    <!-- 상단 툴바/헤더 영역 -->
+    <LinearLayout
+        android:id="@+id/topBarLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintWidth_default="spread">
+
+        <!-- 햄버거 메뉴 아이콘 -->
+        <ImageView
+            android:id="@+id/ivMenu"
+            android:layout_width="@dimen/sp_40"
+            android:layout_height="@dimen/sp_40"
+            android:src="@drawable/ic_hourly_weatherclockimg"
+            android:layout_gravity="center_vertical"
+            />
+
+        <!-- 도시명 텍스트: 서울 -->
+        <TextView
+            android:id="@+id/tvCity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="도화동"
+            android:textSize="@dimen/sp_30"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_weight="1"
+            />
+
+        <!-- 우측 여백을 위한 투명한 뷰 -->
+        <View
+            android:layout_width="@dimen/sp_40"
+            android:layout_height="@dimen/sp_40"
+            android:layout_gravity="center_vertical"/>
+
+        <!-- (우측에 아이콘 등을 추가할 수도 있음) -->
+    </LinearLayout><!-- 상단 툴바/헤더 영역 [끝] -->
+
+    <!-- 날씨 아이콘과 온도 등을 담을 레이아웃(중앙 정렬) -->
+    <!-- 날씨 아이콘과 온도 등을 담을 레이아웃(세로 정렬) -->
+    <LinearLayout
+        android:id="@+id/weatherInfoLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@+id/topBarLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/clothesLayout"
+        android:layout_marginTop="@dimen/sp_5"
+        >
+
+        <!-- [1] 아이콘과 현재 온도를 '한 줄'로 가로 배치하려고
+             중첩 LinearLayout(orientation="horizontal") 사용 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            >
+
+            <!-- 날씨 아이콘 -->
+            <ImageView
+                android:id="@+id/currentWeatherIcon"
+                android:layout_width="@dimen/sp_80"
+                android:layout_height="@dimen/sp_80"
+                android:src="@drawable/weather_icon_snow"
+                android:layout_marginRight="12dp"/>
+
+            <!-- 현재 온도 -->
+            <TextView
+                android:id="@+id/CurrentTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-10°"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/sp_55"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- [2] 날씨 설명 (두 번째 줄) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            >
+            <TextView
+                android:id="@+id/WeatherCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="눈내림"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/sp_14"
+                android:layout_marginTop="@dimen/sp_8"
+                android:layout_marginBottom="@dimen/sp_4"
+                android:layout_marginRight="@dimen/sp_8"
+                android:gravity="center"/>
+            <TextView
+                android:id="@+id/WeatherDiff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="어제보다 4° 높아요"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="@dimen/sp_14"
+                android:layout_marginTop="@dimen/sp_8"
+                android:layout_marginBottom="@dimen/sp_4"
+                android:gravity="center"/>
+        </LinearLayout>
+        <!-- [3] 최저/최고 온도 (세 번째 줄) -->
+        <TextView
+            android:id="@+id/dailyMinMaxTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="최저: -13°  최고: -8°"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/sp_14"
+            android:gravity="center"/>
+
+    </LinearLayout> <!-- 날씨 아이콘과 온도 등을 담을 레이아웃[끝] -->
+
+    <!-- 우측 추천 옷 영역 -->
+    <LinearLayout
+        android:id="@+id/clothesLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@+id/topBarLayout"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/weatherInfoLayout"
+        android:layout_marginTop="@dimen/sp_5">
+
+        <ImageView
+            android:id="@+id/RecommendClothesIcon"
+            android:layout_width="@dimen/sp_80"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_current_padded_jacket" />
+
+        <!-- "추천 옷: 점퍼" -->
+        <TextView
+            android:id="@+id/RecommendClothes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="추천 옷: 점퍼"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/sp_14"
+            android:layout_marginTop="@dimen/sp_8"
+            android:layout_marginBottom="@dimen/sp_4"
+            android:gravity="center"/>
+
+        <!-- 체감 온도 -->
+        <TextView
+            android:id="@+id/apparentTemperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="체감온도: -16°"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/sp_14" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

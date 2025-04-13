@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".presentation.weather.additional.AdditionalWeatherFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/weather"
+    android:padding="10dp">
+
+    <!--
+        (1) 세 개의 가이드라인:
+            - guideLeft: 20% 위치
+            - guideCenterLeft: 45% 위치
+            - guideCenterRight: 55% 위치
+            - guideRight: 80% 위치
+
+            - guideLeft: 10% 위치
+            - guideCenterLeft: 47.5% 위치
+            - guideCenterRight: 52.5% 위치
+            - guideRight: 90% 위치
+
+          왼쪽 칼럼은 [guideLeft ~ guideCenterLeft] (37.5% 폭),
+          오른쪽 칼럼은 [guideCenterRight ~ guideRight] (37.5% 폭),
+          중앙에는 5% 갭(47.5% ~ 52.5%),
+          양쪽 바깥으론 10%씩 남음 => 전체가 가운데 몰린 형태.
+    -->
+
+    <!--
+         체인 구성을 위해:
+           - 첫 번째(위) 아이템: top_toTopOf="parent"
+           - 마지막(아래) 아이템: bottom_toBottomOf="parent"
+           - 중간(uv_index)은 fine_dust 아래, wind_speed 위...
+         체인스타일은 "packed"로 잡아서 여유공간이 있으면 위아래로 살짝 몰림.
+    -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.00" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideCenterLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.475" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideCenterRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.525" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="1" />
+
+
+    <!-- =========================================================
+         왼쪽 칼럼: (1) fine_dust, (2) uv_index, (3) wind_speed
+         ========================================================= -->
+
+    <!-- (왼쪽 1) 미세먼지 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fine_dust"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/additional_rounded_corner"
+        app:layout_constraintStart_toStartOf="@id/guideLeft"
+        app:layout_constraintEnd_toStartOf="@id/guideCenterLeft"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/uv_index"
+        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintVertical_chainStyle="packed"
+        >
+
+        <!-- (1) 첫 번째 뷰: fine_dust_title -->
+        <TextView
+            android:id="@+id/fine_dust_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="미세먼지"
+            android:textStyle="bold"
+            android:textSize="@dimen/sp_20"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/fineDustLevel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginBottom="5dp"
+            />
+
+        <!-- (2) 두 번째 뷰: fine_dust_level -->
+        <TextView
+            android:id="@+id/fineDustLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="보통 27"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/weatherBtnRadiusBackground"
+            app:layout_constraintTop_toBottomOf="@id/fine_dust_title"
+            app:layout_constraintBottom_toTopOf="@+id/fine_dust_progress_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="10dp"
+            />
+
+        <!-- (3) 세 번째 뷰: fine_dust_progress_bar -->
+        <ProgressBar
+            android:id="@+id/fine_dust_progress_bar"
+            android:layout_width="100dp"
+            android:layout_height="15dp"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/additional_progress_bar"
+            android:max="100"
+            android:progress="27"
+            app:layout_constraintTop_toBottomOf="@+id/fineDustLevel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- (왼쪽 2) 자외선 지수 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/uv_index"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@+id/guideLeft"
+        app:layout_constraintEnd_toStartOf="@+id/guideCenterLeft"
+        app:layout_constraintTop_toBottomOf="@+id/fine_dust"
+        app:layout_constraintBottom_toTopOf="@+id/wind_speed"
+        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/additional_rounded_corner">
+
+        <!-- ◆ 내부 자식들 (uv_index 내부 내용) -->
+        <ImageView
+            android:id="@+id/uv_index_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_additional_sun"
+            android:contentDescription="샘플 이미지"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/uv_index_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginBottom="5dp"
+            />
+
+        <TextView
+            android:id="@+id/uv_index_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="자외선지수"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toBottomOf="@+id/uv_index_image"
+            app:layout_constraintBottom_toTopOf="@+id/uvIndexLevel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="2dp" />
+
+        <TextView
+            android:id="@+id/uvIndexLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="높음"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/weatherBtnRadiusBackground"
+            app:layout_constraintTop_toBottomOf="@+id/uv_index_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- (왼쪽 3) 바람세기 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/wind_speed"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@+id/guideLeft"
+        app:layout_constraintEnd_toStartOf="@+id/guideCenterLeft"
+        app:layout_constraintTop_toBottomOf="@+id/uv_index"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/additional_rounded_corner">
+
+        <!-- ◆ 내부 자식들 (wind_speed 내부 내용) -->
+        <ImageView
+            android:id="@+id/wind_speed_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_additional_wind"
+            android:contentDescription="샘플 이미지"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/wind_speed_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginBottom="5dp" />
+
+        <TextView
+            android:id="@+id/wind_speed_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="바람"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toBottomOf="@+id/wind_speed_image"
+            app:layout_constraintBottom_toTopOf="@+id/windSpeedLevel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="2dp" />
+
+        <TextView
+            android:id="@+id/windSpeedLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3m/s"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/weatherBtnRadiusBackground"
+            app:layout_constraintTop_toBottomOf="@+id/wind_speed_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- =========================================================
+         오른쪽 칼럼: (4) ultra_fine_dust, (5) precipitation, (6) sun_setting
+         ========================================================= -->
+
+    <!-- (오른쪽 1) 초미세먼지 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ultra_fine_dust"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@+id/guideCenterRight"
+        app:layout_constraintEnd_toStartOf="@+id/guideRight"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/precipitation"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/additional_rounded_corner">
+
+        <!-- ◆ 내부 자식들 (ultra_fine_dust 내부 내용) -->
+        <TextView
+            android:id="@+id/ultra_fine_dust_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="초미세먼지"
+            android:textStyle="bold"
+            android:textSize="@dimen/sp_20"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/ultraFineDustLevel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginBottom="5dp"
+            />
+
+        <TextView
+            android:id="@+id/ultraFineDustLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="보통 27"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/weatherBtnRadiusBackground"
+            app:layout_constraintTop_toBottomOf="@+id/ultra_fine_dust_title"
+            app:layout_constraintBottom_toTopOf="@+id/ultra_fine_dust_progress_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="10dp"
+            />
+
+        <ProgressBar
+            android:id="@+id/ultra_fine_dust_progress_bar"
+            android:layout_width="100dp"
+            android:layout_height="15dp"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/additional_progress_bar"
+            android:max="100"
+            android:progress="27"
+            app:layout_constraintTop_toBottomOf="@+id/ultraFineDustLevel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- (오른쪽 2) 강수 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/precipitation"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@+id/guideCenterRight"
+        app:layout_constraintEnd_toStartOf="@+id/guideRight"
+        app:layout_constraintTop_toBottomOf="@+id/ultra_fine_dust"
+        app:layout_constraintBottom_toTopOf="@+id/sun_setting"
+        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/additional_rounded_corner">
+
+        <!-- ◆ 내부 자식들 (precipitation 내부 내용) -->
+        <ImageView
+            android:id="@+id/precipitation_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_additional_rain"
+            android:contentDescription="샘플 이미지"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/precipitation_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginBottom="5dp"
+            />
+
+        <TextView
+            android:id="@+id/precipitation_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="강수"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toBottomOf="@+id/precipitation_image"
+            app:layout_constraintBottom_toTopOf="@+id/precipitationLevel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="2dp"
+            />
+
+        <TextView
+            android:id="@+id/precipitationLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.25mm/적음"
+            android:textSize="@dimen/sp_14"
+            android:textColor="@color/weatherBtnRadiusBackground"
+            app:layout_constraintTop_toBottomOf="@+id/precipitation_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- (오른쪽 3) 일출/일몰 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sun_setting"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@+id/guideCenterRight"
+        app:layout_constraintEnd_toStartOf="@+id/guideRight"
+        app:layout_constraintTop_toBottomOf="@+id/precipitation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/additional_rounded_corner">
+
+        <!--
+            기존 일출/일몰을 2등분하기 위해 sunrise / sunset 두 개의 ConstraintLayout을 남김
+            (여기서도 수평 체인을 쓰면 중첩을 조금 더 줄일 수 있지만,
+             코너 라운드를 나누고 싶다면 이렇게 2개를 두는 게 간단합니다)
+        -->
+
+        <!-- 일출 영역 (왼쪽 절반) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/sunrise"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/sunset"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/sh_add_round_t_l_01">
+
+            <ImageView
+                android:id="@+id/sunrise_image"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_additional_sunrise"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/sunrise_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                android:layout_marginBottom="5dp"
+                />
+
+            <TextView
+                android:id="@+id/sunrise_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일출"
+                android:textSize="@dimen/sp_18"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                app:layout_constraintTop_toBottomOf="@+id/sunrise_image"
+                app:layout_constraintBottom_toTopOf="@+id/sunriseTime"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="2dp"
+                />
+            <TextView
+                android:id="@+id/sunriseTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="오전 6:00AM"
+                android:textSize="@dimen/sp_14"
+                android:textColor="@color/weatherBtnRadiusBackground"
+                app:layout_constraintTop_toBottomOf="@+id/sunrise_title"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 일몰 영역 (오른쪽 절반) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/sunset"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toEndOf="@+id/sunrise"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/sh_add_round_t_r_01">
+
+            <ImageView
+                android:id="@+id/sunset_image"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_additional_sunset"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/sunset_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                android:layout_marginBottom="5dp"
+                />
+
+            <TextView
+                android:id="@+id/sunset_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일몰"
+                android:textSize="@dimen/sp_18"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                app:layout_constraintTop_toBottomOf="@+id/sunset_image"
+                app:layout_constraintBottom_toTopOf="@+id/sunsetTime"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="2dp"
+                />
+            <TextView
+                android:id="@+id/sunsetTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="오후 6:00PM"
+                android:textSize="@dimen/sp_14"
+                android:textColor="@color/weatherBtnRadiusBackground"
+                app:layout_constraintTop_toBottomOf="@+id/sunset_title"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
