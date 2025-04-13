@@ -1,11 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-<!--    <style name="Base.Theme.KH_StudyProjects_WeatherApp" parent="Theme.Material3.DayNight.NoActionBar"> 기존 다크모드 지원-->
+<!--    <style name="Base.Theme.KH_StudyProjects_WeatherApp" parent="Theme.Material3.DayNight.NoActionBar"> &lt;!&ndash;기존 다크모드 지원&ndash;&gt;-->
     <style name="Base.Theme.KH_StudyProjects_WeatherApp" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
-        <item name="android:statusBarColor">@color/weather</item> <!-- 상태바 색상-->
-        <item name="android:windowLightStatusBar">false</item>   <!-- 상태바 아이콘(true: 검정 / false: 흰색) -->
+        <item name="android:statusBarColor">@color/status_bar_color</item> <!-- 휴대폰 상단 색상상태바 색상-->
+        <item name="android:windowLightStatusBar">true</item>   <!-- 상태바 아이콘(true: 검정 / false: 흰색) -->
 <!--        <item name="android:windowFullscreen">true</item> &lt;!&ndash;상태바 감추기&ndash;&gt;-->
 
     </style>
