@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="status_bar_color">#7FC6EF</color> <!-- 휴대폰 상단 상태바 색상 -->
-    
     <color name="weather">#7ECEFC</color> <!--날씨 화면 기본 배경색-->
     <color name="weather_radius">#7FC6EF</color> <!--날씨 화면 기본 배경색-->
     <color name="weatherRadiusBackground">#6563FF</color>
@@ -13,7 +11,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!--날씨 화면 온도 배경색-->
+    <!--날씨 시간별예보 온도 배경색-->
     <color name="temperature30">#FF5630</color>
     <color name="temperature20">#EDD061</color>
     <color name="temperature15">#C2D07A</color>
