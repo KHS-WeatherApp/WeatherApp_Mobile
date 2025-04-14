@@ -11,12 +11,18 @@ import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemHorizontalBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourlyForecastDto
+import java.util.*
 
 // RecyclerView 어댑터 클래스
 class WeatherHourlyForecastAdapter(
     private val context: Context,
     var isVertical: Boolean = false
 ) : ListAdapter<WeatherHourlyForecastDto, RecyclerView.ViewHolder>(WeatherHourlyForecastDiffCallback()) {
+
+    // 최저 온도를 저장하는 프로퍼티
+    private var minTemperature: Double = 0.0
+    // 현재 시간을 저장하는 프로퍼티
+    private var currentHour: Int = 0
 
     // 뷰 타입 상수
     companion object {
@@ -27,13 +33,44 @@ class WeatherHourlyForecastAdapter(
     // ViewHolder 재사용을 위한 설정
     init {
         setHasStableIds(true)
+        // 현재 시간 설정
+        currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    }
+
+    // submitList를 오버라이드하여 최저 온도 업데이트
+    override fun submitList(list: List<WeatherHourlyForecastDto>?) {
+        super.submitList(list)
+        minTemperature = list?.minOfOrNull { it.temperature?.toDouble() ?: 0.0 } ?: 0.0
     }
 
     // 각 아이템의 고유 ID 반환
     override fun getItemId(position: Int): Long = position.toLong()
 
+    // 아이템의 뷰 타입을 반환
     override fun getItemViewType(position: Int): Int =
         if (isVertical) VIEW_TYPE_VERTICAL else VIEW_TYPE_HORIZONTAL
+
+    // 시간에 따른 AM/PM 텍스트를 반환하는 메서드
+    private fun getAmPmText(hour: String?): String {
+        // 시간 문자열에서 숫자만 추출
+        val hourInt = hour?.replace("시", "")?.toIntOrNull() ?: return ""
+        return when (hourInt) {
+            0 -> if (currentHour == 0) "오전" else "내일"
+            6 -> "오전"
+            12, 18 -> "오후"
+            else -> ""
+        }
+    }
+
+    // 24시간 형식을 12시간 형식으로 변환하는 메서드
+    private fun convertTo12HourFormat(hour: String?): String {
+        val hourInt = hour?.replace("시", "")?.toIntOrNull() ?: return ""
+        return when (hourInt) {
+            0 -> "12시"
+            in 1..12 -> "${hourInt}시"
+            else -> "${hourInt - 12}시"
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -42,14 +79,14 @@ class WeatherHourlyForecastAdapter(
                 val binding = WeatherHourlyForecastItemVerticalBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
-                VerticalViewHolder(binding, context)
+                VerticalViewHolder(binding, context, this)
             }
             else -> {
                 // 가로 모드 레이아웃 바인딩 생성 및 ViewHolder 반환
                 val binding = WeatherHourlyForecastItemHorizontalBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
-                HorizontalViewHolder(binding, context)
+                HorizontalViewHolder(binding, context, this)
             }
         }
     }
@@ -76,7 +113,8 @@ class WeatherHourlyForecastAdapter(
     // ViewHolder 클래스들에서 layoutParams 캐싱
     class HorizontalViewHolder(
         private val binding: WeatherHourlyForecastItemHorizontalBinding,
-        private val context: Context
+        private val context: Context,
+        private val adapter: WeatherHourlyForecastAdapter
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // 레이아웃 파라미터 캐싱
@@ -85,8 +123,8 @@ class WeatherHourlyForecastAdapter(
 
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
-                tvAmPm.text = item.tvAmPm                   // AM/PM 텍스트 설정
-                tvHour.text = item.tvHour                   // 시간 텍스트 설정
+                tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
+                tvHour.text = adapter.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
@@ -102,39 +140,16 @@ class WeatherHourlyForecastAdapter(
         }
 
         // 온도에 따른 마진을 설정하는 메서드
-        private fun getMarginForTemperature(temp: Double): Int = when {
-            temp >= 30.0 -> resources.getDimensionPixelSize(R.dimen.dp_150)
-            temp >= 29.0 -> resources.getDimensionPixelSize(R.dimen.dp_145)
-            temp >= 28.0 -> resources.getDimensionPixelSize(R.dimen.dp_140)
-            temp >= 27.0 -> resources.getDimensionPixelSize(R.dimen.dp_135)
-            temp >= 26.0 -> resources.getDimensionPixelSize(R.dimen.dp_130)
-            temp >= 25.0 -> resources.getDimensionPixelSize(R.dimen.dp_125)
-            temp >= 24.0 -> resources.getDimensionPixelSize(R.dimen.dp_120)
-            temp >= 23.0 -> resources.getDimensionPixelSize(R.dimen.dp_115)
-            temp >= 22.0 -> resources.getDimensionPixelSize(R.dimen.dp_110)
-            temp >= 21.0 -> resources.getDimensionPixelSize(R.dimen.dp_105)
-            temp >= 20.0 -> resources.getDimensionPixelSize(R.dimen.dp_100)
-            temp >= 19.0 -> resources.getDimensionPixelSize(R.dimen.dp_95)
-            temp >= 18.0 -> resources.getDimensionPixelSize(R.dimen.dp_90)
-            temp >= 17.0 -> resources.getDimensionPixelSize(R.dimen.dp_85)
-            temp >= 16.0 -> resources.getDimensionPixelSize(R.dimen.dp_80)
-            temp >= 15.0 -> resources.getDimensionPixelSize(R.dimen.dp_75)
-            temp >= 14.0 -> resources.getDimensionPixelSize(R.dimen.dp_70)
-            temp >= 13.0 -> resources.getDimensionPixelSize(R.dimen.dp_65)
-            temp >= 12.0 -> resources.getDimensionPixelSize(R.dimen.dp_60)
-            temp >= 11.0 -> resources.getDimensionPixelSize(R.dimen.dp_55)
-            temp >= 10.0 -> resources.getDimensionPixelSize(R.dimen.dp_50)
-            temp >= 9.0 -> resources.getDimensionPixelSize(R.dimen.dp_45)
-            temp >= 8.0 -> resources.getDimensionPixelSize(R.dimen.dp_40)
-            temp >= 7.0 -> resources.getDimensionPixelSize(R.dimen.dp_35)
-            temp >= 6.0 -> resources.getDimensionPixelSize(R.dimen.dp_30)
-            temp >= 5.0 -> resources.getDimensionPixelSize(R.dimen.dp_25)
-            temp >= 4.0 -> resources.getDimensionPixelSize(R.dimen.dp_20)
-            temp >= 3.0 -> resources.getDimensionPixelSize(R.dimen.dp_15)
-            temp >= 2.0 -> resources.getDimensionPixelSize(R.dimen.dp_10)
-            temp >= 1.0 -> resources.getDimensionPixelSize(R.dimen.dp_5)
-            temp >= 0.0 -> resources.getDimensionPixelSize(R.dimen.dp_0)
-            else -> resources.getDimensionPixelSize(R.dimen.dp_0)
+        private fun getMarginForTemperature(temp: Double): Int {
+            // 어댑터에서 저장된 최저 온도 사용
+            val minTemp = adapter.minTemperature
+            // 온도 차이 계산
+            val tempDiff = temp - minTemp
+            // 기본 마진 (최저 온도일 때의 마진)
+            val baseMargin = resources.getDimensionPixelSize(R.dimen.dp_0)
+            // 온도 차이에 따른 추가 마진 계산 (1도당 5dp)
+            val additionalMargin = (tempDiff * resources.getDimensionPixelSize(R.dimen.dp_5)).toInt()
+            return baseMargin + additionalMargin
         }
 
         // 온도에 따른 배경 리소스를 설정하는 메서드
@@ -151,14 +166,15 @@ class WeatherHourlyForecastAdapter(
     // 세로 모드 ViewHolder 클래스
     class VerticalViewHolder(
         private val binding: WeatherHourlyForecastItemVerticalBinding,
-        private val context: Context // context를 매개변수로 받음
+        private val context: Context,
+        private val adapter: WeatherHourlyForecastAdapter
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // bindItems() 메서드에서 세로 모드 뷰에 데이터를 바인딩
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
-                tvAmPm.text = item.tvAmPm                   // AM/PM 텍스트 설정
-                tvHour.text = item.tvHour                   // 시간 텍스트 설정
+                tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
+                tvHour.text = adapter.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
