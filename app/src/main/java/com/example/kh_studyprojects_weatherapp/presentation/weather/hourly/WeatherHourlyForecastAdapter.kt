@@ -170,7 +170,9 @@ class WeatherHourlyForecastAdapter(
         private val adapter: WeatherHourlyForecastAdapter
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        // bindItems() 메서드에서 세로 모드 뷰에 데이터를 바인딩
+        // 레이아웃 파라미터 캐싱
+        private val resources = context.resources
+
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
@@ -183,31 +185,12 @@ class WeatherHourlyForecastAdapter(
                 val temperatureDouble = item.temperature!!.toDouble()
                 val layoutParams = vi01.layoutParams
 
-                // 온도 넓이 속성
-                layoutParams.width = when {
-                    temperatureDouble >= 30.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_160)
-                    temperatureDouble >= 29.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_150)
-                    temperatureDouble >= 28.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_140)
-                    temperatureDouble >= 27.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_130)
-                    temperatureDouble >= 26.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_120)
-                    temperatureDouble >= 25.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_110)
-                    temperatureDouble >= 24.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_100)
-                    temperatureDouble >= 23.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_90)
-                    temperatureDouble >= 22.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_80)
-                    temperatureDouble >= 21.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_70)
-                    temperatureDouble >= 20.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_60)
-                    temperatureDouble >= 19.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_50)
-                    temperatureDouble >= 18.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_40)
-                    temperatureDouble >= 17.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_30)
-                    temperatureDouble >= 16.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_20)
-                    temperatureDouble >= 15.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_10)
-                    temperatureDouble >= 14.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_9)
-                    temperatureDouble >= 13.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_8)
-                    temperatureDouble >= 12.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_7)
-                    temperatureDouble >= 11.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_6)
-                    temperatureDouble >= 10.0 -> context.resources.getDimensionPixelSize(R.dimen.dp_5)
-                    else -> 0
-                }
+                // 온도 넓이 속성 - 최저 온도 기준으로 상대적 넓이 계산
+                val minTemp = adapter.minTemperature
+                val tempDiff = temperatureDouble - minTemp
+                val baseWidth = resources.getDimensionPixelSize(R.dimen.dp_30)  // 기본 넓이
+                val additionalWidth = (tempDiff * resources.getDimensionPixelSize(R.dimen.dp_5)).toInt()  // 온도당 5dp 추가
+                layoutParams.width = baseWidth + additionalWidth
                 vi01.layoutParams = layoutParams
 
                 // 온도 배경 설정
@@ -218,7 +201,7 @@ class WeatherHourlyForecastAdapter(
                         temperatureDouble >= 20.0 -> R.drawable.sh_hourly_round_temperature_20
                         temperatureDouble >= 15.0 -> R.drawable.sh_hourly_round_temperature_15
                         temperatureDouble >= 10.0 -> R.drawable.sh_hourly_round_temperature_10
-                        else -> 0
+                        else -> R.drawable.sh_hourly_round_temperature_10
                     }
                 )
             }
