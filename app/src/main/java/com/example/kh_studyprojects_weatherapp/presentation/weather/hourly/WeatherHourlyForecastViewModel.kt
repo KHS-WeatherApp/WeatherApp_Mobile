@@ -1,5 +1,6 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourlyForecastDto
@@ -24,7 +25,7 @@ class WeatherHourlyForecastViewModel @Inject constructor(
     fun fetchHourlyForecast() {
         viewModelScope.launch {
             try {
-                val result = weatherRepository.getWeatherInfo(37.5665, 126.9780) // 서울 좌표
+                val result = weatherRepository.getWeatherInfo(37.5606, 126.9433) // 서울 좌표
                 result.onSuccess { response ->
                     // API 응답을 WeatherHourlyForecastDto 리스트로 변환
                     val hourlyData = response["hourly"] as? Map<String, Any>
@@ -42,16 +43,16 @@ class WeatherHourlyForecastViewModel @Inject constructor(
     }
 
     private fun convertToHourlyForecast(hourlyData: Map<String, Any>): List<WeatherHourlyForecastDto> {
-        val times = hourlyData["time"] as? List<String> ?: return emptyList()
-        val temperatures = hourlyData["temperature_2m"] as? List<Double> ?: return emptyList()
-        val precipitationProbs = hourlyData["precipitation_probability"] as? List<Int> ?: return emptyList()
-        val precipitations = hourlyData["precipitation"] as? List<Double> ?: return emptyList()
-        val weatherCodes = hourlyData["weather_code"] as? List<Int> ?: return emptyList()
-
+        val times = hourlyData["time"] as? List<String> ?: return emptyList() // 시간 데이터
+        val temperatures = hourlyData["temperature_2m"] as? List<Double> ?: return emptyList() // 온도 데이터
+        val precipitationProbs = hourlyData["precipitation_probability"] as? List<Int> ?: return emptyList() // 강수 확률 데이터
+        val precipitations = hourlyData["precipitation"] as? List<Double> ?: return emptyList() // 강수량 데이터
+        val weatherCodes = hourlyData["weather_code"] as? List<Int> ?: return emptyList() // 날씨 코드 데이터
+        
         // 현재 시간 구하기
         val now = LocalDateTime.now()
         val currentHourStart = now.withMinute(0).withSecond(0).withNano(0)
-        
+
         // 현재 시간부터의 데이터 인덱스 찾기
         val currentIndex = times.indexOfFirst { time ->
             val dateTime = LocalDateTime.parse(time.replace("Z", ""))
