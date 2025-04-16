@@ -439,7 +439,7 @@ sealed class WeatherDailyViewHolder(
     protected fun getClothingIcon(temperature: Double): Int {
         return when {
             temperature >= 28 -> R.drawable.clothing_icon_hawaiianshirt
-            temperature >= 23 -> R.drawable.ic_com_clothes_01
+            temperature >= 23 -> R.drawable.clothing_icon_hawaiianshirt
             temperature >= 20 -> R.drawable.clothing_icon_hawaiianshirt
             temperature >= 17 -> R.drawable.clothing_icon_hawaiianshirt
             temperature >= 12 -> R.drawable.clothing_icon_hawaiianshirt
