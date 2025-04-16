@@ -4,8 +4,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="weather">#7ECEFC</color> <!--날씨 화면 기본 배경색-->
-
-    <color name="weathercontainerBackground">#343A78A9</color>
+    <color name="weathercontainerBackground">#343A78A9</color> <!--백그라운드 배경-->
 
     <!--날씨 시간별예보 - 온도 배경색-->
     <color name="temperature30">#FF5630</color>
