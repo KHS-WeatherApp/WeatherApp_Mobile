@@ -9,6 +9,8 @@
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:forceDarkAllowed">true</item>
+        <item name="android:windowBackground">@color/weather</item> <!-- 윈도우 배경색 -->
+
     </style>
     <style name="Theme.KH_StudyProjects_WeatherApp" parent="Base.Theme.KH_StudyProjects_WeatherApp" />
 </resources>
