@@ -110,6 +110,14 @@ sealed class WeatherDailyViewHolder(
                     }
                 }
 
+                // 오후 10시(22시) 이후라면 더보기 버튼 숨김
+                val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+                if (currentHour >= 22) {
+                    dayExpandMore24Btn.visibility = View.GONE
+                } else {
+                    dayExpandMore24Btn.visibility = View.VISIBLE
+                }
+
                 // 시간별 날씨 보기 버튼 처리
                 dayExpandMore24Btn.setOnClickListener {
                     isExpanded = !isExpanded
@@ -150,11 +158,33 @@ sealed class WeatherDailyViewHolder(
             container.removeAllViews()
 
             val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+            Log.i("WeatherDailyViewHolder", "currentHour :  ${currentHour}")
             val interval = if (isHourlyMode) 1 else 2
-            val filtered = data.filter {
-                val hour = it.tvHour?.toIntOrNull() ?: return@filter false
-                hour in (currentHour + 1)..23 && ((hour - (currentHour + 1)) % interval == 0)
+            // 1시간 후부터 23시까지, interval에 맞는 항목만 필터링
+            val filtered: List<WeatherHourlyForecastDto> = if (data.size == 24 && currentHour < 23) {
+                // subList: currentHour+1 부터 23시까지 (data.size == 24)
+                data.subList(currentHour + 1, data.size)
+                    .filterIndexed { index, _ -> index % interval == 0 }
+            } else {
+                // 데이터가 24개가 아닐 경우 원래의 로직 사용
+                data.filter {
+                    // 24시간 값이 저장된 필드를 사용합니다.
+                    val rawHour = it.tvHour?.toIntOrNull() ?: return@filter false
+
+                    // 12시간제를 24시간제로 변환:
+                    // - 오전: 12시면 0으로, 그 외는 그대로 사용
+                    // - 오후: 12시면 그대로, 그 외는 +12
+                    val hour = if (it.tvAmPm == "오전") {
+                        if (rawHour == 12) 0 else rawHour
+                    } else {  // "오후"
+                        if (rawHour == 12) 12 else rawHour + 12
+                    }
+
+                    // 현재 시간(24시간제) 이후부터 23시까지 interval에 맞게 필터링
+                    hour in (currentHour + 1)..23 && ((hour - (currentHour + 1)) % interval == 0)
+                }
             }
+
 
             for (hourData in filtered) {
                 val view = LayoutInflater.from(container.context).inflate(R.layout.item_weather_daily_tohourly_forecast_time, container, false)
@@ -418,10 +448,3 @@ sealed class WeatherDailyViewHolder(
         }
     }
 }
-
-// 시간별 날씨 데이터 클래스
-data class HourlyForecast(
-    val hour: Int,
-    val temp: String,
-    val weatherCode: Int
-)
