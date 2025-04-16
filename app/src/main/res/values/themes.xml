@@ -2,20 +2,13 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.KH_StudyProjects_WeatherApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:enforceNavigationBarContrast">false</item>
-        <item name="android:enforceStatusBarContrast">false</item>
-        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:fitsSystemWindows">false</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:forceDarkAllowed">true</item>
-        <!--        <item name="android:windowBackground">@color/status_bar_color</item> &lt;!&ndash; 윈도우 배경색 &ndash;&gt;-->
-        <!--        <item name="android:windowFullscreen">true</item> &lt;!&ndash;상태바 감추기&ndash;&gt;-->
-
     </style>
     <style name="Theme.KH_StudyProjects_WeatherApp" parent="Base.Theme.KH_StudyProjects_WeatherApp" />
 </resources>
