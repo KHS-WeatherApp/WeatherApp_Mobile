@@ -38,9 +38,10 @@
         android:id="@+id/imgClothes"
         android:layout_width="@dimen/dp_30"
         android:layout_height="@dimen/dp_30"
-        android:src="@drawable/ic_com_clothes_01"
+        android:src="@drawable/clothing_icon_hawaiianshirt"
         android:contentDescription="추천 옷차림 아이콘"
         android:layout_marginHorizontal="@dimen/dp_4"
+        android:scaleType="fitCenter"
         app:layout_constraintStart_toEndOf="@id/tvHour"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -50,52 +51,44 @@
         android:id="@+id/imgWeather"
         android:layout_width="@dimen/dp_30"
         android:layout_height="@dimen/dp_30"
-        android:src="@drawable/ic_nav_weatherimg"
+        android:src="@drawable/weather_icon_partly_cloudy"
         android:contentDescription="날씨 아이콘"
+        android:scaleType="fitCenter"
         app:layout_constraintStart_toEndOf="@id/imgClothes"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <!--강수 확률, 강수량, 구분선 영역-->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_hourly_item04"
+    <!--강수 확률-->
+    <TextView
+        android:id="@+id/probability"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:text="75%"
+        android:textSize="@dimen/dp_10"
         android:layout_marginStart="@dimen/dp_10"
         app:layout_constraintStart_toEndOf="@id/imgWeather"
-        app:layout_constraintEnd_toStartOf="@id/temperature"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/vi01"/>
 
-        <TextView
-            android:id="@+id/probability"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="75%"
-            android:textSize="@dimen/dp_10"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/vi01"/>
+    <!--강수량-->
+    <TextView
+        android:id="@+id/precipitation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1.1mm"
+        android:textSize="@dimen/dp_10"
+        app:layout_constraintStart_toEndOf="@id/probability"
+        app:layout_constraintTop_toTopOf="@id/probability"/>
 
-        <TextView
-            android:id="@+id/precipitation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1.1mm"
-            android:textSize="@dimen/dp_10"
-            app:layout_constraintStart_toEndOf="@id/probability"
-            app:layout_constraintTop_toTopOf="@id/probability"/>
-
-        <View
-            android:id="@+id/vi01"
-            android:layout_width="@dimen/dp_100"
-            android:layout_height="@dimen/dp_2"
-            android:background="@color/white"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--구분선-->
+    <View
+        android:id="@+id/vi01"
+        android:layout_width="@dimen/dp_100"
+        android:layout_height="@dimen/dp_2"
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/probability"/>
 
     <!--온도-->
     <TextView
@@ -108,7 +101,7 @@
         android:background="@drawable/sh_hourly_round_temperature_30"
         android:text="21"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/cl_hourly_item04"
+        app:layout_constraintStart_toEndOf="@id/vi01"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
