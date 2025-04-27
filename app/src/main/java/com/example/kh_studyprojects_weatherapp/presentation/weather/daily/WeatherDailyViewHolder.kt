@@ -153,6 +153,8 @@ sealed class WeatherDailyViewHolder(
             }
         }
 
+
+
         private fun updateHourlyData(binding: ItemWeatherDailyTohourlyForecastBinding, data: List<WeatherHourlyForecastDto>) {
             val container = binding.hourlyItemsContainer
             container.removeAllViews()
@@ -192,11 +194,15 @@ sealed class WeatherDailyViewHolder(
 
                 hourBinding.hourlyTime.text = "${hourData.tvAmPm} ${hourData.tvHour}시"
                 hourBinding.hourlyTemp.text = hourData.temperature
+                val temperature = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
+                hourBinding.hourlyTemp.setBackgroundResource(getBackgroundForTemperature(temperature))
                 hourBinding.hourlyWeatherIcon.setImageResource(getWeatherIcon(hourData.weatherCode))
+                hourBinding.hourlyClothingIcon.setImageResource(getClothingIcon(temperature))
 
                 val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
-                if (prob >= 20) {
-                    hourBinding.hourlyPrecipitation.text = hourData.probability
+                if (prob >= 5) {
+                    Log.i("WeatherDailyViewHolder","강수량 : ${hourData.probability}+\" • \"+${hourData.precipitation}")
+                    hourBinding.hourlyPrecipitation.text = hourData.probability + if (hourData.precipitation != "0.0mm") " • ${hourData.precipitation}" else ""
                     hourBinding.hourlyPrecipitation.visibility = View.VISIBLE
                 } else {
                     hourBinding.hourlyPrecipitation.visibility = View.GONE
@@ -338,11 +344,14 @@ sealed class WeatherDailyViewHolder(
 
                 hourBinding.hourlyTime.text = "${hourData.tvAmPm} ${hourData.tvHour}시"
                 hourBinding.hourlyTemp.text = hourData.temperature
+                val temperature = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
+                hourBinding.hourlyTemp.setBackgroundResource(getBackgroundForTemperature(temperature))
                 hourBinding.hourlyWeatherIcon.setImageResource(getWeatherIcon(hourData.weatherCode))
+                hourBinding.hourlyClothingIcon.setImageResource(getClothingIcon(temperature))
 
                 val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
-                if (prob >= 20) {
-                    hourBinding.hourlyPrecipitation.text = hourData.probability
+                if (prob >= 5) {
+                    hourBinding.hourlyPrecipitation.text = hourData.probability + if (hourData.precipitation != "0.0mm") " • ${hourData.precipitation}" else ""
                     hourBinding.hourlyPrecipitation.visibility = View.VISIBLE
                 } else {
                     hourBinding.hourlyPrecipitation.visibility = View.GONE
@@ -446,5 +455,15 @@ sealed class WeatherDailyViewHolder(
             temperature >= 9 -> R.drawable.clothing_icon_hawaiianshirt
             else -> R.drawable.clothing_icon_hawaiianshirt
         }
+    }
+
+    // 온도에 따른 배경 리소스를 설정하는 메서드
+    protected fun getBackgroundForTemperature(temp: Double): Int = when {
+        temp >= 30.0 -> R.drawable.sh_hourly_round_temperature_30
+        temp >= 25.0 -> R.drawable.sh_hourly_round_temperature_20
+        temp >= 20.0 -> R.drawable.sh_hourly_round_temperature_20
+        temp >= 15.0 -> R.drawable.sh_hourly_round_temperature_15
+        temp >= 10.0 -> R.drawable.sh_hourly_round_temperature_10
+        else -> R.drawable.sh_hourly_round_temperature_10
     }
 }

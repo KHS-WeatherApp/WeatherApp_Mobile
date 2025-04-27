@@ -24,9 +24,9 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="33dp"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center">
                 <!-- 요일 텍스트 -->
                 <TextView
                     android:id="@+id/text_week"
@@ -92,6 +92,14 @@
                     android:text="16°"
                     android:textColor="@android:color/white"
                     android:textSize="15sp"/>
+                <!-- 더보기 , 시간별 날씨보기란  -->
+                <ImageView
+                    android:id="@+id/day_expand_more_24_btn"
+                    android:layout_width="18dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="0dp"/>
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
