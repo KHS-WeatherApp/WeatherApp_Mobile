@@ -7,27 +7,18 @@
     tools:context="presentation.weather.hourly.WeatherHourlyForecastFragment"
     android:background="@drawable/sh_hourly_round_01">
 
-    <ImageView
-        android:id="@+id/imgClock"
-        android:layout_width="@dimen/dp_15"
-        android:layout_height="@dimen/dp_15"
-        android:src="@drawable/ic_hourly_weatherclockimg"
-        android:contentDescription="시계이미지"
-        android:layout_margin="@dimen/dp_6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/view01"/>
-
     <TextView
         android:id="@+id/tvHourly01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_10"
+        android:layout_marginVertical="@dimen/dp_10"
         android:text="시간별 예보"
-        android:textSize="@dimen/dp_12"
-        android:textColor="@color/weatherRadiusBackground"
-        app:layout_constraintStart_toEndOf="@id/imgClock"
-        app:layout_constraintTop_toTopOf="@id/imgClock"
-        app:layout_constraintBottom_toBottomOf="@id/imgClock"/>
+        android:textSize="@dimen/sp_18"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/view01"/>
 
     <!--가로세로 전환 버튼-->
     <Switch
@@ -40,21 +31,19 @@
         android:switchMinWidth="56dp"
         android:text="세로로 보기"
         android:textSize="@dimen/dp_12"
-        android:textColor="@color/weatherRadiusBackground"
-        android:textOff="OFF"
-        android:textOn="ON"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/imgClock"
-        app:layout_constraintBottom_toBottomOf="@id/imgClock"/>
+        app:layout_constraintTop_toTopOf="@id/tvHourly01"
+        app:layout_constraintBottom_toBottomOf="@id/tvHourly01"/>
 
     <!--구분선-->
     <View
         android:id="@+id/view01"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_2"
+        android:layout_height="@dimen/dp_1"
         android:background="@color/weather"
-        android:layout_marginTop="@dimen/dp_6"
-        app:layout_constraintTop_toBottomOf="@id/imgClock"/>
+        android:layout_marginTop="@dimen/dp_10"
+        app:layout_constraintTop_toBottomOf="@id/tvHourly01"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/clHourly02"

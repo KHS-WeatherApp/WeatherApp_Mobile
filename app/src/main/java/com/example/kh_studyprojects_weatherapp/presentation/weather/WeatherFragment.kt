@@ -29,8 +29,6 @@ class WeatherFragment : Fragment() {
     private var _navigationBinding: LayoutNavigationBottomBinding? = null
     private val navigationBinding get() = _navigationBinding!!
 
-//    private val viewModel: WeatherViewModel by viewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -49,28 +47,6 @@ class WeatherFragment : Fragment() {
     }
 
 
-
-    /*override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // 날씨 데이터 관찰
-        viewModel.weatherState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is WeatherState.Loading -> {
-                    // 로딩 처리
-                }
-                is WeatherState.Success -> {
-                    Toast.makeText(context, "날씨 정보를 성공적으로 가져왔습니다.", Toast.LENGTH_SHORT).show()
-                }
-                is WeatherState.Error -> {
-                    Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        viewModel.fetchWeatherData()
-    }*/
-
     /**
      * 하단 네비게이션 버튼들의 클릭 이벤트를 설정하는 메서드
      */
@@ -79,17 +55,14 @@ class WeatherFragment : Fragment() {
             // 날씨 화면 전환 버튼 (현재 화면 새로고침)
             navWeather.setOnClickListener {
                 it.findNavController().navigate(R.id.action_weatherFragment_self)
-//                Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
             }
             // 설정 화면 전환 버튼
             navSetting.setOnClickListener {
                 it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
-//                Toast.makeText(context, "설정 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
             }
             // 미세먼지 화면 전환 버튼
             navFindust.setOnClickListener {
                 it.findNavController().navigate(R.id.action_weatherFragment_to_finedustFragment)
-//                Toast.makeText(context, "미세먼지 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
             }
         }
     }

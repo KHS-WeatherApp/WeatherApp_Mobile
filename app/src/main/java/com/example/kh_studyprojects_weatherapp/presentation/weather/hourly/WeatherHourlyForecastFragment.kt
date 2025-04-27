@@ -49,9 +49,12 @@ class WeatherHourlyForecastFragment : Fragment() {
         binding.switchOrientation.setOnCheckedChangeListener { _, isChecked ->
             Log.d("SwitchTest", "Switch is now: ${if (isChecked) "Checked" else "Unchecked"}")
 
+            // Switch 텍스트 변경
+            binding.switchOrientation.text = if (isChecked) "가로로 보기" else "세로로 보기"
+
             if (isChecked) {  // 스위치가 체크된 경우 세로 모드로 전환
                 // RecyclerView의 레이아웃 매니저를 세로 방향으로 설정
-                binding.clHourly02.layoutManager = LinearLayoutManager(context)
+                binding.clHourly02.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             } else { // 스위치가 체크 해제된 경우 가로 모드로 전환
                 // RecyclerView의 레이아웃 매니저를 가로 방향으로 설정
                 binding.clHourly02.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
