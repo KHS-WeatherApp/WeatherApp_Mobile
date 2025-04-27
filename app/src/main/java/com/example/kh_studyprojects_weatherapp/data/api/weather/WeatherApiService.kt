@@ -11,4 +11,10 @@ interface WeatherApiService {
     suspend fun getWeatherInfo(
         @Body request: WeatherRequest
     ): Response<Map<String, Any>> // 서버 응답 형식에 맞게 수정 가능
+
+    //25.4.27 이수연 : '대기질' 데이터 호출 추가
+    @POST("/api/airPollution")
+    suspend fun getAdditionalWeatherInfo(
+        @Body request: WeatherRequest
+    ): Response<Map<String, Any>>
 }
