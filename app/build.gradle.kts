@@ -79,6 +79,9 @@ dependencies {
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
+    
+    // 구글 위치 정보 API
+    implementation("com.google.android.gms:play-services-location:21.1.0")
 }
 
 kapt {

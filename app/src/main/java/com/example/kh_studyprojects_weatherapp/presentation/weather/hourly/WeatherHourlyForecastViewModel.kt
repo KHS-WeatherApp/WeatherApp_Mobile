@@ -1,43 +1,86 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
+import android.location.Geocoder
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
+import com.example.kh_studyprojects_weatherapp.presentation.location.LocationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class WeatherHourlyForecastViewModel @Inject constructor(
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: WeatherRepository,
+    private val locationManager: LocationManager,
+    private val geocoder: Geocoder
 ) : ViewModel() {
 
     private val _hourlyForecastItems = MutableStateFlow<List<WeatherHourlyForecastDto>>(emptyList())
     val hourlyForecastItems: StateFlow<List<WeatherHourlyForecastDto>> = _hourlyForecastItems.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+
+    private val _locationInfo = MutableStateFlow<String?>(null)
+    val locationInfo: StateFlow<String?> = _locationInfo.asStateFlow()
+
+    // 현재 위치의 위도와 경도를 저장하는 변수
+    private var currentLatitude: Double = -28.1662 // 기본값 좌표 설정
+    private var currentLongitude: Double = 29.1732
+
     fun fetchHourlyForecast() {
         viewModelScope.launch {
             try {
-                val result = weatherRepository.getWeatherInfo(37.5606, 126.9433) // 서울 좌표
+                _isLoading.value = true
+                _error.value = null
+                
+                Log.d("WeatherHourlyForecast", "위치 정보 요청 시작")
+                
+                // 현재 위치 가져오기
+                val locationInfo = locationManager.getCurrentLocation()
+                if (locationInfo != null) {
+                    currentLatitude = locationInfo.latitude
+                    currentLongitude = locationInfo.longitude
+                    _locationInfo.value = "${locationInfo.address}\n위도: $currentLatitude, 경도: $currentLongitude"
+                    Log.d("WeatherHourlyForecast", "GPS 위치 정보 획득 성공 - ${locationInfo.address}")
+                } else {
+                    _locationInfo.value = "기본 위치(서울)\n위도: $currentLatitude, 경도: $currentLongitude"
+                    Log.w("WeatherHourlyForecast", "GPS 위치 정보 획득 실패 - 기본값(서울) 사용")
+                }
+                
+                // 가져온 위치 정보로 날씨 데이터 요청
+                Log.d("WeatherHourlyForecast", "날씨 정보 요청 시작 - 위도: $currentLatitude, 경도: $currentLongitude")
+                val result = weatherRepository.getWeatherInfo(currentLatitude, currentLongitude)
                 result.onSuccess { response ->
-                    // API 응답을 WeatherHourlyForecastDto 리스트로 변환
                     val hourlyData = response["hourly"] as? Map<String, Any>
                     if (hourlyData != null) {
                         val items = convertToHourlyForecast(hourlyData)
                         _hourlyForecastItems.value = items
+                        Log.d("WeatherHourlyForecast", "날씨 정보 획득 성공 - ${items.size}개의 시간대 데이터")
+                    } else {
+                        _error.value = "날씨 데이터 형식이 올바르지 않습니다."
+                        Log.e("WeatherHourlyForecast", "날씨 데이터 형식 오류")
                     }
                 }.onFailure { e ->
-                    e.printStackTrace()
+                    _error.value = "날씨 정보를 가져오는데 실패했습니다: ${e.message}"
+                    Log.e("WeatherHourlyForecast", "날씨 정보를 가져오는데 실패했습니다.", e)
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                _error.value = "오류가 발생했습니다: ${e.message}"
+                Log.e("WeatherHourlyForecast", "날씨 정보를 가져오는 중 오류가 발생했습니다.", e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -79,7 +122,7 @@ class WeatherHourlyForecastViewModel @Inject constructor(
             val formattedHour = "${hourInt}시" // 시간 형식 변환    
             val prob = if (precipitationProbs[index] > 0) "${precipitationProbs[index]}%" else "" // 강수 확률 형식 변환
             val precip = if (precipitations[index] > 0) "${precipitations[index]}mm" else "" // 강수량 형식 변환
-            val temp = temperatures[index].toString() // 온도 형식 변환
+            val temp = "${temperatures[index]}" // 온도 형식 변환
             val weatherCode = weatherCodes[index].toInt() // 날씨 코드 형식 변환
 
             result.add(WeatherHourlyForecastDto(amPm, formattedHour, prob, precip, temp, weatherCode))

@@ -40,7 +40,9 @@ class WeatherHourlyForecastAdapter(
     // submitList를 오버라이드하여 최저 온도 업데이트
     override fun submitList(list: List<WeatherHourlyForecastDto>?) {
         super.submitList(list)
-        minTemperature = list?.minOfOrNull { it.temperature?.toDouble() ?: 0.0 } ?: 0.0
+        minTemperature = list?.minOfOrNull { 
+            it.temperature?.toDoubleOrNull() ?: 0.0 
+        } ?: 0.0
     }
 
     // 각 아이템의 고유 ID 반환
@@ -130,7 +132,7 @@ class WeatherHourlyForecastAdapter(
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
 
                 // 온도에 따른 마진 설정
-                val temperatureDouble = item.temperature!!.toDouble()
+                val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
                 temperatureLayoutParams.topMargin = getMarginForTemperature(temperatureDouble)
                 temperature.layoutParams = temperatureLayoutParams
 
@@ -182,7 +184,7 @@ class WeatherHourlyForecastAdapter(
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
 
                 // item.temperature를 Double로 변환하여 마진 설정
-                val temperatureDouble = item.temperature!!.toDouble()
+                val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
                 val layoutParams = vi01.layoutParams
 
                 // 온도 넓이 속성 - 최저 온도 기준으로 상대적 넓이 계산
