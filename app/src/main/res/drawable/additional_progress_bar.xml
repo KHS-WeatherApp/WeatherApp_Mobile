@@ -44,7 +44,7 @@ android:id="@android:id/progress": 이 ID는 필수적입니다. 이 ID가 없�
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
             <corners android:radius="50dp"/>  <!-- 완전한 라운드 모서리를 위해 큰 값 설정 -->
-            <solid android:color="#E0E0E0"/>  <!-- 배경색을 연한 회색으로 설정 -->
+            <solid android:color="#D0D0D0"/>  <!-- 배경색을 연한 회색으로 설정 -->
             <size android:height="10dp"/>
         </shape>
     </item>
@@ -54,9 +54,22 @@ android:id="@android:id/progress": 이 ID는 필수적입니다. 이 ID가 없�
         <scale android:scaleWidth="100%">
             <shape android:shape="rectangle">
                 <corners android:radius="50dp"/>  <!-- 완전한 라운드 모서리를 위해 큰 값 설정 -->
-                <solid android:color="#90EE90"/>  <!-- 연한 초록색 -->
+                <solid android:color="#575b58"/>
                 <size android:height="10dp"/>
             </shape>
         </scale>
     </item>
 </layer-list>
+
+<!--
+#D0D0D0 - 약간 더 진한 회색
+#C0C0C0 - 중간 회색
+#B0B0B0 - 더 진한 회색
+#A0A0A0 - 상당히 진한 회색
+#909090 - 매우 진한 회색
+#808080 - 중간 회색 (gray)
+#707070 - 더 진한 회색
+#606060 - 매우 진한 회색
+#505050 - 거의 검정에 가까운 회색
+
+-->

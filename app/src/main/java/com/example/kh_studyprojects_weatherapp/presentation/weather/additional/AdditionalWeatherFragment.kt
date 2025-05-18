@@ -1,7 +1,10 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.additional
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,7 +76,7 @@ class AdditionalWeatherFragment : Fragment() {
                 (4) 강수량	   => '기본'   current 변수
                 (5) 풍속       => '기본'   current 변수
                 (6) 일출/일몰	=> '기본'  daily 변수
-            
+
             */
 
             // 1. 기본 날씨 데이터 처리 - daily
@@ -91,8 +94,8 @@ class AdditionalWeatherFragment : Fragment() {
                 val currentDate = java.time.LocalDate.now().toString()
 
                 // 오늘 날짜와 일치하는 인덱스 찾기
-                val todayIndex = timeList?.indexOfFirst { date -> 
-                    date.toString() == currentDate 
+                val todayIndex = timeList?.indexOfFirst { date ->
+                    date.toString() == currentDate
                 } ?: -1
 
                 if (todayIndex == -1) {
@@ -110,20 +113,20 @@ class AdditionalWeatherFragment : Fragment() {
                     // "2025-04-12T06:01" 형식에서 시간만 추출하고 AM/PM 형식으로 변환
                     val sunriseTime = java.time.LocalTime.parse(sunrise.substringAfter("T"))
                     val sunsetTime = java.time.LocalTime.parse(sunset.substringAfter("T"))
-                    
+
                     // 시간을 AM/PM 형식으로 변환
                     val sunriseFormatted = String.format("%02d:%02d%s",
                         if (sunriseTime.hour % 12 == 0) 12 else sunriseTime.hour % 12,
                         sunriseTime.minute,
                         if (sunriseTime.hour < 12) "AM" else "PM"
                     )
-                    
+
                     val sunsetFormatted = String.format("%02d:%02d%s",
                         if (sunsetTime.hour % 12 == 0) 12 else sunsetTime.hour % 12,
                         sunsetTime.minute,
                         if (sunsetTime.hour < 12) "AM" else "PM"
                     )
-                    
+
                     binding.sunriseTime.text = sunriseFormatted
                     binding.sunsetTime.text = sunsetFormatted
                 }
@@ -199,14 +202,21 @@ class AdditionalWeatherFragment : Fragment() {
      * @param value 미세먼지 수치
      */
     private fun updateFineDustProgress(value: Double) {
+        android.util.Log.d("AdditionalWeather", "🧡🧡🧡미세먼지❤❤❤"+value)
         val progress = when {
-            value <= 30 -> Pair(25, "좋음")    // 0-30: 좋음
-            value <= 80 -> Pair(50, "보통")    // 31-80: 보통
-            value <= 150 -> Pair(75, "나쁨")   // 81-150: 나쁨
-            else -> Pair(100, "매우나쁨")      // 151 이상: 매우나쁨
+            value <= 30 -> Triple(value, "좋음", "#0048c6")    // 파랑색
+            value <= 80 -> Triple(value, "보통", "#90e990")    // 초록색
+            value <= 150 -> Triple(value, "나쁨", "#fcb80c")   // 주황색
+            else -> Triple(value, "매우나쁨", "#fc2407")      // 빨간색
         }
-        binding.fineDustProgressBar.progress = progress.first
-        //binding.fineDustState.text = progress.second
+        //프로그레스 바의 진행률 변경(최대 200으로 넣음)
+        binding.fineDustProgressBar.max = 200
+        binding.fineDustProgressBar.progress = progress.first.toInt()
+        // 프로그레스 바의 색상 변경
+        binding.fineDustProgressBar.progressTintList = ColorStateList.valueOf(
+            Color.parseColor(
+            progress.third
+        ))
     }
 
     /**
@@ -214,14 +224,21 @@ class AdditionalWeatherFragment : Fragment() {
      * @param value 초미세먼지 수치
      */
     private fun updateUltraFineDustProgress(value: Double) {
+        android.util.Log.d("AdditionalWeather", "🧡🧡🧡초미세먼지❤❤❤"+value)
         val progress = when {
-            value <= 15 -> Pair(25, "좋음")    // 0-15: 좋음
-            value <= 35 -> Pair(50, "보통")    // 16-35: 보통
-            value <= 75 -> Pair(75, "나쁨")    // 36-75: 나쁨
-            else -> Pair(100, "매우나쁨")      // 76 이상: 매우나쁨
+            value <= 15 -> Triple(value, "좋음", "#0048c6")    // 파랑색
+            value <= 35 -> Triple(value, "보통", "#90e990")    // 초록색
+            value <= 75 -> Triple(value, "나쁨", "#fcb80c")   // 주황색
+            else -> Triple(value, "매우나쁨", "#fc2407")      // 빨간색
         }
-        binding.ultraFineDustProgressBar.progress = progress.first
-        //binding.ultraFineDustState.text = progress.second
+        //프로그레스 바의 진행률 변경(최대 200으로 넣음)
+        binding.ultraFineDustProgressBar.max = 200
+        binding.ultraFineDustProgressBar.progress = progress.first.toInt()
+        // 프로그레스 바의 색상 변경
+        binding.ultraFineDustProgressBar.progressTintList = ColorStateList.valueOf(
+            Color.parseColor(
+                progress.third
+            ))
     }
 
     /**

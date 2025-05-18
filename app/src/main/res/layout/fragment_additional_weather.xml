@@ -64,8 +64,8 @@
 
 
     <!-- =========================================================
-         왼쪽 칼럼: (1) fine_dust, (2) uv_index, (3) wind_speed
-         ========================================================= -->
+        왼쪽 칼럼: (1) fine_dust, (2) uv_index, (3) wind_speed
+        ========================================================= -->
 
     <!-- (왼쪽 1) 미세먼지 -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -91,7 +91,7 @@
             android:text="미세먼지"
             android:textStyle="bold"
             android:textSize="@dimen/sp_20"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/fineDustLevel"
             app:layout_constraintStart_toStartOf="parent"
@@ -107,7 +107,7 @@
             android:layout_height="wrap_content"
             android:text="보통 27"
             android:textSize="@dimen/sp_14"
-            android:textColor="@color/weatherBtnRadiusBackground"
+            android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@id/fine_dust_title"
             app:layout_constraintBottom_toTopOf="@+id/fine_dust_progress_bar"
             app:layout_constraintStart_toStartOf="parent"
@@ -168,7 +168,7 @@
             android:text="자외선지수"
             android:textSize="@dimen/sp_20"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             app:layout_constraintTop_toBottomOf="@+id/uv_index_image"
             app:layout_constraintBottom_toTopOf="@+id/uvIndexLevel"
             app:layout_constraintStart_toStartOf="parent"
@@ -181,7 +181,7 @@
             android:layout_height="wrap_content"
             android:text="높음"
             android:textSize="@dimen/sp_14"
-            android:textColor="@color/weatherBtnRadiusBackground"
+            android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/uv_index_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -225,7 +225,7 @@
             android:text="바람"
             android:textSize="@dimen/sp_20"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             app:layout_constraintTop_toBottomOf="@+id/wind_speed_image"
             app:layout_constraintBottom_toTopOf="@+id/windSpeedLevel"
             app:layout_constraintStart_toStartOf="parent"
@@ -238,7 +238,7 @@
             android:layout_height="wrap_content"
             android:text="3m/s"
             android:textSize="@dimen/sp_14"
-            android:textColor="@color/weatherBtnRadiusBackground"
+            android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/wind_speed_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -274,7 +274,7 @@
             android:text="초미세먼지"
             android:textStyle="bold"
             android:textSize="@dimen/sp_20"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/ultraFineDustLevel"
             app:layout_constraintStart_toStartOf="parent"
@@ -289,7 +289,7 @@
             android:layout_height="wrap_content"
             android:text="보통 27"
             android:textSize="@dimen/sp_14"
-            android:textColor="@color/weatherBtnRadiusBackground"
+            android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/ultra_fine_dust_title"
             app:layout_constraintBottom_toTopOf="@+id/ultra_fine_dust_progress_bar"
             app:layout_constraintStart_toStartOf="parent"
@@ -349,7 +349,7 @@
             android:text="강수"
             android:textSize="@dimen/sp_20"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             app:layout_constraintTop_toBottomOf="@+id/precipitation_image"
             app:layout_constraintBottom_toTopOf="@+id/precipitationLevel"
             app:layout_constraintStart_toStartOf="parent"
@@ -363,7 +363,7 @@
             android:layout_height="wrap_content"
             android:text="0.25mm/적음"
             android:textSize="@dimen/sp_14"
-            android:textColor="@color/weatherBtnRadiusBackground"
+            android:textColor="@color/white"
             app:layout_constraintTop_toBottomOf="@+id/precipitation_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -384,7 +384,7 @@
         app:layout_constraintDimensionRatio="1:1"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/additional_rounded_corner">
+        >
 
         <!--
             기존 일출/일몰을 2등분하기 위해 sunrise / sunset 두 개의 ConstraintLayout을 남김
@@ -423,7 +423,7 @@
                 android:text="일출"
                 android:textSize="@dimen/sp_18"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
                 app:layout_constraintTop_toBottomOf="@+id/sunrise_image"
                 app:layout_constraintBottom_toTopOf="@+id/sunriseTime"
                 app:layout_constraintStart_toStartOf="parent"
@@ -436,7 +436,7 @@
                 android:layout_height="wrap_content"
                 android:text="오전 6:00AM"
                 android:textSize="@dimen/sp_14"
-                android:textColor="@color/weatherBtnRadiusBackground"
+                android:textColor="@color/white"
                 app:layout_constraintTop_toBottomOf="@+id/sunrise_title"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -475,7 +475,7 @@
                 android:text="일몰"
                 android:textSize="@dimen/sp_18"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
                 app:layout_constraintTop_toBottomOf="@+id/sunset_image"
                 app:layout_constraintBottom_toTopOf="@+id/sunsetTime"
                 app:layout_constraintStart_toStartOf="parent"
@@ -488,7 +488,7 @@
                 android:layout_height="wrap_content"
                 android:text="오후 6:00PM"
                 android:textSize="@dimen/sp_14"
-                android:textColor="@color/weatherBtnRadiusBackground"
+                android:textColor="@color/white"
                 app:layout_constraintTop_toBottomOf="@+id/sunset_title"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
