@@ -32,13 +32,35 @@
         android:layout_marginEnd="8dp" />
 
     <!-- 강수 확률 + 강수량 -->
-    <TextView
-        android:id="@+id/hourly_precipitation"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="80%·0.7mm"
-        android:textColor="#CCFFFFFF"
-        android:textSize="8sp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginEnd="8dp">
+        <TextView
+            android:id="@+id/hourly_probability"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="80%"
+            android:textColor="#CCFFFFFF"
+            android:textSize="8sp"
+             />
+        <TextView
+            android:id="@+id/hourly_precipitation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#CCFFFFFF"
+            android:textSize="8sp" />
+    </LinearLayout>
+    <!-- 온도별 선 (Progress Bar 역할) -->
+    <View
+        android:id="@+id/hourly_temp_line"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#CCFFFFFF"
+        android:layout_gravity="center_vertical"
         android:layout_marginEnd="8dp" />
 
     <!-- 온도 원형 뱃지 -->

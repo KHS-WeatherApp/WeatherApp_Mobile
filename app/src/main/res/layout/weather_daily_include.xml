@@ -29,8 +29,8 @@
     <View
         android:id="@+id/weather_divider"
         android:layout_width="match_parent"
-        android:layout_height="0.7dp"
-        android:background="#33EEF2F9"/>
+        android:layout_height="1dp"
+        android:background="@color/weather"/>
 
     <!-- 일별 예보 리스트 -->
     <androidx.recyclerview.widget.RecyclerView

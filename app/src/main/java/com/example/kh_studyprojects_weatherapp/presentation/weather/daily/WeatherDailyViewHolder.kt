@@ -34,8 +34,11 @@ sealed class WeatherDailyViewHolder(
     ) : WeatherDailyViewHolder(binding) {
         private var isExpanded = false
         private var isHourlyMode = true // true: 1시간 단위, false: 2시간 단위
+        private var isClickable = true
+        private var currentItem: WeatherDailyDto? = null
         
         override fun bind(item: WeatherDailyDto) {
+            currentItem = item
             binding.apply {
                 textWeek.text = item.week
                 if (item.weatherCode !in intArrayOf(0, 1, 2, 3, 45, 48, 51, 53, 55)) {
@@ -50,37 +53,28 @@ sealed class WeatherDailyViewHolder(
                 textMaxTemp.text = item.maxTemp
                 imageWeather.setImageResource(getWeatherIcon(item.weatherCode))
 
-                Log.i("WeatherDailyViewHolder","오늘온도 : ${item.minTemp}  / ${item.maxTemp}")
-                // 안전한 변환 (null 또는 숫자가 아닌 경우 0으로 처리)
-                // 예: 전역 최저/최고온도 = -20 ~ 40 => fullRange = 60
-                // (1) 온도 파싱
+                // 온도 파싱 및 온도 바 설정
                 val minTemp = item.minTemp.replace("°", "").toDoubleOrNull()
                 val maxTemp = item.maxTemp.replace("°", "").toDoubleOrNull()
 
                 if (minTemp != null && maxTemp != null) {
-                    // (2) 전역 온도 범위 (예: -20 ~ 40 => fullRange = 60)
                     val minTempRange = item.globalMinTemp
                     val maxTempRange = item.globalMaxTemp
                     val fullRange = (maxTempRange - minTempRange).toFloat()
 
-                    // (3) 안전 범위 보정
                     val clampedMin = minTemp.coerceIn(minTempRange.toDouble(), maxTempRange.toDouble())
                     val clampedMax = maxTemp.coerceIn(minTempRange.toDouble(), maxTempRange.toDouble())
 
-                    // (4) 오프셋 계산 (예: min=4 => offset=24, max=23 => offset=43)
                     val dayMinOffset = (clampedMin - minTempRange).toFloat()
                     val dayMaxOffset = (clampedMax - minTempRange).toFloat()
 
-                    // (5) 0~1 비율
-                    val startRatio = dayMinOffset / fullRange  // (예: 24/60)
-                    val endRatio = dayMaxOffset / fullRange    // (예: 43/60)
+                    val startRatio = dayMinOffset / fullRange
+                    val endRatio = dayMaxOffset / fullRange
                     val widthRatio = (endRatio - startRatio).coerceAtLeast(0f)
 
-                    // (6) 실제 뷰 폭 설정 (onBind 시점엔 width=0일 수 있으므로 post 사용)
                     flTemperatureContainer.post {
                         val containerWidth = flTemperatureContainer.width
                         if (containerWidth > 0) {
-                            // 시작 위치, 너비를 픽셀로 변환
                             val barStartPx = containerWidth * startRatio
                             val barWidthPx = containerWidth * widthRatio
 
@@ -90,19 +84,14 @@ sealed class WeatherDailyViewHolder(
                             lp.marginStart = barStartPx.toInt().coerceAtLeast(0)
                             viewTemperatureBar.layoutParams = lp
 
-                            // 배경(그라데이션 pill) 설정
                             viewTemperatureBar.setBackgroundResource(R.drawable.sh_day_progressbar_01)
                         }
                     }
 
-                    // 평균 온도 계산 및 옷 아이콘 설정
                     val avgTemp = (minTemp + maxTemp) / 2.0
                     imageClothing.setImageResource(getClothingIcon(avgTemp))
                 } else {
-                    // 온도 변환 실패 시 처리
                     Log.e("WeatherDailyViewHolder", "온도 변환 실패: min=${item.minTemp}, max=${item.maxTemp}")
-
-                    // 막대를 숨기거나 width=0으로 설정
                     flTemperatureContainer.post {
                         val lp = viewTemperatureBar.layoutParams as FrameLayout.LayoutParams
                         lp.width = 0
@@ -112,85 +101,106 @@ sealed class WeatherDailyViewHolder(
 
                 // 오후 10시(22시) 이후라면 더보기 버튼 숨김
                 val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-                if (currentHour >= 22) {
-                    dayExpandMore24Btn.visibility = View.GONE
-                } else {
-                    dayExpandMore24Btn.visibility = View.VISIBLE
-                }
+                dayExpandMore24Btn.visibility = if (currentHour >= 22) View.GONE else View.VISIBLE
 
-                // 시간별 날씨 보기 버튼 처리
-                dayExpandMore24Btn.setOnClickListener {
+                // 클릭 리스너 설정
+                val toggleListener = View.OnClickListener {
+                    if (!isClickable) return@OnClickListener
+                    isClickable = false
+                    
                     isExpanded = !isExpanded
-                    toggleExpandedView(item.hourlyForecast)
-                    // 애니메이션 효과
-                    it.animate()
-                        .rotation(if(isExpanded) 180f else 0f)
+                    currentItem?.let { toggleExpandedView(it) }
+                    
+                    dayExpandMore24Btn.animate()
+                        .rotation(if (isExpanded) 180f else 0f)
                         .setDuration(300)
+                        .withEndAction { isClickable = true }
                         .start()
                 }
 
-                Log.i("WeatherDailyViewHolder", "hourlyForecast size: ${item.hourlyForecast?.size ?: 0}")
+                // 메인 레이아웃과 확장 영역에 클릭 리스너 설정
+                rawLayout.setOnClickListener(toggleListener)
+                hourlyExpandedContainer.setOnClickListener(toggleListener)
             }
         }
 
-        private fun toggleExpandedView(hourlyData: List<WeatherHourlyForecastDto>) {
-            // 확장 영역 가져오기 - 바인딩 사용
+        private fun toggleExpandedView(item: WeatherDailyDto) {
             binding.hourlyExpandedContainer.visibility = if (isExpanded) View.VISIBLE else View.GONE
             
             if (isExpanded) {
-                // 확장 영역의 토글 스위치 설정
-                // 중첩된 바인딩 생성
                 val hourlyForecastBinding = ItemWeatherDailyTohourlyForecastBinding.bind(binding.hourlyForecast.root)
                 
+                // 확장된 영역의 전체 레이아웃에 클릭 리스너 설정
+                hourlyForecastBinding.hourlyForecastLayout.setOnClickListener {
+                    if (!isClickable) return@setOnClickListener
+                    isClickable = false
+                    
+                    isExpanded = false
+                    binding.hourlyExpandedContainer.visibility = View.GONE
+                    
+                    binding.dayExpandMore24Btn.animate()
+                        .rotation(0f)
+                        .setDuration(300)
+                        .withEndAction { isClickable = true }
+                        .start()
+                }
+
                 hourlyForecastBinding.hourlyToggle.isChecked = !isHourlyMode
                 hourlyForecastBinding.hourlyToggle.setOnCheckedChangeListener { _, isChecked ->
                     isHourlyMode = !isChecked
-                    updateHourlyData(hourlyForecastBinding, hourlyData)
+                    updateHourlyData(hourlyForecastBinding, item.hourlyForecast, item.globalMinTemp, item.globalMaxTemp)
                 }
                 
-                // 시간별 데이터 업데이트
-                updateHourlyData(hourlyForecastBinding, hourlyData)
+                updateHourlyData(hourlyForecastBinding, item.hourlyForecast, item.globalMinTemp, item.globalMaxTemp)
             }
         }
 
-
-
-        private fun updateHourlyData(binding: ItemWeatherDailyTohourlyForecastBinding, data: List<WeatherHourlyForecastDto>) {
+        private fun updateHourlyData(
+            binding: ItemWeatherDailyTohourlyForecastBinding,
+            data: List<WeatherHourlyForecastDto>,
+            minTempRange: Double,
+            maxTempRange: Double
+        ) {
             val container = binding.hourlyItemsContainer
             container.removeAllViews()
 
             val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-            Log.i("WeatherDailyViewHolder", "currentHour :  ${currentHour}")
             val interval = if (isHourlyMode) 1 else 2
-            // 1시간 후부터 23시까지, interval에 맞는 항목만 필터링
-            val filtered: List<WeatherHourlyForecastDto> = if (data.size == 24 && currentHour < 23) {
-                // subList: currentHour+1 부터 23시까지 (data.size == 24)
+
+            val filtered = if (data.size == 24 && currentHour < 23) {
                 data.subList(currentHour + 1, data.size)
                     .filterIndexed { index, _ -> index % interval == 0 }
             } else {
-                // 데이터가 24개가 아닐 경우 원래의 로직 사용
                 data.filter {
-                    // 24시간 값이 저장된 필드를 사용합니다.
                     val rawHour = it.tvHour?.toIntOrNull() ?: return@filter false
-
-                    // 12시간제를 24시간제로 변환:
-                    // - 오전: 12시면 0으로, 그 외는 그대로 사용
-                    // - 오후: 12시면 그대로, 그 외는 +12
                     val hour = if (it.tvAmPm == "오전") {
                         if (rawHour == 12) 0 else rawHour
-                    } else {  // "오후"
+                    } else {
                         if (rawHour == 12) 12 else rawHour + 12
                     }
-
-                    // 현재 시간(24시간제) 이후부터 23시까지 interval에 맞게 필터링
                     hour in (currentHour + 1)..23 && ((hour - (currentHour + 1)) % interval == 0)
                 }
             }
 
-
             for (hourData in filtered) {
-                val view = LayoutInflater.from(container.context).inflate(R.layout.item_weather_daily_tohourly_forecast_time, container, false)
+                val view = LayoutInflater.from(container.context)
+                    .inflate(R.layout.item_weather_daily_tohourly_forecast_time, container, false)
                 val hourBinding = ItemWeatherDailyTohourlyForecastTimeBinding.bind(view)
+
+                // 각 아이템에 클릭 리스너 설정
+                view.setOnClickListener {
+                    if (!isClickable) return@setOnClickListener
+                    isClickable = false
+                    
+                    isExpanded = false
+                    (this@Today).binding.hourlyExpandedContainer.visibility = View.GONE
+                    
+                    (this@Today).binding.dayExpandMore24Btn.animate()
+                        .rotation(0f)
+                        .setDuration(300)
+                        .withEndAction { isClickable = true }
+                        .start()
+                }
 
                 hourBinding.hourlyTime.text = "${hourData.tvAmPm} ${hourData.tvHour}시"
                 hourBinding.hourlyTemp.text = hourData.temperature
@@ -199,13 +209,44 @@ sealed class WeatherDailyViewHolder(
                 hourBinding.hourlyWeatherIcon.setImageResource(getWeatherIcon(hourData.weatherCode))
                 hourBinding.hourlyClothingIcon.setImageResource(getClothingIcon(temperature))
 
+                // 온도 선 설정
+                val tempLine = hourBinding.hourlyTempLine
+                tempLine.post {
+                    val parent = tempLine.parent as ViewGroup
+                    val containerWidth = parent.width
+
+                    val timeWidth = hourBinding.hourlyTime.width
+                    val weatherIconWidth = hourBinding.hourlyWeatherIcon.width
+                    val clothingIconWidth = hourBinding.hourlyClothingIcon.width
+                    val precipitationWidth = hourBinding.hourlyPrecipitation.width
+
+                    val occupiedWidth = timeWidth + weatherIconWidth + clothingIconWidth + precipitationWidth
+                    val availableWidth = (containerWidth - occupiedWidth).coerceAtLeast(0)
+
+                    val baseTemp = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
+                    val isRaining = (hourData.precipitation?.replace("mm", "")?.toDoubleOrNull() ?: 0.0) > 0.0
+                    val adjustedTemp = if (isRaining) baseTemp - 2.0 else baseTemp
+
+                    val clampedTemp = adjustedTemp.coerceIn(minTempRange, maxTempRange)
+                    val tempOffset = (clampedTemp - minTempRange).toFloat()
+                    val widthRatio = tempOffset / (maxTempRange - minTempRange).toFloat()
+
+                    val targetWidth = (availableWidth * widthRatio).toInt().coerceAtLeast(1)
+
+                    val lp = tempLine.layoutParams
+                    lp.width = targetWidth
+                    tempLine.layoutParams = lp
+                }
+
                 val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
                 if (prob >= 5) {
-                    Log.i("WeatherDailyViewHolder","강수량 : ${hourData.probability}+\" • \"+${hourData.precipitation}")
-                    hourBinding.hourlyPrecipitation.text = hourData.probability + if (hourData.precipitation != "0.0mm") " • ${hourData.precipitation}" else ""
-                    hourBinding.hourlyPrecipitation.visibility = View.VISIBLE
+                    hourBinding.hourlyProbability.text = hourData.probability
+                    hourBinding.hourlyPrecipitation.text = if (hourData.precipitation != "0.0mm") hourData.precipitation else ""
+                    hourBinding.hourlyProbability.visibility = View.VISIBLE
+                    hourBinding.hourlyPrecipitation.visibility = if(hourBinding.hourlyPrecipitation.text == "") View.GONE else View.VISIBLE
                 } else {
                     hourBinding.hourlyPrecipitation.visibility = View.GONE
+                    hourBinding.hourlyProbability.visibility = View.GONE
                 }
                 container.addView(view)
             }
@@ -216,9 +257,12 @@ sealed class WeatherDailyViewHolder(
         private val binding: ItemWeatherDailyOtherBinding
     ) : WeatherDailyViewHolder(binding) {
         private var isExpanded = false
-        private var isHourlyMode = true // true: 1시간 단위, false: 2시간 단위
+        private var isHourlyMode = true
+        private var isClickable = true
+        private var currentItem: WeatherDailyDto? = null
 
         override fun bind(item: WeatherDailyDto) {
+            currentItem = item
             binding.apply {
                 textWeek.text = item.week
                 textDate.text = item.date
@@ -291,42 +335,69 @@ sealed class WeatherDailyViewHolder(
                         viewTemperatureBar.layoutParams = lp
                     }
                 }
+
                 // 시간별 날씨 보기 버튼 처리
-                dayExpandMore24Btn.setOnClickListener {
+                val toggleListener = View.OnClickListener {
+                    if (!isClickable) return@OnClickListener
+                    isClickable = false
+                    
                     isExpanded = !isExpanded
-                    toggleExpandedView(item.hourlyForecast)
-                    // 애니메이션 효과
-                    it.animate()
-                        .rotation(if(isExpanded) 180f else 0f)
+                    currentItem?.let { toggleExpandedView(it) }
+                    
+                    dayExpandMore24Btn.animate()
+                        .rotation(if (isExpanded) 180f else 0f)
                         .setDuration(300)
+                        .withEndAction { isClickable = true }
                         .start()
                 }
+
+                // rawLayout 클릭시
+                rawLayout.setOnClickListener(toggleListener)
+
+                // ✅ hourlyExpandedContainer 클릭시도 똑같이
+                hourlyExpandedContainer.setOnClickListener(toggleListener)
 
                 Log.i("WeatherDailyViewHolder", "hourlyForecast size: ${item.hourlyForecast?.size ?: 0}")
             }
         }
 
-        private fun toggleExpandedView(hourlyData: List<WeatherHourlyForecastDto>) {
-            // 확장 영역 가져오기 - 바인딩 사용
+        private fun toggleExpandedView(item: WeatherDailyDto) {
             binding.hourlyExpandedContainer.visibility = if (isExpanded) View.VISIBLE else View.GONE
             
             if (isExpanded) {
-                // 확장 영역의 토글 스위치 설정
-                // 중첩된 바인딩 생성
                 val hourlyForecastBinding = ItemWeatherDailyTohourlyForecastBinding.bind(binding.hourlyForecast.root)
                 
+                // 확장된 영역의 전체 레이아웃에 클릭 리스너 설정
+                hourlyForecastBinding.hourlyForecastLayout.setOnClickListener {
+                    if (!isClickable) return@setOnClickListener
+                    isClickable = false
+                    
+                    isExpanded = false
+                    binding.hourlyExpandedContainer.visibility = View.GONE
+                    
+                    binding.dayExpandMore24Btn.animate()
+                        .rotation(0f)
+                        .setDuration(300)
+                        .withEndAction { isClickable = true }
+                        .start()
+                }
+
                 hourlyForecastBinding.hourlyToggle.isChecked = !isHourlyMode
                 hourlyForecastBinding.hourlyToggle.setOnCheckedChangeListener { _, isChecked ->
                     isHourlyMode = !isChecked
-                    updateHourlyData(hourlyForecastBinding, hourlyData)
+                    updateHourlyData(hourlyForecastBinding, item.hourlyForecast, item.globalMinTemp, item.globalMaxTemp)
                 }
                 
-                // 시간별 데이터 업데이트
-                updateHourlyData(hourlyForecastBinding, hourlyData)
+                updateHourlyData(hourlyForecastBinding, item.hourlyForecast, item.globalMinTemp, item.globalMaxTemp)
             }
         }
 
-        private fun updateHourlyData(binding: ItemWeatherDailyTohourlyForecastBinding, data: List<WeatherHourlyForecastDto>) {
+        private fun updateHourlyData(
+            binding: ItemWeatherDailyTohourlyForecastBinding,
+            data: List<WeatherHourlyForecastDto>,
+            minTempRange: Double,
+            maxTempRange: Double
+        ) {
             val container = binding.hourlyItemsContainer
             container.removeAllViews()
 
@@ -342,6 +413,21 @@ sealed class WeatherDailyViewHolder(
                 val view = LayoutInflater.from(container.context).inflate(R.layout.item_weather_daily_tohourly_forecast_time, container, false)
                 val hourBinding = ItemWeatherDailyTohourlyForecastTimeBinding.bind(view)
 
+                // 각 아이템에 클릭 리스너 설정
+                view.setOnClickListener {
+                    if (!isClickable) return@setOnClickListener
+                    isClickable = false
+                    
+                    isExpanded = false
+                    (this@Other).binding.hourlyExpandedContainer.visibility = View.GONE
+                    
+                    (this@Other).binding.dayExpandMore24Btn.animate()
+                        .rotation(0f)
+                        .setDuration(300)
+                        .withEndAction { isClickable = true }
+                        .start()
+                }
+
                 hourBinding.hourlyTime.text = "${hourData.tvAmPm} ${hourData.tvHour}시"
                 hourBinding.hourlyTemp.text = hourData.temperature
                 val temperature = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
@@ -349,18 +435,49 @@ sealed class WeatherDailyViewHolder(
                 hourBinding.hourlyWeatherIcon.setImageResource(getWeatherIcon(hourData.weatherCode))
                 hourBinding.hourlyClothingIcon.setImageResource(getClothingIcon(temperature))
 
+                // 온도 선 설정
+                val tempLine = hourBinding.hourlyTempLine
+                tempLine.post {
+                    val parent = tempLine.parent as ViewGroup
+                    val containerWidth = parent.width
+
+                    val timeWidth = hourBinding.hourlyTime.width
+                    val weatherIconWidth = hourBinding.hourlyWeatherIcon.width
+                    val clothingIconWidth = hourBinding.hourlyClothingIcon.width
+                    val precipitationWidth = hourBinding.hourlyPrecipitation.width
+
+                    val occupiedWidth = timeWidth + weatherIconWidth + clothingIconWidth + precipitationWidth
+                    val availableWidth = (containerWidth - occupiedWidth).coerceAtLeast(0)
+
+                    val baseTemp = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
+                    val isRaining = (hourData.precipitation?.replace("mm", "")?.toDoubleOrNull() ?: 0.0) > 0.0
+                    val adjustedTemp = if (isRaining) baseTemp - 2.0 else baseTemp
+
+                    val clampedTemp = adjustedTemp.coerceIn(minTempRange, maxTempRange)
+                    val tempOffset = (clampedTemp - minTempRange).toFloat()
+                    val widthRatio = tempOffset / (maxTempRange - minTempRange).toFloat()
+
+                    val targetWidth = (availableWidth * widthRatio).toInt().coerceAtLeast(1)
+
+                    val lp = tempLine.layoutParams
+                    lp.width = targetWidth
+                    tempLine.layoutParams = lp
+                }
+
                 val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
                 if (prob >= 5) {
-                    hourBinding.hourlyPrecipitation.text = hourData.probability + if (hourData.precipitation != "0.0mm") " • ${hourData.precipitation}" else ""
-                    hourBinding.hourlyPrecipitation.visibility = View.VISIBLE
+                    hourBinding.hourlyProbability.text = hourData.probability
+                    hourBinding.hourlyPrecipitation.text = if (hourData.precipitation != "0.0mm") hourData.precipitation else ""
+                    hourBinding.hourlyProbability.visibility = View.VISIBLE
+                    hourBinding.hourlyPrecipitation.visibility = if(hourBinding.hourlyPrecipitation.text == "") View.GONE else View.VISIBLE
                 } else {
                     hourBinding.hourlyPrecipitation.visibility = View.GONE
+                    hourBinding.hourlyProbability.visibility = View.GONE
                 }
                 container.addView(view)
             }
         }
     }
-
 
     class Yesterday(
         private val binding: ItemWeatherDailyYesterdayBinding

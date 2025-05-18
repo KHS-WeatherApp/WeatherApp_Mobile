@@ -6,6 +6,7 @@
     android:orientation="vertical"
     android:background="@drawable/sh_day_all_view_bg_01">
     <LinearLayout
+        android:id="@+id/raw_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="8dp"
@@ -176,10 +177,14 @@
         android:id="@+id/hourly_expanded_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
         
         <include
             android:id="@+id/hourly_forecast"
-            layout="@layout/item_weather_daily_tohourly_forecast"/>
+            layout="@layout/item_weather_daily_tohourly_forecast"
+            android:clickable="false"
+            android:focusable="false"/>
     </FrameLayout>
 </LinearLayout>
