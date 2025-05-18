@@ -5,4 +5,10 @@ interface WeatherRepository {
         latitude: Double, 
         longitude: Double
     ): Result<Map<String, Any>>
+
+    //25.4.27 이수연 : '대기질' 데이터 호출 추가
+    suspend fun getAdditionalWeatherInfo(
+        latitude: Double,
+        longitude: Double
+    ): Result<Map<String, Any>>
 }

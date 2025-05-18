@@ -54,44 +54,36 @@ class AdditionalWeatherFragment : Fragment() {
      */
     private fun setupWeatherDataObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.weatherState.collect { weatherData ->
-                if (weatherData.isNotEmpty()) {
-                    updateUI(weatherData)
+            viewModel.weatherState.collect { combinedData ->
+                if (combinedData.isNotEmpty()) {
+                    updateUI(combinedData)
                 }
             }
         }
     }
 
     @SuppressLint("DefaultLocale")
-    private fun updateUI(weatherData: Map<String, Any>) {
+    private fun updateUI(combinedData: Map<String, Any>) {
         try {
-            // 1. [현재] 데이터 처리
-//            val current = weatherData["current"] as? Map<*, *>
-//            current?.let {
-//                // (1) 미세먼지 (PM10)
-//                val pm10 = it["pm10"] as? Double
-//                binding.fineDustLevel.text = "${pm10?.toInt() ?: 0} μg/m³"   //(1-1) text 값 세팅
-//                updateFineDustProgress(pm10 ?: 0.0)                    //(1-2) progress bar 세팅
-//
-//                // (2) 초미세먼지 (PM2.5)
-//                val pm25 = it["pm2_5"] as? Double
-//                binding.ultraFineDustLevel.text = "${pm25?.toInt() ?: 0} μg/m³" //(2-1) text 값 세팅
-//                updateUltraFineDustProgress(pm25 ?: 0.0)                  //(2-2) progress bar 세팅
-//
-//            }
+            /*
+                💚 additional에서 필요한 변수
+                (1) 미세먼지    => '대기질' current 변수
+                (2) 초미세먼지  => '대기질' current 변수
+                (3) 자외선지수  => '대기질'   current 변수
+                (4) 강수량	   => '기본'   current 변수
+                (5) 풍속       => '기본'   current 변수
+                (6) 일출/일몰	=> '기본'  daily 변수
+            
+            */
 
-            // 2. [당일] 데이터 처리
-            val daily = weatherData["daily"] as? Map<*, *>
+            // 1. 기본 날씨 데이터 처리 - daily
+            val daily = combinedData["daily"] as? Map<*, *>
             if (daily == null) {
                 android.util.Log.e("AdditionalWeather", "daily 데이터가 null입니다.")
                 return
             }
-
             daily.let {
                 val timeList = it["time"] as? List<*>
-                val uvIndexList = it["uv_index_max"] as? List<*>
-                val precipitationList = it["precipitation_sum"] as? List<*>
-                val windSpeedList = it["wind_speed_10m_max"] as? List<*>
                 val sunriseList = it["sunrise"] as? List<*>
                 val sunsetList = it["sunset"] as? List<*>
 
@@ -106,31 +98,6 @@ class AdditionalWeatherFragment : Fragment() {
                 if (todayIndex == -1) {
                     android.util.Log.e("AdditionalWeather", "오늘 날짜에 해당하는 인덱스를 찾을 수 없습니다.")
                     return
-                }
-
-                // (3) UV 지수
-                val uvi = uvIndexList?.get(todayIndex) as? Double
-                if (uvi == null) {
-                    android.util.Log.e("AdditionalWeather", "UV 지수 데이터가 null입니다.")
-                } else {
-                    updateUVProgress(uvi)
-                }
-
-                // (4) 강수량
-                val precipitation = precipitationList?.get(todayIndex) as? Double
-                if (precipitation == null) {
-                    android.util.Log.e("AdditionalWeather", "강수량 데이터가 null입니다.")
-                } else {
-                    val precipitationText = updatePrecipitationProgress(precipitation)
-                    binding.precipitationLevel.text = "${precipitation} mm ($precipitationText)"
-                }
-
-                // (5) 풍속
-                val windSpeed = windSpeedList?.get(todayIndex) as? Double
-                if (windSpeed == null) {
-                    android.util.Log.e("AdditionalWeather", "풍속 데이터가 null입니다.")
-                } else {
-                    binding.windSpeedLevel.text = "${windSpeed} km/h"
                 }
 
                 // (6) 일출/일몰 시간
@@ -159,6 +126,66 @@ class AdditionalWeatherFragment : Fragment() {
                     
                     binding.sunriseTime.text = sunriseFormatted
                     binding.sunsetTime.text = sunsetFormatted
+                }
+            }
+
+            //2. 기본 날씨 데이터 처리 - current
+            val current = combinedData["current"] as? Map<*, *>
+            if (current == null) {
+                android.util.Log.e("AdditionalWeather", "current 데이터가 null입니다.")
+                return
+            }
+            current.let {
+
+                // (4) 강수량
+                val precipitation = it["precipitation"] as? Double
+                if (precipitation == null) {
+                    android.util.Log.e("AdditionalWeather", "강수량 데이터가 null입니다.")
+                } else {
+                    val precipitationText = updatePrecipitationProgress(precipitation)
+                    binding.precipitationLevel.text = "${precipitation} mm ($precipitationText)"
+                }
+
+                // (5) 풍속
+                val windSpeed = it["wind_speed_10m"] as? Double
+                if (windSpeed == null) {
+                    android.util.Log.e("AdditionalWeather", "풍속 데이터가 null입니다.")
+                } else {
+                    binding.windSpeedLevel.text = "${windSpeed} km/h"
+                }
+            }
+
+            // 3. 대기질 데이터 처리 - air_current
+            val airCurrent = combinedData["air_current"] as? Map<*, *>
+            if (airCurrent == null) {
+                android.util.Log.e("AdditionalWeather", "air_current 데이터가 null입니다.")
+                return
+            }
+            airCurrent.let {
+                // (1) 미세먼지 (PM10)
+                val pm10 = it["pm10"] as? Double
+                if (pm10 == null) {
+                    android.util.Log.e("AdditionalWeather", "미세먼지(PM10) 데이터가 null입니다.")
+                } else {
+                    binding.fineDustLevel.text = "${pm10.toInt()} μg/m³"
+                    updateFineDustProgress(pm10)
+                }
+
+                // (2) 초미세먼지 (PM2.5)
+                val pm25 = it["pm2_5"] as? Double
+                if (pm25 == null) {
+                    android.util.Log.e("AdditionalWeather", "초미세먼지(PM2.5) 데이터가 null입니다.")
+                } else {
+                    binding.ultraFineDustLevel.text = "${pm25.toInt()} μg/m³"
+                    updateUltraFineDustProgress(pm25)
+                }
+
+                // (3) UV 지수
+                val uvi = it["uv_index"] as? Double
+                if (uvi == null) {
+                    android.util.Log.e("AdditionalWeather", "uv지수 데이터가 null입니다.")
+                } else {
+                    updateUVProgress(uvi)
                 }
             }
         } catch (e: Exception) {

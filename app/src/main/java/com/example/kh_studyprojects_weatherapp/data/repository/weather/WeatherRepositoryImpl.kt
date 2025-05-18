@@ -22,7 +22,7 @@ class WeatherRepositoryImpl @Inject constructor(
                 latitude = latitude,
                 longitude = longitude,
                 queryParam = "current=temperature_2m,relative_humidity_2m," +
-                    "apparent_temperature,is_day,precipitation,weather_code&" +
+                    "apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&" +
                     "hourly=temperature_2m,apparent_temperature,precipitation_probability," +
                     "precipitation,weather_code&" +
                     "daily=weather_code,temperature_2m_max,temperature_2m_min," +
@@ -45,6 +45,39 @@ class WeatherRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("WeatherRepository", "API 호출 예외 발생", e)
+            Result.failure(e)
+        }
+    }
+    //25.4.27 이수연 : '대기질' 데이터 호출 추가
+    override suspend fun getAdditionalWeatherInfo(
+        latitude: Double,
+        longitude: Double
+    ): Result<Map<String, Any>> {
+        return try {
+            val requestAir = WeatherRequest(
+                latitude = latitude,
+                longitude = longitude,
+                queryParam = "current=pm10,pm2_5,uv_index,uv_index_clear_sky"
+            )
+            Log.d("WeatherRepository", "요청 데이터(대기질): $requestAir")
+            val responseAir = weatherApiService.getAdditionalWeatherInfo(requestAir)
+            Log.d("WeatherRepository", "응답 코드: ${responseAir.code()}")
+            Log.d("WeatherRepository", "요청 데이터(대기질): ${responseAir}")
+            if (responseAir.isSuccessful && responseAir.body() != null) {
+                // 데이터의 key를 구분하여 저장
+                val airData = responseAir.body()!!.mapKeys { (key, _) ->
+                    when (key) {
+                        "current" -> "air_current"
+                        "daily" -> "air_daily"
+                        else -> key
+                    }
+                }
+                Result.success(airData)
+
+            } else {
+                Result.failure(Exception("Error: ${responseAir.code()}"))
+            }
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }
