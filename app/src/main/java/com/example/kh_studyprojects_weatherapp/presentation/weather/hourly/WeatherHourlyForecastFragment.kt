@@ -2,6 +2,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -64,19 +65,45 @@ class WeatherHourlyForecastFragment : Fragment() {
         }
 
         // 데이터 관찰 및 어댑터에 제출
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.hourlyForecastItems.collect { items ->
-                    adapter.submitList(items)
-                }
-            }
-        }
+        observeViewModel()
 
         // 데이터 가져오기
         viewModel.fetchHourlyForecast()
 
         // 루트 뷰를 반환하여 Fragment의 UI를 화면에 표시
         return root
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.hourlyForecastItems.collect { items ->
+                        adapter?.submitList(items)
+                    }
+                }
+                launch {
+                    viewModel.isLoading.collect { isLoading ->
+                        // 로딩 상태 처리
+                    }
+                }
+                launch {
+                    viewModel.error.collect { error ->
+                        error?.let {
+                            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+                /*디버깅용 위도 경도 구 동  Toast 메시지 출력*/
+                launch {
+                    viewModel.locationInfo.collect { locationInfo ->
+                        locationInfo?.let {
+                            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Fragment의 뷰가 파괴될 때 호출되는 메서드

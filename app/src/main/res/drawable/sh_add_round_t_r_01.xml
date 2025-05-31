@@ -1,4 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/white" />
-    <corners android:radius="16dp" />
+    <solid android:color="@color/weathercontainerBackground" />
+    <corners
+        android:bottomRightRadius="15dp"
+        android:topRightRadius="15dp" />
 </shape>
