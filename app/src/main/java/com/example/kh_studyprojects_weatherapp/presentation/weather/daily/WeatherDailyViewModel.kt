@@ -127,8 +127,8 @@ class WeatherDailyViewModel @Inject constructor(
 
         val hourlyPerDay = hourlyTimes.groupBy { it.substring(0, 10) } // yyyy-MM-dd
 
-        val lowestTemp = (minTemps.minOrNull() ?: -18.0) - 2.0
-        val highestTemp = (maxTemps.maxOrNull() ?: 38.0) + 2.0
+        val lowestTemp = (minTemps.minOrNull() ?: -18.0)
+        val highestTemp = (maxTemps.maxOrNull() ?: 38.0)
 
         return dailyTime.mapIndexed { index, date ->
 

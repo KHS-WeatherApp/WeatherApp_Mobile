@@ -10,9 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
-    private const val DEVICE_URL = "http://192.168.126.40:8080"  // 내부 WiFi IP 김효동
-//    private const val DEVICE_URL = "http://192.168.0.65:8080"  // 내부 WiFi IP 김효동 회사
-//    private const val DEVICE_URL = "http://172.30.1.53:8080"  // 내부 WiFi IP 김지윤
+    private const val DEVICE_URL = "http://172.30.1.30:8080"  // 내부 WiFi IP 김효동
     private const val EMULATOR_URL = "http://10.0.2.2:8080"
 
     // 에뮬레이터 여부에 따라 URL 선택

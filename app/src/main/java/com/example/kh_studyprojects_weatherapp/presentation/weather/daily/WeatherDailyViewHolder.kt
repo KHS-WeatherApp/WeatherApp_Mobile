@@ -22,6 +22,7 @@ import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDaily
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourlyForecastDto
 import java.util.*
 import android.util.Log
+import android.util.TypedValue
 
 sealed class WeatherDailyViewHolder(
     private val binding: androidx.viewbinding.ViewBinding
@@ -212,36 +213,39 @@ sealed class WeatherDailyViewHolder(
                 // 온도 선 설정
                 val tempLine = hourBinding.hourlyTempLine
                 tempLine.post {
-                    val parent = tempLine.parent as ViewGroup
-                    val containerWidth = parent.width
+                    // 최소폭 (예: 56dp)
+                    val minWidthPx = TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 56f, tempLine.context.resources.displayMetrics
+                    ).toInt()
 
-                    val timeWidth = hourBinding.hourlyTime.width
-                    val weatherIconWidth = hourBinding.hourlyWeatherIcon.width
-                    val clothingIconWidth = hourBinding.hourlyClothingIcon.width
-                    val precipitationWidth = hourBinding.hourlyPrecipitation.width
+                    // 최대폭 (예: 120dp)
+                    val maxWidthPx = TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 120f, tempLine.context.resources.displayMetrics
+                    ).toInt()
 
-                    val occupiedWidth = timeWidth + weatherIconWidth + clothingIconWidth + precipitationWidth
-                    val availableWidth = (containerWidth - occupiedWidth).coerceAtLeast(0)
-
+                    // 온도 → 비율 계산
                     val baseTemp = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
-                    val isRaining = (hourData.precipitation?.replace("mm", "")?.toDoubleOrNull() ?: 0.0) > 0.0
-                    val adjustedTemp = if (isRaining) baseTemp - 2.0 else baseTemp
+                    val adjustedTemp = baseTemp.coerceIn(minTempRange, maxTempRange)
+                    val tempOffset = (adjustedTemp - minTempRange).toFloat()
+                    val widthRatioLinear = tempOffset / (maxTempRange - minTempRange).toFloat()
 
-                    val clampedTemp = adjustedTemp.coerceIn(minTempRange, maxTempRange)
-                    val tempOffset = (clampedTemp - minTempRange).toFloat()
-                    val widthRatio = tempOffset / (maxTempRange - minTempRange).toFloat()
+                    // 곡선화 (원하면)
+                    val widthRatio = (1 - Math.pow((1 - widthRatioLinear).toDouble(), 2.0)).toFloat()
 
-                    val targetWidth = (availableWidth * widthRatio).toInt().coerceAtLeast(1)
+                    // 🚀 최소~최대 폭 안에서 자연스럽게 비율로 계산
+                    val finalWidth = (minWidthPx + (maxWidthPx - minWidthPx) * widthRatio).toInt()
+
+                    //Log.d("온도 계산", "minWidthPx=$minWidthPx maxWidthPx=$maxWidthPx ,, minTempRange=$minTempRange, maxTempRange=$maxTempRange, temp=$adjustedTemp , width=$finalWidth")
 
                     val lp = tempLine.layoutParams
-                    lp.width = targetWidth
+                    lp.width = finalWidth
                     tempLine.layoutParams = lp
                 }
 
                 val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
                 if (prob >= 5) {
                     hourBinding.hourlyProbability.text = hourData.probability
-                    hourBinding.hourlyPrecipitation.text = if (hourData.precipitation != "0.0mm") hourData.precipitation else ""
+                    hourBinding.hourlyPrecipitation.text = if (hourData.precipitation != "0.0mm") (" • "+hourData.precipitation) else ""
                     hourBinding.hourlyProbability.visibility = View.VISIBLE
                     hourBinding.hourlyPrecipitation.visibility = if(hourBinding.hourlyPrecipitation.text == "") View.GONE else View.VISIBLE
                 } else {
@@ -436,38 +440,45 @@ sealed class WeatherDailyViewHolder(
                 hourBinding.hourlyClothingIcon.setImageResource(getClothingIcon(temperature))
 
                 // 온도 선 설정
+                // 온도선 설정
                 val tempLine = hourBinding.hourlyTempLine
                 tempLine.post {
-                    val parent = tempLine.parent as ViewGroup
-                    val containerWidth = parent.width
+                    // 최소폭 (예: 56dp)
+                    val minWidthPx = TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 56f, tempLine.context.resources.displayMetrics
+                    ).toInt()
 
-                    val timeWidth = hourBinding.hourlyTime.width
-                    val weatherIconWidth = hourBinding.hourlyWeatherIcon.width
-                    val clothingIconWidth = hourBinding.hourlyClothingIcon.width
-                    val precipitationWidth = hourBinding.hourlyPrecipitation.width
+                    // 최대폭 (예: 120dp)
+                    val maxWidthPx = TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 120f, tempLine.context.resources.displayMetrics
+                    ).toInt()
 
-                    val occupiedWidth = timeWidth + weatherIconWidth + clothingIconWidth + precipitationWidth
-                    val availableWidth = (containerWidth - occupiedWidth).coerceAtLeast(0)
-
+                    // 온도 → 비율 계산
                     val baseTemp = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
-                    val isRaining = (hourData.precipitation?.replace("mm", "")?.toDoubleOrNull() ?: 0.0) > 0.0
-                    val adjustedTemp = if (isRaining) baseTemp - 2.0 else baseTemp
+                    val adjustedTemp = baseTemp.coerceIn(minTempRange, maxTempRange)
+                    val tempOffset = (adjustedTemp - minTempRange).toFloat()
+                    val widthRatioLinear = tempOffset / (maxTempRange - minTempRange).toFloat()
 
-                    val clampedTemp = adjustedTemp.coerceIn(minTempRange, maxTempRange)
-                    val tempOffset = (clampedTemp - minTempRange).toFloat()
-                    val widthRatio = tempOffset / (maxTempRange - minTempRange).toFloat()
+                    // 곡선화 (원하면)
+                    val widthRatio = (1 - Math.pow((1 - widthRatioLinear).toDouble(), 2.0)).toFloat()
 
-                    val targetWidth = (availableWidth * widthRatio).toInt().coerceAtLeast(1)
+                    // 🚀 최소~최대 폭 안에서 자연스럽게 비율로 계산
+                    val finalWidth = (minWidthPx + (maxWidthPx - minWidthPx) * widthRatio).toInt()
+
+                    //Log.d("온도 계산", "minWidthPx=$minWidthPx maxWidthPx=$maxWidthPx ,, minTempRange=$minTempRange, maxTempRange=$maxTempRange, temp=$adjustedTemp , width=$finalWidth")
 
                     val lp = tempLine.layoutParams
-                    lp.width = targetWidth
+                    lp.width = finalWidth
                     tempLine.layoutParams = lp
                 }
+
+
+
 
                 val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
                 if (prob >= 5) {
                     hourBinding.hourlyProbability.text = hourData.probability
-                    hourBinding.hourlyPrecipitation.text = if (hourData.precipitation != "0.0mm") hourData.precipitation else ""
+                    hourBinding.hourlyPrecipitation.text = if (hourData.precipitation != "0.0mm") (" • "+hourData.precipitation) else ""
                     hourBinding.hourlyProbability.visibility = View.VISIBLE
                     hourBinding.hourlyPrecipitation.visibility = if(hourBinding.hourlyPrecipitation.text == "") View.GONE else View.VISIBLE
                 } else {
