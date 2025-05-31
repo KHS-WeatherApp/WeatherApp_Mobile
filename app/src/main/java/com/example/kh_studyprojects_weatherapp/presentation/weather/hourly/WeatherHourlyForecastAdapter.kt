@@ -11,6 +11,7 @@ import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemHorizontalBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import java.util.*
 
 // RecyclerView 어댑터 클래스
@@ -150,7 +151,7 @@ class WeatherHourlyForecastAdapter(
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
 
                 // 날씨 코드에 따른 이미지 설정
-                imgWeather.setImageResource(adapter.getWeatherIcon(item.weatherCode))
+                imgWeather.setImageResource(WeatherCommon.getWeatherIcon(item.weatherCode))
 
                 // 온도에 따른 마진 설정
                 val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
@@ -205,7 +206,7 @@ class WeatherHourlyForecastAdapter(
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
 
                 // 날씨 코드에 따른 이미지 설정
-                imgWeather.setImageResource(adapter.getWeatherIcon(item.weatherCode))
+                imgWeather.setImageResource(WeatherCommon.getWeatherIcon(item.weatherCode))
 
                 // item.temperature를 Double로 변환하여 마진 설정
                 val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyOtherBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyTodayBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyYesterdayBinding
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyDto
+import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherDailyDto
 
 class WeatherDailyAdapter : ListAdapter<WeatherDailyDto, WeatherDailyViewHolder>(DiffCallback()) {
     

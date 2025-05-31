@@ -10,8 +10,9 @@ import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyYeste
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyOtherBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyTohourlyForecastBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyTohourlyForecastTimeBinding
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyDto
+import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherDailyDto
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import java.util.*
 import android.util.Log
 import android.util.TypedValue
@@ -44,7 +45,7 @@ sealed class WeatherDailyViewHolder(
 
                 textMinTemp.text = item.minTemp
                 textMaxTemp.text = item.maxTemp
-                imageWeather.setImageResource(getWeatherIcon(item.weatherCode))
+                imageWeather.setImageResource(WeatherCommon.getWeatherIcon(item.weatherCode))
 
                 // 온도 파싱 및 온도 바 설정
                 val minTemp = item.minTemp.replace("°", "").toDoubleOrNull()
@@ -82,7 +83,7 @@ sealed class WeatherDailyViewHolder(
                     }
 
                     val avgTemp = (minTemp + maxTemp) / 2.0
-                    imageClothing.setImageResource(getClothingIcon(avgTemp))
+                    imageClothing.setImageResource(WeatherCommon.getClothingIcon(avgTemp))
                 } else {
                     Log.e("WeatherDailyViewHolder", "온도 변환 실패: min=${item.minTemp}, max=${item.maxTemp}")
                     flTemperatureContainer.post {
@@ -198,9 +199,9 @@ sealed class WeatherDailyViewHolder(
                 hourBinding.hourlyTime.text = "${hourData.tvAmPm} ${hourData.tvHour}시"
                 hourBinding.hourlyTemp.text = hourData.temperature
                 val temperature = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
-                hourBinding.hourlyTemp.setBackgroundResource(getBackgroundForTemperature(temperature))
-                hourBinding.hourlyWeatherIcon.setImageResource(getWeatherIcon(hourData.weatherCode))
-                hourBinding.hourlyClothingIcon.setImageResource(getClothingIcon(temperature))
+                hourBinding.hourlyTemp.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperature))
+                hourBinding.hourlyWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(hourData.weatherCode))
+                hourBinding.hourlyClothingIcon.setImageResource(WeatherCommon.getClothingIcon(temperature))
 
                 // 온도 선 설정
                 val tempLine = hourBinding.hourlyTempLine
@@ -272,7 +273,7 @@ sealed class WeatherDailyViewHolder(
 
                 textMinTemp.text = item.minTemp
                 textMaxTemp.text = item.maxTemp
-                imageWeather.setImageResource(getWeatherIcon(item.weatherCode))
+                imageWeather.setImageResource(WeatherCommon.getWeatherIcon(item.weatherCode))
 
                 // (1) 온도 파싱
                 val minTemp = item.minTemp.replace("°", "").toDoubleOrNull()
@@ -318,7 +319,7 @@ sealed class WeatherDailyViewHolder(
 
                     // (7) 평균 온도로 옷 아이콘 결정 (기존 로직 유지)
                     val avgTemp = (minTemp + maxTemp) / 2.0
-                    imageClothing.setImageResource(getClothingIcon(avgTemp))
+                    imageClothing.setImageResource(WeatherCommon.getClothingIcon(avgTemp))
 
                 } else {
                     // 온도 변환 실패 시 처리
@@ -427,12 +428,11 @@ sealed class WeatherDailyViewHolder(
                 hourBinding.hourlyTime.text = "${hourData.tvAmPm} ${hourData.tvHour}시"
                 hourBinding.hourlyTemp.text = hourData.temperature
                 val temperature = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
-                hourBinding.hourlyTemp.setBackgroundResource(getBackgroundForTemperature(temperature))
-                hourBinding.hourlyWeatherIcon.setImageResource(getWeatherIcon(hourData.weatherCode))
-                hourBinding.hourlyClothingIcon.setImageResource(getClothingIcon(temperature))
+                hourBinding.hourlyTemp.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperature))
+                hourBinding.hourlyWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(hourData.weatherCode))
+                hourBinding.hourlyClothingIcon.setImageResource(WeatherCommon.getClothingIcon(temperature))
 
                 // 온도 선 설정
-                // 온도선 설정
                 val tempLine = hourBinding.hourlyTempLine
                 tempLine.post {
                     // 최소폭 (예: 56dp)
@@ -463,9 +463,6 @@ sealed class WeatherDailyViewHolder(
                     lp.width = finalWidth
                     tempLine.layoutParams = lp
                 }
-
-
-
 
                 val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
                 if (prob >= 5) {
@@ -544,46 +541,5 @@ sealed class WeatherDailyViewHolder(
                 }
             }
         }
-    }
-
-    protected fun getWeatherIcon(weatherCode: Int): Int {
-        return when (weatherCode) {
-            0 -> R.drawable.weather_icon_sun
-            1, 2, 3 -> R.drawable.weather_icon_partly_cloudy
-            45, 48 -> R.drawable.weather_icon_fog
-            51, 53, 55 -> R.drawable.weather_icon_drizzle
-            56, 57 -> R.drawable.weather_icon_freezing_drizzle
-            61, 63, 65 -> R.drawable.weather_icon_shower
-            66, 67 -> R.drawable.weather_icon_shower
-            71, 73, 75 -> R.drawable.weather_icon_snow
-            77 -> R.drawable.weather_icon_snow
-            80, 81, 82 -> R.drawable.weather_icon_thunder
-            85, 86 -> R.drawable.weather_icon_thunder
-            95 -> R.drawable.weather_icon_thunder
-            96, 99 -> R.drawable.weather_icon_thunder
-            else -> R.drawable.weather_icon_unknown
-        }
-    }
-
-    protected fun getClothingIcon(temperature: Double): Int {
-        return when {
-            temperature >= 28 -> R.drawable.clothing_icon_hawaiianshirt
-            temperature >= 23 -> R.drawable.clothing_icon_hawaiianshirt
-            temperature >= 20 -> R.drawable.clothing_icon_hawaiianshirt
-            temperature >= 17 -> R.drawable.clothing_icon_hawaiianshirt
-            temperature >= 12 -> R.drawable.clothing_icon_hawaiianshirt
-            temperature >= 9 -> R.drawable.clothing_icon_hawaiianshirt
-            else -> R.drawable.clothing_icon_hawaiianshirt
-        }
-    }
-
-    // 온도에 따른 배경 리소스를 설정하는 메서드
-    protected fun getBackgroundForTemperature(temp: Double): Int = when {
-        temp >= 30.0 -> R.drawable.sh_hourly_round_temperature_30
-        temp >= 25.0 -> R.drawable.sh_hourly_round_temperature_20
-        temp >= 20.0 -> R.drawable.sh_hourly_round_temperature_20
-        temp >= 15.0 -> R.drawable.sh_hourly_round_temperature_15
-        temp >= 10.0 -> R.drawable.sh_hourly_round_temperature_10
-        else -> R.drawable.sh_hourly_round_temperature_10
     }
 }
