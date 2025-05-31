@@ -3,20 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="@dimen/weather_hourly_item_height"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingHorizontal="12dp"> <!-- 배경 색상 지정 -->
+    android:paddingHorizontal="@dimen/weather_hourly_item_padding_horizontal"> <!-- 배경 색상 지정 -->
 
     <!-- 시간 텍스트 -->
     <TextView
         android:id="@+id/hourly_time"
-        android:layout_width="65dp"
+        android:layout_width="@dimen/weather_hourly_time_width"
         android:layout_height="wrap_content"
-        android:text="오후 12시"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
-        android:layout_marginEnd="8dp"
+        android:text="@string/weather_hourly_time_sample"
+        android:textColor="@color/white"
+        android:textSize="@dimen/weather_hourly_time_text_size"
+        android:layout_marginEnd="@dimen/weather_hourly_time_margin_end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -24,11 +24,11 @@
     <!-- 옷 아이콘 -->
     <ImageView
         android:id="@+id/hourly_clothing_icon"
-        android:layout_width="25dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/weather_hourly_clothing_icon_width"
+        android:layout_height="@dimen/weather_hourly_clothing_icon_height"
         android:src="@drawable/weather_icon_fog"
-        android:layout_marginEnd="8dp"
-        android:paddingRight="5dp"
+        android:layout_marginEnd="@dimen/weather_hourly_icon_margin_end"
+        android:paddingRight="@dimen/weather_hourly_clothing_icon_padding_right"
         app:layout_constraintStart_toEndOf="@id/hourly_time"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -36,10 +36,10 @@
     <!-- 날씨 아이콘 -->
     <ImageView
         android:id="@+id/hourly_weather_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/weather_hourly_weather_icon_size"
+        android:layout_height="@dimen/weather_hourly_weather_icon_size"
         android:src="@drawable/weather_icon_fog"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/weather_hourly_icon_margin_end"
         app:layout_constraintStart_toEndOf="@id/hourly_clothing_icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -48,9 +48,9 @@
     <LinearLayout
         android:id="@+id/hourly_probability_layout"
         android:layout_width="wrap_content"
-        android:layout_height="11dp"
+        android:layout_height="@dimen/weather_hourly_probability_layout_height"
         android:orientation="horizontal"
-        android:layout_marginStart="@dimen/dp_10"
+        android:layout_marginStart="@dimen/weather_hourly_probability_layout_margin_start"
         app:layout_constraintStart_toEndOf="@id/hourly_weather_icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/hourly_temp_line">
@@ -58,9 +58,9 @@
             android:id="@+id/hourly_probability"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="80%"
-            android:textColor="#CCFFFFFF"
-            android:textSize="8sp"
+            android:text="@string/weather_hourly_probability_sample"
+            android:textColor="@color/weather_hourly_probability_text"
+            android:textSize="@dimen/weather_hourly_probability_text_size"
             android:layout_gravity="center"
         />
         <TextView
@@ -68,18 +68,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textColor="#CCFFFFFF"
+            android:textColor="@color/weather_hourly_probability_text"
             android:layout_gravity="center"
-            android:textSize="8sp" />
+            android:textSize="@dimen/weather_hourly_probability_text_size" />
     </LinearLayout>
     <!-- 온도별 선 (Progress Bar 역할) -->
     <View
         android:id="@+id/hourly_temp_line"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="#CCFFFFFF"
+        android:layout_height="@dimen/weather_hourly_temp_line_height"
+        android:background="@color/weather_hourly_temp_line"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/weather_hourly_temp_line_margin_end"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/hourly_probability_layout"/>
@@ -87,13 +87,13 @@
     <!-- 온도 원형 뱃지 -->
     <TextView
         android:id="@+id/hourly_temp"
-        android:layout_width="40dp"
-        android:layout_height="28dp"
+        android:layout_width="@dimen/weather_hourly_temp_badge_width"
+        android:layout_height="@dimen/weather_hourly_temp_badge_height"
         android:gravity="center"
-        android:text="5°"
-        android:textColor="@android:color/white"
-        android:textSize="13sp"
-        android:layout_marginStart="@dimen/dp_10"
+        android:text="@string/weather_hourly_temp_sample"
+        android:textColor="@color/white"
+        android:textSize="@dimen/weather_hourly_temp_badge_text_size"
+        android:layout_marginStart="@dimen/weather_hourly_temp_badge_margin_start"
         app:layout_constraintStart_toEndOf="@id/hourly_temp_line"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

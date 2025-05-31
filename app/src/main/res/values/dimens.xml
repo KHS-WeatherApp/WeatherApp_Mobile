@@ -3843,6 +3843,7 @@
     <dimen name="weather_item_slider_margin_horizontal">5dp</dimen>
     <!-- 더보기 버튼 크기 -->
     <dimen name="weather_item_expand_btn_size">20dp</dimen>
+    <dimen name="weather_item_expand_btn_width_size_v2">18dp</dimen>
     <!-- 더보기 버튼 왼쪽 패딩 -->
     <dimen name="weather_item_expand_btn_padding_left">1dp</dimen>
     <!-- 구분선 두께 -->
@@ -3868,6 +3869,7 @@
     <dimen name="weather_item_include_button_text_size">16sp</dimen>
     <!-- 일별 예보 컨테이너 레이아웃 디멘 -->
 
+    <!-- 일별 예보 확장 컨테이너 안 -->
     <!-- 시간별 예보 컨테이너 레이아웃 디멘 -->
     <!-- 시간별 예보 컨테이너 가로 패딩 -->
     <dimen name="weather_hourly_padding_horizontal">8dp</dimen>
@@ -3886,4 +3888,44 @@
     <!-- 시간별 예보 아이템 컨테이너 세로 패딩 -->
     <dimen name="weather_hourly_items_padding_vertical">4dp</dimen>
     <!-- 시간별 예보 컨테이너 레이아웃 디멘 -->
+
+    <!-- 시간별 예보 아이템 높이 -->
+    <dimen name="weather_hourly_item_height">40dp</dimen>
+    <!-- 시간별 예보 아이템 가로 패딩 -->
+    <dimen name="weather_hourly_item_padding_horizontal">12dp</dimen>
+    <!-- 시간 텍스트 영역 가로폭 -->
+    <dimen name="weather_hourly_time_width">65dp</dimen>
+    <!-- 시간 텍스트 크기 -->
+    <dimen name="weather_hourly_time_text_size">14sp</dimen>
+    <!-- 시간 텍스트 오른쪽 마진 -->
+    <dimen name="weather_hourly_time_margin_end">8dp</dimen>
+    <!-- 옷 아이콘 가로폭 -->
+    <dimen name="weather_hourly_clothing_icon_width">25dp</dimen>
+    <!-- 옷 아이콘 세로높이 -->
+    <dimen name="weather_hourly_clothing_icon_height">20dp</dimen>
+    <!-- 옷 아이콘 오른쪽 패딩 -->
+    <dimen name="weather_hourly_clothing_icon_padding_right">5dp</dimen>
+    <!-- 날씨 아이콘 크기 -->
+    <dimen name="weather_hourly_weather_icon_size">20dp</dimen>
+    <!-- 아이콘 오른쪽 마진 -->
+    <dimen name="weather_hourly_icon_margin_end">8dp</dimen>
+    <!-- 강수 확률/강수량 레이아웃 높이 -->
+    <dimen name="weather_hourly_probability_layout_height">11dp</dimen>
+    <!-- 강수 확률/강수량 레이아웃 왼쪽 마진 -->
+    <dimen name="weather_hourly_probability_layout_margin_start">10dp</dimen>
+    <!-- 강수 확률/강수량 텍스트 크기 -->
+    <dimen name="weather_hourly_probability_text_size">8sp</dimen>
+    <!-- 온도별 선(Progress Bar) 높이 -->
+    <dimen name="weather_hourly_temp_line_height">1dp</dimen>
+    <!-- 온도별 선 오른쪽 마진 -->
+    <dimen name="weather_hourly_temp_line_margin_end">8dp</dimen>
+    <!-- 온도 원형 뱃지 가로폭 -->
+    <dimen name="weather_hourly_temp_badge_width">40dp</dimen>
+    <!-- 온도 원형 뱃지 세로높이 -->
+    <dimen name="weather_hourly_temp_badge_height">28dp</dimen>
+    <!-- 온도 원형 뱃지 텍스트 크기 -->
+    <dimen name="weather_hourly_temp_badge_text_size">13sp</dimen>
+    <!-- 온도 원형 뱃지 왼쪽 마진 -->
+    <dimen name="weather_hourly_temp_badge_margin_start">10dp</dimen>
+    <!-- 일별 예보 확장 컨테이너 안 -->
 </resources>

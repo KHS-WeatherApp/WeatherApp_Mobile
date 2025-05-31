@@ -95,11 +95,10 @@
                 <!-- 더보기 , 시간별 날씨보기란  -->
                 <ImageView
                     android:id="@+id/day_expand_more_24_btn"
-                    android:layout_width="@dimen/weather_item_expand_btn_size"
+                    android:layout_width="@dimen/weather_item_expand_btn_width_size_v2"
                     android:layout_height="@dimen/weather_item_expand_btn_size"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:paddingLeft="@dimen/weather_item_expand_btn_padding_left"/>
+                    android:layout_centerVertical="true"/>
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>

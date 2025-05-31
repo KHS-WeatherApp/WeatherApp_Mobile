@@ -30,4 +30,9 @@
     <!-- 시간별 예보 구분선 색상 -->
     <color name="weather_hourly_divider">#33FFFFFF</color>
 
+    <!-- 시간별 예보 강수확률/강수량 텍스트 색상 -->
+    <color name="weather_hourly_probability_text">#CCFFFFFF</color>
+    <!-- 시간별 예보 온도선(Progress Bar) 색상 -->
+    <color name="weather_hourly_temp_line">#CCFFFFFF</color>
+
 </resources>

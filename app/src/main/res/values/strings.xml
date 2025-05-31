@@ -35,4 +35,8 @@
     <string name="weather_hourly_title">시간별 날씨</string>
     <!-- 시간별 예보 토글 텍스트 -->
     <string name="weather_hourly_toggle">2시간 간격</string>
+
+    <string name="weather_hourly_time_sample">오후 12시</string>
+    <string name="weather_hourly_probability_sample">80%</string>
+    <string name="weather_hourly_temp_sample">5°</string>
 </resources>
