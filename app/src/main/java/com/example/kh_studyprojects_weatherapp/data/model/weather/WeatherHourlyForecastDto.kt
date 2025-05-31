@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.domain.model.weather
+package com.example.kh_studyprojects_weatherapp.data.model.weather
 
 data class WeatherHourlyForecastDto(
     val tvAmPm: String?,            // AM/PM

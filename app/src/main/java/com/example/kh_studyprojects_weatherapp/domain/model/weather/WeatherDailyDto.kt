@@ -1,5 +1,7 @@
 package com.example.kh_studyprojects_weatherapp.domain.model.weather
 
+import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
+
 data class WeatherDailyDto(
     val type: Type,
     val week: String,

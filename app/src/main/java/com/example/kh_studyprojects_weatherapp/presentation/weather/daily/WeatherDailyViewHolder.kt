@@ -1,16 +1,8 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.daily
 
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Switch
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyTodayBinding
@@ -19,7 +11,7 @@ import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyOther
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyTohourlyForecastBinding
 import com.example.kh_studyprojects_weatherapp.databinding.ItemWeatherDailyTohourlyForecastTimeBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDailyDto
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourlyForecastDto
+import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import java.util.*
 import android.util.Log
 import android.util.TypedValue

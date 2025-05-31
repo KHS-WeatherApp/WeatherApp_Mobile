@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemHorizontalBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourlyForecastDto
+import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import java.util.*
 
 // RecyclerView 어댑터 클래스
@@ -74,6 +74,24 @@ class WeatherHourlyForecastAdapter(
         }
     }
 
+    // 날씨 코드에 따른 아이콘 리소스를 반환하는 메서드
+    private fun getWeatherIcon(weatherCode: Int): Int = when (weatherCode) {
+        0 -> R.drawable.weather_icon_sun
+        1, 2, 3 -> R.drawable.weather_icon_partly_cloudy
+        45, 48 -> R.drawable.weather_icon_fog
+        51, 53, 55 -> R.drawable.weather_icon_drizzle
+        56, 57 -> R.drawable.weather_icon_freezing_drizzle
+        61, 63, 65 -> R.drawable.weather_icon_shower
+        66, 67 -> R.drawable.weather_icon_shower
+        71, 73, 75 -> R.drawable.weather_icon_snow
+        77 -> R.drawable.weather_icon_snow
+        80, 81, 82 -> R.drawable.weather_icon_thunder
+        85, 86 -> R.drawable.weather_icon_thunder
+        95 -> R.drawable.weather_icon_thunder
+        96, 99 -> R.drawable.weather_icon_thunder
+        else -> R.drawable.weather_icon_unknown
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_VERTICAL -> {
@@ -131,6 +149,9 @@ class WeatherHourlyForecastAdapter(
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
 
+                // 날씨 코드에 따른 이미지 설정
+                imgWeather.setImageResource(adapter.getWeatherIcon(item.weatherCode))
+
                 // 온도에 따른 마진 설정
                 val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
                 temperatureLayoutParams.topMargin = getMarginForTemperature(temperatureDouble)
@@ -182,6 +203,9 @@ class WeatherHourlyForecastAdapter(
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
+
+                // 날씨 코드에 따른 이미지 설정
+                imgWeather.setImageResource(adapter.getWeatherIcon(item.weatherCode))
 
                 // item.temperature를 Double로 변환하여 마진 설정
                 val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
