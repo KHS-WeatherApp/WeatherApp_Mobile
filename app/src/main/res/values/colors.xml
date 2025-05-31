@@ -25,4 +25,9 @@
     <!--날씨 추가정보 - 텍스트-->
     <color name="weatherBtnRadiusBackground">#71818B</color><!--3A78A96D-->
 
+    <!-- 날씨 아이템 구분선 색상 -->
+    <color name="weather_item_divider">#33EEF2F9</color>
+    <!-- 시간별 예보 구분선 색상 -->
+    <color name="weather_hourly_divider">#33FFFFFF</color>
+
 </resources>

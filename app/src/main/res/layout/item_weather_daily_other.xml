@@ -9,21 +9,21 @@
         android:id="@+id/raw_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp"
+        android:paddingHorizontal="@dimen/weather_item_padding_horizontal"
+        android:paddingVertical="@dimen/weather_item_padding_vertical"
         android:orientation="horizontal">
 
         <!-- 날짜와 날씨 정보 -->
         <LinearLayout
-            android:layout_width="38dp"
+            android:layout_width="@dimen/weather_item_week_width"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_vertical"
-            android:paddingStart="1dp">
+            android:paddingStart="@dimen/weather_item_padding_start">
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="33dp"
+                android:layout_height="@dimen/weather_item_week_height"
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
                 <!-- 요일 -->
@@ -32,8 +32,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="월"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/weather_item_text_size_large"
                     android:textStyle="bold"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
@@ -41,11 +41,11 @@
                 <!-- 날짜 -->
                 <TextView
                     android:id="@+id/text_date"
-                    android:layout_width="20dp"
+                    android:layout_width="@dimen/weather_item_date_width"
                     android:layout_height="wrap_content"
                     android:text="3.24"
-                    android:textColor="@android:color/white"
-                    android:textSize="10sp"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/weather_item_text_size_small"
                     android:gravity="center|center_vertical"
                     app:layout_constraintTop_toBottomOf="@id/text_week"
                     app:layout_constraintStart_toStartOf="@id/text_week" />
@@ -64,23 +64,23 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_alignParentStart="true"
-                android:paddingStart="7dp">
+                android:paddingStart="@dimen/weather_item_inner_padding_start">
 
                 <!-- 옷 아이콘-->
                 <ImageView
                     android:id="@+id/image_clothing"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="@dimen/weather_item_icon_size"
+                    android:layout_height="@dimen/weather_item_icon_size"
                     android:src="@drawable/clothing_icon_hawaiianshirt"
-                    android:layout_marginEnd="8dp"/>
+                    android:layout_marginEnd="@dimen/weather_item_margin_end"/>
 
                 <!-- 날씨 아이콘-->
                 <ImageView
                     android:id="@+id/image_weather"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="@dimen/weather_item_icon_size"
+                    android:layout_height="@dimen/weather_item_icon_size"
                     android:src="@drawable/weather_icon_sun"
-                    android:layout_marginEnd="8dp"/>
+                    android:layout_marginEnd="@dimen/weather_item_margin_end"/>
 
                 <!-- 첫 번째 레이아웃: 왼쪽 -->
                 <LinearLayout
@@ -96,8 +96,8 @@
                         android:layout_height="wrap_content"
                         android:gravity="start"
                         android:text="0.2mm"
-                        android:textColor="@android:color/white"
-                        android:textSize="8sp"/>
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/weather_item_text_size_xsmall"/>
                     <!-- 강수량 확률 정보-->
                     <TextView
                         android:id="@+id/text_humidity"
@@ -105,8 +105,8 @@
                         android:layout_height="wrap_content"
                         android:gravity="start"
                         android:text="55%"
-                        android:textColor="@android:color/white"
-                        android:textSize="8sp"/>
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/weather_item_text_size_xsmall"/>
                 </LinearLayout>
             </LinearLayout>
             <!-- 두 번째 레이아웃: 오른쪽 -->
@@ -116,26 +116,26 @@
                 android:orientation="horizontal"
                 android:gravity="end|center_vertical"
                 android:layout_alignParentEnd="true"
-                android:paddingEnd="2dp">
+                android:paddingEnd="@dimen/weather_item_inner_padding_end">
 
                 <!-- 최저 온도 -->
                 <TextView
                     android:id="@+id/text_min_temp"
-                    android:layout_width="38dp"
+                    android:layout_width="@dimen/weather_item_temp_width"
                     android:layout_height="wrap_content"
                     android:text="12°"
                     android:gravity="end"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"/>
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/weather_item_text_size_large"/>
 
                 <!-- 온도 슬라이더 -->
                 <FrameLayout
                     android:id="@+id/flTemperatureContainer"
-                    android:layout_width="60dp"
-                    android:layout_height="8dp"
+                    android:layout_width="@dimen/weather_item_slider_width"
+                    android:layout_height="@dimen/weather_item_slider_height"
                     android:gravity="center_vertical"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="@dimen/weather_item_slider_margin_horizontal"
+                    android:layout_marginEnd="@dimen/weather_item_slider_margin_horizontal"
                     android:background="@drawable/sh_day_progressbarframe_01"
                     android:clipToOutline="true">
 
@@ -150,29 +150,29 @@
                 <!-- 최고 온도 -->
                 <TextView
                     android:id="@+id/text_max_temp"
-                    android:layout_width="38dp"
+                    android:layout_width="@dimen/weather_item_temp_width"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:text="16°"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"/>
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/weather_item_text_size_large"/>
                 <!-- 더보기 , 시간별 날씨보기란  -->
                 <ImageView
                     android:id="@+id/day_expand_more_24_btn"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/weather_item_expand_btn_size"
+                    android:layout_height="@dimen/weather_item_expand_btn_size"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:paddingLeft="1dp"
+                    android:paddingLeft="@dimen/weather_item_expand_btn_padding_left"
                     android:src="@drawable/sh_day_btn_expand_more_24"
-                    android:contentDescription="더보기" />
+                    android:contentDescription="@string/weather_item_expand_btn_desc" />
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.7dp"
-        android:background="#33EEF2F9" />
+        android:layout_height="@dimen/weather_item_divider_height"
+        android:background="@color/weather_item_divider" />
     <FrameLayout
         android:id="@+id/hourly_expanded_container"
         android:layout_width="match_parent"

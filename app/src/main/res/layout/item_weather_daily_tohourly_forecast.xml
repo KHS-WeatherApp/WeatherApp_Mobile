@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/sh_day_all_view_bg_01"
-    android:paddingHorizontal="8dp"
-    android:paddingVertical="8dp">
+    android:paddingHorizontal="@dimen/weather_hourly_padding_horizontal"
+    android:paddingVertical="@dimen/weather_hourly_padding_vertical">
 
     <!-- 헤더 영역: 제목과 토글 스위치 -->
     <LinearLayout
@@ -14,33 +14,33 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="@dimen/weather_hourly_header_margin_bottom">
         
         <TextView
             android:id="@+id/hourly_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="시간별 날씨"
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
+            android:text="@string/weather_hourly_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/weather_hourly_title_text_size"
             android:textStyle="bold"/>
             
         <Switch
             android:id="@+id/hourly_toggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2시간 간격"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"/>
+            android:text="@string/weather_hourly_toggle"
+            android:textColor="@color/white"
+            android:textSize="@dimen/weather_hourly_toggle_text_size"/>
     </LinearLayout>
     
     <!-- 구분선 -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#33FFFFFF"
-        android:layout_marginBottom="8dp"/>
+        android:layout_height="@dimen/weather_hourly_divider_height"
+        android:background="@color/weather_hourly_divider"
+        android:layout_marginBottom="@dimen/weather_hourly_divider_margin_bottom"/>
         
     <!-- 시간별 날씨 아이템들을 가로로 스크롤 가능하게 표시 -->
     <HorizontalScrollView
@@ -53,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingVertical="4dp">
+            android:paddingVertical="@dimen/weather_hourly_items_padding_vertical">
             
             <!-- 이 안에 시간별 날씨 아이템들이 동적으로 추가됩니다 -->
             <!-- 예시 시간별 날씨 아이템 -->

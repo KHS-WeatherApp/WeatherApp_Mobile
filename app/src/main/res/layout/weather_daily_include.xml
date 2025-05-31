@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="16dp"
+    android:layout_marginTop="@dimen/weather_item_include_margin_top"
     android:orientation="vertical">
 
     <!-- 일별 예보 헤더 -->
@@ -15,21 +15,21 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/sh_day_radius_t_lr_01"
-        android:padding="10dp">
+        android:padding="@dimen/weather_item_include_header_padding">
 
         <TextView
             android:id="@+id/weather_daily_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="일별 예보"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:text="@string/weather_item_daily_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/weather_item_include_title_text_size" />
     </LinearLayout>
 
     <View
         android:id="@+id/weather_divider"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/weather_item_include_divider_height"
         android:background="@color/weather"/>
 
     <!-- 일별 예보 리스트 -->
@@ -50,19 +50,19 @@
         android:orientation="horizontal"
         android:background="@drawable/sh_day_radius_b_lr_01"
         android:gravity="center"
-        android:padding="10dp">
+        android:padding="@dimen/weather_item_include_button_container_padding">
 
         <android.widget.Button
             android:id="@+id/btn_weather_yesterday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="@dimen/weather_item_include_button_margin_horizontal"
             android:background="@drawable/sh_day_btn_radius_01"
-            android:padding="12dp"
-            android:text="어제 날씨"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:padding="@dimen/weather_item_include_button_padding"
+            android:text="@string/weather_item_btn_yesterday"
+            android:textColor="@color/white"
+            android:textSize="@dimen/weather_item_include_button_text_size"
             tools:backgroundTint="@null" />
 
         <android.widget.Button
@@ -70,12 +70,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/weather_item_include_button_margin_horizontal"
             android:background="@drawable/sh_day_btn_radius_01"
-            android:padding="12dp"
-            android:text="15일 예보 보기"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:padding="@dimen/weather_item_include_button_padding"
+            android:text="@string/weather_item_btn_forecast"
+            android:textColor="@color/white"
+            android:textSize="@dimen/weather_item_include_button_text_size"
             tools:backgroundTint="@null" />
     </LinearLayout>
 </LinearLayout>

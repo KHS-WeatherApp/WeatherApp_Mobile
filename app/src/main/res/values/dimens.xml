@@ -3806,4 +3806,84 @@
     <dimen name="dp_999.5">999.5dp</dimen>
     <dimen name="dp_1000">1000dp</dimen>
 
+    <!-- 일별 날씨 아이템 레이아웃 디멘 -->
+    <!-- 날씨 아이템 전체 가로 패딩 -->
+    <dimen name="weather_item_padding_horizontal">8dp</dimen>
+    <!-- 날씨 아이템 전체 세로 패딩 -->
+    <dimen name="weather_item_padding_vertical">4dp</dimen>
+    <!-- 요일/날짜 영역 가로폭 -->
+    <dimen name="weather_item_week_width">38dp</dimen>
+    <!-- 요일/날짜 영역 패딩 시작 -->
+    <dimen name="weather_item_padding_start">1dp</dimen>
+    <!-- 요일/날짜 영역 세로 높이 -->
+    <dimen name="weather_item_week_height">33dp</dimen>
+    <!-- 날짜 텍스트 가로폭 -->
+    <dimen name="weather_item_date_width">20dp</dimen>
+    <!-- 큰 텍스트(요일/온도) 크기 -->
+    <dimen name="weather_item_text_size_large">16sp</dimen>
+    <!-- 작은 텍스트(날짜) 크기 -->
+    <dimen name="weather_item_text_size_small">10sp</dimen>
+    <!-- 내부 왼쪽 패딩 -->
+    <dimen name="weather_item_inner_padding_start">7dp</dimen>
+    <!-- 아이콘(옷/날씨) 크기 -->
+    <dimen name="weather_item_icon_size">24dp</dimen>
+    <!-- 아이콘/텍스트 사이 마진 -->
+    <dimen name="weather_item_margin_end">8dp</dimen>
+    <!-- xsmall 텍스트(강수량/습도) 크기 -->
+    <dimen name="weather_item_text_size_xsmall">8sp</dimen>
+    <!-- 내부 오른쪽 패딩 -->
+    <dimen name="weather_item_inner_padding_end">2dp</dimen>
+    <!-- 온도 텍스트 가로폭 -->
+    <dimen name="weather_item_temp_width">38dp</dimen>
+    <!-- 온도 슬라이더(프레임) 가로폭 -->
+    <dimen name="weather_item_slider_width">60dp</dimen>
+    <!-- 온도 슬라이더(프레임) 세로높이 -->
+    <dimen name="weather_item_slider_height">8dp</dimen>
+    <!-- 온도 슬라이더 좌우 마진 -->
+    <dimen name="weather_item_slider_margin_horizontal">5dp</dimen>
+    <!-- 더보기 버튼 크기 -->
+    <dimen name="weather_item_expand_btn_size">20dp</dimen>
+    <!-- 더보기 버튼 왼쪽 패딩 -->
+    <dimen name="weather_item_expand_btn_padding_left">1dp</dimen>
+    <!-- 구분선 두께 -->
+    <dimen name="weather_item_divider_height">0.7dp</dimen>
+    <!-- 일별 날씨 아이템 레이아웃 디멘 -->
+
+    <!-- 일별 예보 컨테이너 레이아웃 디멘 -->
+    <!-- 일별 예보 컨테이너 상단 마진 -->
+    <dimen name="weather_item_include_margin_top">16dp</dimen>
+    <!-- 일별 예보 헤더 패딩 -->
+    <dimen name="weather_item_include_header_padding">10dp</dimen>
+    <!-- 일별 예보 헤더 타이틀 텍스트 크기 -->
+    <dimen name="weather_item_include_title_text_size">18sp</dimen>
+    <!-- 일별 예보 헤더 구분선 두께 -->
+    <dimen name="weather_item_include_divider_height">1dp</dimen>
+    <!-- 일별 예보 버튼 컨테이너 패딩 -->
+    <dimen name="weather_item_include_button_container_padding">10dp</dimen>
+    <!-- 일별 예보 버튼 좌우 마진 -->
+    <dimen name="weather_item_include_button_margin_horizontal">16dp</dimen>
+    <!-- 일별 예보 버튼 내부 패딩 -->
+    <dimen name="weather_item_include_button_padding">12dp</dimen>
+    <!-- 일별 예보 버튼 텍스트 크기 -->
+    <dimen name="weather_item_include_button_text_size">16sp</dimen>
+    <!-- 일별 예보 컨테이너 레이아웃 디멘 -->
+
+    <!-- 시간별 예보 컨테이너 레이아웃 디멘 -->
+    <!-- 시간별 예보 컨테이너 가로 패딩 -->
+    <dimen name="weather_hourly_padding_horizontal">8dp</dimen>
+    <!-- 시간별 예보 컨테이너 세로 패딩 -->
+    <dimen name="weather_hourly_padding_vertical">8dp</dimen>
+    <!-- 시간별 예보 헤더 하단 마진 -->
+    <dimen name="weather_hourly_header_margin_bottom">8dp</dimen>
+    <!-- 시간별 예보 헤더 타이틀 텍스트 크기 -->
+    <dimen name="weather_hourly_title_text_size">14sp</dimen>
+    <!-- 시간별 예보 토글 텍스트 크기 -->
+    <dimen name="weather_hourly_toggle_text_size">12sp</dimen>
+    <!-- 시간별 예보 구분선 두께 -->
+    <dimen name="weather_hourly_divider_height">0.5dp</dimen>
+    <!-- 시간별 예보 구분선 하단 마진 -->
+    <dimen name="weather_hourly_divider_margin_bottom">8dp</dimen>
+    <!-- 시간별 예보 아이템 컨테이너 세로 패딩 -->
+    <dimen name="weather_hourly_items_padding_vertical">4dp</dimen>
+    <!-- 시간별 예보 컨테이너 레이아웃 디멘 -->
 </resources>
