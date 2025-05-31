@@ -14,7 +14,7 @@
         android:layout_marginStart="@dimen/dp_10"
         android:layout_marginVertical="@dimen/dp_10"
         android:text="@string/Hourly_forecast"
-        android:textSize="@dimen/sp_18"
+        android:textSize="@dimen/weather_item_include_title_text_size"
         android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

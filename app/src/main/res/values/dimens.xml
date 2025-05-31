@@ -3806,6 +3806,12 @@
     <dimen name="dp_999.5">999.5dp</dimen>
     <dimen name="dp_1000">1000dp</dimen>
 
+
+    <!--날씨 공통-->
+    <!-- 헤더 타이틀 텍스트 크기(시간별예보, 일별예보) -->
+    <dimen name="weather_item_include_title_text_size">18sp</dimen>
+
+
     <!-- 일별 날씨 아이템 레이아웃 디멘 -->
     <!-- 날씨 아이템 전체 가로 패딩 -->
     <dimen name="weather_item_padding_horizontal">8dp</dimen>
@@ -3855,8 +3861,7 @@
     <dimen name="weather_item_include_margin_top">16dp</dimen>
     <!-- 일별 예보 헤더 패딩 -->
     <dimen name="weather_item_include_header_padding">10dp</dimen>
-    <!-- 일별 예보 헤더 타이틀 텍스트 크기 -->
-    <dimen name="weather_item_include_title_text_size">18sp</dimen>
+
     <!-- 일별 예보 헤더 구분선 두께 -->
     <dimen name="weather_item_include_divider_height">1dp</dimen>
     <!-- 일별 예보 버튼 컨테이너 패딩 -->
