@@ -56,9 +56,9 @@ class CurrentWeatherFragment : Fragment() {
                 val temperature = it["temperature_2m"] as? Double
                 binding.CurrentTemp.text = "${temperature?.toInt()}°"
 
-                // 3. 날씨 코드
+                // 3. 날씨 코드 - 안씀(2025.05.31 변경)
                 val weatherCode = (it["weather_code"] as? Number)?.toInt() ?: 0
-                binding.WeatherCode.text = getWeatherText(weatherCode)
+//                binding.weatherCode.text = getWeatherText(weatherCode)
                 
                 // 4. 날씨 아이콘
                 binding.currentWeatherIcon.setImageResource(getWeatherIcon(weatherCode))
