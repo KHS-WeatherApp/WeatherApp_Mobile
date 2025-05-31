@@ -14,7 +14,7 @@
         android:layout_marginTop="@dimen/dp_5"
         android:textColor="@color/white"
         android:text="오전"
-        android:textSize="@dimen/dp_12"
+        android:textSize="@dimen/sp_12"
         android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -26,7 +26,7 @@
         android:textColor="@color/white"
         android:text="5시"
         android:textStyle="bold"
-        android:textSize="@dimen/dp_17"
+        android:textSize="@dimen/sp_17"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/tvAmPm"/>
 
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:text="75%"
         android:textColor="@color/white"
-        android:textSize="@dimen/dp_12"
+        android:textSize="@dimen/sp_12"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/imgWeather"/>
 
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:text="1.1mm"
         android:textColor="@color/white"
-        android:textSize="@dimen/dp_10"
+        android:textSize="@dimen/sp_10"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/probability"/>
 
