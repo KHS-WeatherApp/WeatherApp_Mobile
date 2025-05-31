@@ -60,7 +60,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="1" />
+        app:layout_constraintGuide_percent="1.0" />
 
 
     <!-- =========================================================
@@ -70,16 +70,16 @@
     <!-- (왼쪽 1) 미세먼지 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fine_dust"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="@dimen/dp_0"
         android:background="@drawable/additional_rounded_corner"
         app:layout_constraintStart_toStartOf="@id/guideLeft"
         app:layout_constraintEnd_toStartOf="@id/guideCenterLeft"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/uv_index"
         app:layout_constraintDimensionRatio="1:1"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="@dimen/dp_5"
+        android:layout_marginBottom="@dimen/dp_5"
         app:layout_constraintVertical_chainStyle="packed"
         >
 
@@ -88,7 +88,7 @@
             android:id="@+id/fine_dust_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="미세먼지"
+            android:text="@string/fine_dust"
             android:textStyle="bold"
             android:textSize="@dimen/sp_20"
             android:textColor="@color/white"
@@ -112,14 +112,14 @@
             app:layout_constraintBottom_toTopOf="@+id/fine_dust_progress_bar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="@dimen/dp_10"
             />
 
         <!-- (3) 세 번째 뷰: fine_dust_progress_bar -->
         <ProgressBar
             android:id="@+id/fine_dust_progress_bar"
-            android:layout_width="100dp"
-            android:layout_height="15dp"
+            android:layout_width="@dimen/dp_100"
+            android:layout_height="@dimen/dp_15"
             style="?android:attr/progressBarStyleHorizontal"
             android:progressDrawable="@drawable/additional_progress_bar"
             android:max="100"
@@ -149,23 +149,23 @@
         <!-- ◆ 내부 자식들 (uv_index 내부 내용) -->
         <ImageView
             android:id="@+id/uv_index_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="@dimen/dp_50"
             android:src="@drawable/ic_additional_sun"
-            android:contentDescription="샘플 이미지"
+            android:contentDescription="@string/uv_index"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/uv_index_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="@dimen/dp_5"
             />
 
         <TextView
             android:id="@+id/uv_index_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="자외선지수"
+            android:text="@string/uv_index"
             android:textSize="@dimen/sp_20"
             android:textStyle="bold"
             android:textColor="@android:color/white"
@@ -173,7 +173,7 @@
             app:layout_constraintBottom_toTopOf="@+id/uvIndexLevel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="2dp" />
+            android:layout_marginBottom="@dimen/dp_2" />
 
         <TextView
             android:id="@+id/uvIndexLevel"
@@ -193,36 +193,36 @@
     <!-- (왼쪽 3) 바람세기 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/wind_speed"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="@dimen/dp_0"
         app:layout_constraintStart_toStartOf="@+id/guideLeft"
         app:layout_constraintEnd_toStartOf="@+id/guideCenterLeft"
         app:layout_constraintTop_toBottomOf="@+id/uv_index"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="@dimen/dp_5"
+        android:layout_marginBottom="@dimen/dp_5"
         android:background="@drawable/additional_rounded_corner">
 
         <!-- ◆ 내부 자식들 (wind_speed 내부 내용) -->
         <ImageView
             android:id="@+id/wind_speed_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="@dimen/dp_50"
             android:src="@drawable/ic_additional_wind"
-            android:contentDescription="샘플 이미지"
+            android:contentDescription="@string/wind_speed"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/wind_speed_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            android:layout_marginBottom="5dp" />
+            android:layout_marginBottom="@dimen/dp_5" />
 
         <TextView
             android:id="@+id/wind_speed_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="바람"
+            android:text="@string/wind_speed"
             android:textSize="@dimen/sp_20"
             android:textStyle="bold"
             android:textColor="@android:color/white"
@@ -230,7 +230,7 @@
             app:layout_constraintBottom_toTopOf="@+id/windSpeedLevel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="2dp" />
+            android:layout_marginBottom="@dimen/dp_2" />
 
         <TextView
             android:id="@+id/windSpeedLevel"
@@ -254,16 +254,16 @@
     <!-- (오른쪽 1) 초미세먼지 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ultra_fine_dust"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="@dimen/dp_0"
         app:layout_constraintStart_toStartOf="@+id/guideCenterRight"
         app:layout_constraintEnd_toStartOf="@+id/guideRight"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/precipitation"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintVertical_chainStyle="packed"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="@dimen/dp_5"
+        android:layout_marginBottom="@dimen/dp_5"
         android:background="@drawable/additional_rounded_corner">
 
         <!-- ◆ 내부 자식들 (ultra_fine_dust 내부 내용) -->
@@ -271,7 +271,7 @@
             android:id="@+id/ultra_fine_dust_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="초미세먼지"
+            android:text="@string/ultra_fine_dust"
             android:textStyle="bold"
             android:textSize="@dimen/sp_20"
             android:textColor="@color/white"
@@ -280,7 +280,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="@dimen/dp_5"
             />
 
         <TextView
@@ -294,13 +294,13 @@
             app:layout_constraintBottom_toTopOf="@+id/ultra_fine_dust_progress_bar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="@dimen/dp_10"
             />
 
         <ProgressBar
             android:id="@+id/ultra_fine_dust_progress_bar"
-            android:layout_width="100dp"
-            android:layout_height="15dp"
+            android:layout_width="@dimen/dp_100"
+            android:layout_height="@dimen/dp_15"
             style="?android:attr/progressBarStyleHorizontal"
             android:progressDrawable="@drawable/additional_progress_bar"
             android:max="100"
@@ -316,37 +316,37 @@
     <!-- (오른쪽 2) 강수 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/precipitation"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="@dimen/dp_0"
         app:layout_constraintStart_toStartOf="@+id/guideCenterRight"
         app:layout_constraintEnd_toStartOf="@+id/guideRight"
         app:layout_constraintTop_toBottomOf="@+id/ultra_fine_dust"
         app:layout_constraintBottom_toTopOf="@+id/sun_setting"
         app:layout_constraintDimensionRatio="1:1"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="@dimen/dp_5"
+        android:layout_marginBottom="@dimen/dp_5"
         android:background="@drawable/additional_rounded_corner">
 
         <!-- ◆ 내부 자식들 (precipitation 내부 내용) -->
         <ImageView
             android:id="@+id/precipitation_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="@dimen/dp_50"
             android:src="@drawable/ic_additional_rain"
-            android:contentDescription="샘플 이미지"
+            android:contentDescription="@string/precipitation"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/precipitation_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="@dimen/dp_5"
             />
 
         <TextView
             android:id="@+id/precipitation_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="강수"
+            android:text="@string/precipitation"
             android:textSize="@dimen/sp_20"
             android:textStyle="bold"
             android:textColor="@android:color/white"
@@ -354,7 +354,7 @@
             app:layout_constraintBottom_toTopOf="@+id/precipitationLevel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="@dimen/dp_2"
             />
 
         <TextView
@@ -375,15 +375,15 @@
     <!-- (오른쪽 3) 일출/일몰 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/sun_setting"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/dp_0"
+        android:layout_height="@dimen/dp_0"
         app:layout_constraintStart_toStartOf="@+id/guideCenterRight"
         app:layout_constraintEnd_toStartOf="@+id/guideRight"
         app:layout_constraintTop_toBottomOf="@+id/precipitation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="@dimen/dp_5"
+        android:layout_marginBottom="@dimen/dp_5"
         >
 
         <!--
@@ -395,7 +395,7 @@
         <!-- 일출 영역 (왼쪽 절반) -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/sunrise"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sunset"
@@ -405,22 +405,22 @@
 
             <ImageView
                 android:id="@+id/sunrise_image"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_50"
                 android:src="@drawable/ic_additional_sunrise"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/sunrise_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="@dimen/dp_5"
                 />
 
             <TextView
                 android:id="@+id/sunrise_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="일출"
+                android:text="@string/sunrise"
                 android:textSize="@dimen/sp_18"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
@@ -428,7 +428,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/sunriseTime"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginBottom="2dp"
+                android:layout_marginBottom="@dimen/dp_2"
                 />
             <TextView
                 android:id="@+id/sunriseTime"
@@ -447,7 +447,7 @@
         <!-- 일몰 영역 (오른쪽 절반) -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/sunset"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dp_0"
             android:layout_height="match_parent"
             app:layout_constraintStart_toEndOf="@+id/sunrise"
             app:layout_constraintEnd_toEndOf="parent"
@@ -457,22 +457,22 @@
 
             <ImageView
                 android:id="@+id/sunset_image"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="@dimen/dp_50"
+                android:layout_height="@dimen/dp_50"
                 android:src="@drawable/ic_additional_sunset"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/sunset_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="@dimen/dp_5"
                 />
 
             <TextView
                 android:id="@+id/sunset_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="일몰"
+                android:text="@string/sunset"
                 android:textSize="@dimen/sp_18"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
@@ -480,7 +480,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/sunsetTime"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginBottom="2dp"
+                android:layout_marginBottom="@dimen/dp_2"
                 />
             <TextView
                 android:id="@+id/sunsetTime"

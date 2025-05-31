@@ -7,4 +7,12 @@
     <string name="pm_fragment">미세 화면 테스트 </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--additional-->
+    <string name="fine_dust">미세먼지</string>
+    <string name="ultra_fine_dust">초미세먼지</string>
+    <string name="uv_index">자외선지수</string>
+    <string name="precipitation">강수</string>
+    <string name="wind_speed">바람</string>
+    <string name="sunrise">일출</string>
+    <string name="sunset">일몰</string>
 </resources>
