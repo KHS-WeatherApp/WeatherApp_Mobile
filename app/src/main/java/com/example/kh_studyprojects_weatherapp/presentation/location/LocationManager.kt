@@ -51,9 +51,9 @@ class LocationManager @Inject constructor(
 
     // 위치 정보를 담는 데이터 클래스
     data class LocationInfo(
-        val latitude: Double,
-        val longitude: Double,
-        val address: String
+        val latitude: Double,   // 위도   
+        val longitude: Double,  // 경도
+        val address: String     // 주소
     )
 
     // 위치 권한 확인
@@ -120,9 +120,9 @@ class LocationManager @Inject constructor(
             val addresses = geocoder.getFromLocation(latitude, longitude, 1)
             val address = addresses?.firstOrNull()
             address?.let {
-                val adminArea = it.adminArea ?: "" // 시/도
-                val subLocality = it.subLocality ?: "" // 구/군
-                val thoroughfare = it.thoroughfare ?: "" // 동/읍/면
+                val adminArea = it.adminArea ?: ""          // 시/도
+                val subLocality = it.subLocality ?: ""      // 구/군
+                val thoroughfare = it.thoroughfare ?: ""    // 동/읍/면
                 
                 // 주소 조합
                 when {
