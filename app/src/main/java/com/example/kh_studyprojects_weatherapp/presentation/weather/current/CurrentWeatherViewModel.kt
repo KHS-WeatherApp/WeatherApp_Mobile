@@ -3,6 +3,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.weather.current
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
+import com.example.kh_studyprojects_weatherapp.presentation.location.LocationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CurrentWeatherViewModel @Inject constructor(
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: WeatherRepository,
+    private val locationManager: LocationManager
 ) : ViewModel() {
 
     // 1. StateFlow를 사용한 데이터 상태 관리(초기값은 빈 Map)
@@ -28,19 +30,25 @@ class CurrentWeatherViewModel @Inject constructor(
     private fun fetchWeatherData() {
         viewModelScope.launch {
             try {
-                // 서울 좌표 사용
-                val latitude = 37.5665
-                val longitude = 126.9780
+                // 현재 위치 정보 가져오기
+                val locationInfo = locationManager.getCurrentLocation()
                 
-                weatherRepository.getWeatherInfo(latitude, longitude)
-                    .onSuccess { response ->
-                        // 4. 성공시 StateFlow에 데이터 저장
-                        _weatherState.value = response
-                    }
-                    .onFailure { exception ->
-                        // 5. 실패시 에러 처리
+                if (locationInfo != null) {
+                    // 위치 정보로 날씨 데이터 가져오기
+                    weatherRepository.getWeatherInfo(
+                        locationInfo.latitude,
+                        locationInfo.longitude
+                    ).onSuccess { response ->
+                        // 위치 정보 추가
+                        val weatherData = response.toMutableMap()
+                        weatherData["location"] = locationInfo.address
+                        _weatherState.value = weatherData
+                    }.onFailure { exception ->
                         println("Error loading weather data: ${exception.message}")
                     }
+                } else {
+                    println("위치 정보를 가져올 수 없습니다.")
+                }
             } catch (e: Exception) {
                 println("Exception while loading weather data: ${e.message}")
             }

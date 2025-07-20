@@ -45,6 +45,14 @@ class CurrentWeatherFragment : Fragment() {
 
     private fun updateUI(weatherData: Map<String, Any>) {
         try {
+            // 위치 정보 표시
+            weatherData["location"]?.let { location ->
+                // 주소에서 thoroughfare(동/읍/면) 정보만 추출
+                val address = location.toString()
+                val thoroughfare = address.split(" ").lastOrNull() ?: address
+                binding.location.text = thoroughfare
+            }
+
             // 현재 날씨 데이터 처리
             val current = weatherData["current"] as? Map<*, *>
             current?.let {

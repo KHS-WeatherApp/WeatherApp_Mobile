@@ -43,7 +43,7 @@ android:id="@android:id/progress": 이 ID는 필수적입니다. 이 ID가 없�
     <!-- Background Layer -->
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
-            <corners android:radius="50dp"/>  <!-- 완전한 라운드 모서리를 위해 큰 값 설정 -->
+            <corners android:radius="8dp"/>  <!-- 진행바와 동일한 radius 값 사용 -->
             <solid android:color="#D0D0D0"/>  <!-- 배경색을 연한 회색으로 설정 -->
             <size android:height="10dp"/>
         </shape>
@@ -51,9 +51,9 @@ android:id="@android:id/progress": 이 ID는 필수적입니다. 이 ID가 없�
 
     <!-- Progress Layer -->
     <item android:id="@android:id/progress">
-        <scale android:scaleWidth="100%">
+        <scale android:scaleWidth="100%" android:scaleGravity="left">
             <shape android:shape="rectangle">
-                <corners android:radius="50dp"/>  <!-- 완전한 라운드 모서리를 위해 큰 값 설정 -->
+                <corners android:radius="8dp"/>  <!-- 진행률 변경 시에도 라운드 유지를 위해 작은 값 사용 -->
                 <solid android:color="#575b58"/>
                 <size android:height="10dp"/>
             </shape>

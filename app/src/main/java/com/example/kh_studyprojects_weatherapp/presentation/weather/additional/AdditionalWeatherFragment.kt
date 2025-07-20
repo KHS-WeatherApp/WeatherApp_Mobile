@@ -209,9 +209,21 @@ class AdditionalWeatherFragment : Fragment() {
             value <= 150 -> Triple(value, "나쁨", "#fcb80c")   // 주황색
             else -> Triple(value, "매우나쁨", "#fc2407")      // 빨간색
         }
-        //프로그레스 바의 진행률 변경(최대 200으로 넣음)
-        binding.fineDustProgressBar.max = 200
-        binding.fineDustProgressBar.progress = progress.first.toInt()
+        
+        // 프로그레스 바의 진행률 변경 - 적절한 범위로 조정
+        /*  적절한 진행률 계산: 실제 미세먼지 값을 0-100 범위로 매핑
+            미세먼지: 0-30 → 0-25%, 30-80 → 25-50%, 80-150 → 50-75%, 150+ → 75-100%
+            초미세먼지: 0-15 → 0-25%, 15-35 → 25-50%, 35-75 → 50-75%, 75+ → 75-100%
+        */
+        binding.fineDustProgressBar.max = 100
+        val progressValue = when {
+            value <= 15 -> (value / 15 * 25).toInt()      // 0-15 → 0-25
+            value <= 35 -> (25 + (value - 15) / 20 * 25).toInt()  // 15-35 → 25-50
+            value <= 75 -> (50 + (value - 35) / 40 * 25).toInt() // 35-75 → 50-75
+            else -> (75 + (value - 75) / 25 * 25).toInt().coerceAtMost(100) // 75+ → 75-100
+        }
+        binding.fineDustProgressBar.progress = progressValue
+        
         // 프로그레스 바의 색상 변경
         binding.fineDustProgressBar.progressTintList = ColorStateList.valueOf(
             Color.parseColor(
@@ -231,9 +243,21 @@ class AdditionalWeatherFragment : Fragment() {
             value <= 75 -> Triple(value, "나쁨", "#fcb80c")   // 주황색
             else -> Triple(value, "매우나쁨", "#fc2407")      // 빨간색
         }
-        //프로그레스 바의 진행률 변경(최대 200으로 넣음)
-        binding.ultraFineDustProgressBar.max = 200
-        binding.ultraFineDustProgressBar.progress = progress.first.toInt()
+        
+        //프로그레스 바의 진행률 변경 - 적절한 범위로 조정
+        /*  적절한 진행률 계산: 실제 미세먼지 값을 0-100 범위로 매핑
+            미세먼지: 0-30 → 0-25%, 30-80 → 25-50%, 80-150 → 50-75%, 150+ → 75-100%
+            초미세먼지: 0-15 → 0-25%, 15-35 → 25-50%, 35-75 → 50-75%, 75+ → 75-100%
+        */
+        binding.ultraFineDustProgressBar.max = 100
+        val progressValue = when {
+            value <= 15 -> (value / 15 * 25).toInt()      // 0-15 → 0-25
+            value <= 35 -> (25 + (value - 15) / 20 * 25).toInt()  // 15-35 → 25-50
+            value <= 75 -> (50 + (value - 35) / 40 * 25).toInt() // 35-75 → 50-75
+            else -> (75 + (value - 75) / 25 * 25).toInt().coerceAtMost(100) // 75+ → 75-100
+        }
+        binding.ultraFineDustProgressBar.progress = progressValue
+        
         // 프로그레스 바의 색상 변경
         binding.ultraFineDustProgressBar.progressTintList = ColorStateList.valueOf(
             Color.parseColor(
