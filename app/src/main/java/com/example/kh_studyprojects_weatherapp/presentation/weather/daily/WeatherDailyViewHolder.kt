@@ -162,8 +162,8 @@ sealed class WeatherDailyViewHolder(
             val interval = if (isHourlyMode) 1 else 2
 
             val filtered = if (data.size == 24 && currentHour < 23) {
-                data.subList(currentHour + 1, data.size)
-                    .filterIndexed { index, _ -> index % interval == 0 }
+                data.subList(currentHour, data.size)
+                    .filterIndexed { index, _ -> index % interval == 0 } //data.subList(currentHour + 1, data.size)
             } else {
                 data.filter {
                     val rawHour = it.tvHour?.toIntOrNull() ?: return@filter false
