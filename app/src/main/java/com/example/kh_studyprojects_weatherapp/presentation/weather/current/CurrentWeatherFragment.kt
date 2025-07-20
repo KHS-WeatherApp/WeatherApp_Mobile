@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.FragmentCurrentWeatherBinding
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -69,14 +70,14 @@ class CurrentWeatherFragment : Fragment() {
 //                binding.weatherCode.text = getWeatherText(weatherCode)
                 
                 // 4. 날씨 아이콘
-                binding.currentWeatherIcon.setImageResource(getWeatherIcon(weatherCode))
+                binding.currentWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
 
                 // 5. 옷차림 추천(아이콘)
-                temperature?.let { temp ->
-                    binding.RecommendClothesIcon.setImageResource(getClothingIcon(temp))
+                apparentTemperature?.let { temp ->
+                    binding.RecommendClothesIcon.setImageResource(WeatherCommon.getClothingIcon(temp))
                 }
                 // 6. 옷차림 추천(텍스트)
-                temperature?.let { temp ->
+                apparentTemperature?.let { temp ->
                     binding.RecommendClothes.text = "추천 옷 : ${getClothingText(temp)}"
                 }
                 // 7. 어제와의 온도 비교
@@ -134,6 +135,19 @@ class CurrentWeatherFragment : Fragment() {
         }
     }
 
+       //현재온도에 따른 옷차림 추천 text 함수
+    private fun getClothingText(temperature: Double): String {
+        return when {
+            temperature >= 28 -> "반팔"
+            temperature >= 23 -> "얇은 셔츠"
+            temperature >= 20 -> "얇은 가디건"
+            temperature >= 17 -> "맨투맨"
+            temperature >= 12 -> "자켓"
+            temperature >= 9 -> "코트"
+            else -> "패딩"
+        }
+    }
+
     //날씨코드에 따른 날씨text 함수
     private fun getWeatherText(weatherCode: Int): String {
         return when (weatherCode) {
@@ -151,46 +165,6 @@ class CurrentWeatherFragment : Fragment() {
             95 -> "약한 뇌우"
             96, 99 -> "강한 뇌우"
             else -> "알 수 없음"
-        }
-    }
-    
-    //날씨코드에 따른 날씨icon 함수
-    private fun getWeatherIcon(weatherCode: Int): Int {
-        return when (weatherCode) {
-            0 -> R.drawable.weather_icon_sun            // 맑음
-            1, 2, 3 -> R.drawable.weather_icon_cloudy   // 구름 낀
-            45, 48 -> R.drawable.weather_icon_fog       // 안개
-            51, 53, 55, 56, 57 -> R.drawable.weather_icon_raining  // 이슬비
-            61, 63, 65, 66, 67 -> R.drawable.weather_icon_shower   // 비
-            71, 73, 75, 77 -> R.drawable.weather_icon_snow         // 눈
-            95, 96, 99 -> R.drawable.weather_icon_thunder         // 천둥번개
-            else -> R.drawable.weather_icon_unknown
-        }
-    }
-
-    //현재온도에 따른 옷icon 함수
-    private fun getClothingIcon(temperature: Double): Int {
-        return when {
-            temperature >= 28 -> R.drawable.clothing_icon_hawaiianshirt  // 민소매, 반팔
-            temperature >= 23 -> R.drawable.clothing_icon_hawaiianshirt  // 반팔
-            temperature >= 20 -> R.drawable.clothing_icon_hawaiianshirt  // 얇은 가디건
-            temperature >= 17 -> R.drawable.clothing_icon_hawaiianshirt  // 가디건, 맨투맨
-            temperature >= 12 -> R.drawable.clothing_icon_hawaiianshirt  // 자켓
-            temperature >= 9 -> R.drawable.clothing_icon_hawaiianshirt   // 코트
-            else -> R.drawable.clothing_icon_hawaiianshirt              // 패딩
-        }
-    }
-
-    //현재온도에 따른 옷차림 추천 text 함수
-    private fun getClothingText(temperature: Double): String {
-        return when {
-            temperature >= 28 -> "반팔"
-            temperature >= 23 -> "얇은 셔츠"
-            temperature >= 20 -> "얇은 가디건"
-            temperature >= 17 -> "맨투맨"
-            temperature >= 12 -> "자켓"
-            temperature >= 9 -> "코트"
-            else -> "패딩"
         }
     }
 
