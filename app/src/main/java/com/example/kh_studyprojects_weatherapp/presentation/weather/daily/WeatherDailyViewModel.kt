@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherDailyDto
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
+import com.example.kh_studyprojects_weatherapp.presentation.location.LocationManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +22,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 
 @HiltViewModel
 class WeatherDailyViewModel @Inject constructor(
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: WeatherRepository,
+    private val locationManager: LocationManager
 ) : ViewModel() {
 
     private val _weatherItems = MutableStateFlow<List<WeatherDailyDto>>(emptyList())
@@ -37,8 +39,21 @@ class WeatherDailyViewModel @Inject constructor(
     private var isYesterdayShown = false
     private var is15DaysShown = false
 
+    private val _locationInfo = MutableStateFlow<String?>(null)
+    val locationInfo: StateFlow<String?> = _locationInfo.asStateFlow()
+
     init {
-        fetchWeatherData(37.5606, 126.9433)
+        viewModelScope.launch {
+            val locationInfo = locationManager.getCurrentLocation()
+
+            if (locationInfo != null) {
+                val currentLatitude = locationInfo.latitude
+                val currentLongitude = locationInfo.longitude
+                fetchWeatherData(currentLatitude, currentLongitude)
+            } else {
+                fetchWeatherData(37.5606, 126.986) // 기본 위치
+            }
+        }
     }
 
     fun fetchWeatherData(latitude: Double, longitude: Double) {

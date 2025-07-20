@@ -35,7 +35,7 @@ sealed class WeatherDailyViewHolder(
             currentItem = item
             binding.apply {
                 textWeek.text = item.week
-                if (item.weatherCode !in intArrayOf(0, 1, 2, 3, 45, 48, 51, 53, 55)) {
+                if (item.weatherCode !in intArrayOf(0, 1, 2)) {//, 3, 45, 48, 51, 53, 55
                     textPrecipitation.text = item.precipitation
                     textHumidity.text = item.humidity
                 } else {

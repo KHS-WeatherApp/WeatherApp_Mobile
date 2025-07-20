@@ -1,5 +1,6 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.daily
 
+import android.location.Geocoder
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +13,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.data.repository.weather.WeatherRepositoryImpl
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherDailyIncludeBinding
+import com.example.kh_studyprojects_weatherapp.presentation.location.LocationManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.catch  // 이 import 추가
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class WeatherDailyFragment : Fragment() {
@@ -23,8 +26,15 @@ class WeatherDailyFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: WeatherDailyViewModel by viewModels {
-        WeatherDailyViewModelFactory(WeatherRepositoryImpl.getInstance())
+        WeatherDailyViewModelFactory(
+            WeatherRepositoryImpl.getInstance(),
+            LocationManager(
+                requireContext(),
+                Geocoder(requireContext(), Locale.getDefault())
+            )
+        )
     }
+
     private val adapter = WeatherDailyAdapter()
 
     override fun onCreateView(
