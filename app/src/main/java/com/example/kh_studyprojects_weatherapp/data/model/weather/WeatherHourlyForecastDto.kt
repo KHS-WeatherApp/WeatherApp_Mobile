@@ -6,5 +6,6 @@ data class WeatherHourlyForecastDto(
     val probability: String?,       // 강수 확률
     val precipitation: String?,     // 강수량
     val temperature: String?,        // 온도
-    val weatherCode: Int            // 시간별 날씨 코드
+    val weatherCode: Int,            // 시간별 날씨 코드
+    val apparent_temperature: String?      // 체감온도
 )

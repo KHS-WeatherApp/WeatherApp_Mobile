@@ -199,9 +199,10 @@ sealed class WeatherDailyViewHolder(
                 hourBinding.hourlyTime.text = "${hourData.tvAmPm} ${hourData.tvHour}시"
                 hourBinding.hourlyTemp.text = hourData.temperature
                 val temperature = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
+                val apparent_temperature = hourData.apparent_temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
                 hourBinding.hourlyTemp.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperature))
                 hourBinding.hourlyWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(hourData.weatherCode))
-                hourBinding.hourlyClothingIcon.setImageResource(WeatherCommon.getClothingIcon(temperature))
+                hourBinding.hourlyClothingIcon.setImageResource(WeatherCommon.getClothingIcon(apparent_temperature))
 
                 // 온도 선 설정
                 val tempLine = hourBinding.hourlyTempLine
@@ -278,6 +279,9 @@ sealed class WeatherDailyViewHolder(
                 // (1) 온도 파싱
                 val minTemp = item.minTemp.replace("°", "").toDoubleOrNull()
                 val maxTemp = item.maxTemp.replace("°", "").toDoubleOrNull()
+                val apparentMin = item.apparent_temperature_min.replace("°", "").toDoubleOrNull()
+                val apparentMax = item.apparent_temperature_max.replace("°", "").toDoubleOrNull()
+
 
                 if (minTemp != null && maxTemp != null) {
                     // (2) 전역 온도 범위 (예: -20 ~ 40 => fullRange = 60)
@@ -318,7 +322,7 @@ sealed class WeatherDailyViewHolder(
                     }
 
                     // (7) 평균 온도로 옷 아이콘 결정 (기존 로직 유지)
-                    val avgTemp = (minTemp + maxTemp) / 2.0
+                    val avgTemp = ((apparentMin ?: 0.0) + (apparentMax ?: 0.0)) / 2.0
                     imageClothing.setImageResource(WeatherCommon.getClothingIcon(avgTemp))
 
                 } else {

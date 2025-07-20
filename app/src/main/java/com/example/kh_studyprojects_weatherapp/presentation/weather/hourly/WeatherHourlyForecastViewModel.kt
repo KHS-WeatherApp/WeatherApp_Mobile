@@ -90,6 +90,7 @@ class WeatherHourlyForecastViewModel @Inject constructor(
         val precipitationProbs = hourlyData["precipitation_probability"] as? List<Int> ?: return emptyList() // 강수 확률 데이터
         val precipitations = hourlyData["precipitation"] as? List<Double> ?: return emptyList() // 강수량 데이터
         val weatherCodes = hourlyData["weather_code"] as? List<Int> ?: return emptyList() // 날씨 코드 데이터
+        val apparentTemps = hourlyData["apparent_temperature"] as? List<Double> ?: return emptyList() // 체감온도 데이터
         
         // 현재 시간 구하기
         val now = LocalDateTime.now()
@@ -123,8 +124,9 @@ class WeatherHourlyForecastViewModel @Inject constructor(
             val precip = if (precipitations[index] > 0) "${precipitations[index]}mm" else "" // 강수량 형식 변환
             val temp = "${temperatures[index]}" // 온도 형식 변환
             val weatherCode = weatherCodes[index].toInt() // 날씨 코드 형식 변환
+            val apparentTemp =  "${apparentTemps[index]}" // 체감온도 형식 변환
 
-            result.add(WeatherHourlyForecastDto(amPm, formattedHour, prob, precip, temp, weatherCode))
+            result.add(WeatherHourlyForecastDto(amPm, formattedHour, prob, precip, temp, weatherCode , apparentTemp))
             hoursCount++
         }
 

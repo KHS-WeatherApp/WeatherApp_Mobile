@@ -128,6 +128,8 @@ class WeatherDailyViewModel @Inject constructor(
         val weatherCodes = daily["weather_code"] as? List<*> ?: return emptyList()
         val precipitations = daily["precipitation_sum"] as? List<Double> ?: return emptyList()
         val humidities = daily["precipitation_probability_max"] as? List<*> ?: return emptyList()
+        val apparentTempMaxs = daily["apparent_temperature_min"] as? List<Double> ?: return emptyList()
+        val apparentTempMins = daily["apparent_temperature_max"] as? List<Double> ?: return emptyList()
 
         val hourlyTimes = hourly["time"] as? List<String> ?: return emptyList()
         val hourlyTemps = hourly["temperature_2m"] as? List<Double> ?: return emptyList()
@@ -136,6 +138,7 @@ class WeatherDailyViewModel @Inject constructor(
         //val hourlyCodes = hourly["weather_code"] as? List<Int> ?: return emptyList()
         val hourlyProbRaw = hourly["precipitation_probability"] as? List<*> ?: return emptyList()
         val hourlyCodesRaw = hourly["weather_code"] as? List<*> ?: return emptyList()
+        val hourlyApparentTemps = hourly["apparent_temperature"] as? List<Double> ?: return emptyList()
 
         val hourlyProb = hourlyProbRaw.map { (it as Number).toInt() }
         val hourlyCodes = hourlyCodesRaw.map { (it as Number).toInt() }
@@ -166,7 +169,8 @@ class WeatherDailyViewModel @Inject constructor(
                         probability = "${hourlyProb.getOrNull(idx) ?: 0}%",
                         precipitation = "${hourlyPrecip.getOrNull(idx) ?: 0.0}mm",
                         temperature = "${hourlyTemps.getOrNull(idx) ?: 0.0}°",
-                        weatherCode = hourlyCodes.getOrNull(idx) ?: 0
+                        weatherCode = hourlyCodes.getOrNull(idx) ?: 0,
+                        apparent_temperature = "${hourlyApparentTemps.getOrNull(idx) ?: 0.0}°",
                     )
                 } catch (e: Exception) {
                     Log.e("TodayViewHolder", "hourlyForecast error: $timeStr", e)
@@ -195,7 +199,9 @@ class WeatherDailyViewModel @Inject constructor(
                 isVisible = true,
                 globalMinTemp = lowestTemp,
                 globalMaxTemp = highestTemp,
-                hourlyForecast = hourlyForecast
+                hourlyForecast = hourlyForecast,
+                apparent_temperature_max = "${apparentTempMaxs.getOrNull(index) ?: 0.0}°",
+                apparent_temperature_min = "${apparentTempMins.getOrNull(index) ?: 0.0}°",
             )
         }
     }
