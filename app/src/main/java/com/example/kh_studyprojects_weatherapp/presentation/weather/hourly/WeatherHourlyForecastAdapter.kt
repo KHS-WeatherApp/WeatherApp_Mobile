@@ -12,6 +12,7 @@ import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecast
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
+import com.example.kh_studyprojects_weatherapp.util.CommonUtil
 import java.util.*
 
 // RecyclerView 어댑터 클래스
@@ -65,34 +66,9 @@ class WeatherHourlyForecastAdapter(
         }
     }
 
-    // 24시간 형식을 12시간 형식으로 변환하는 메서드
-    private fun convertTo12HourFormat(hour: String?): String {
-        val hourInt = hour?.replace("시", "")?.toIntOrNull() ?: return ""
-        return when (hourInt) {
-            0 -> "12시"
-            in 1..12 -> "${hourInt}시"
-            else -> "${hourInt - 12}시"
-        }
-    }
 
-    // 날씨 코드에 따른 아이콘 리소스를 반환하는 메서드
-    private fun getWeatherIcon(weatherCode: Int): Int = when (weatherCode) {
-        0 -> R.drawable.weather_icon_sun
-        1, 2, 3 -> R.drawable.weather_icon_partly_cloudy
-        45, 48 -> R.drawable.weather_icon_fog
-        51, 53, 55 -> R.drawable.weather_icon_drizzle
-        56, 57 -> R.drawable.weather_icon_freezing_drizzle
-        61, 63, 65 -> R.drawable.weather_icon_shower
-        66, 67 -> R.drawable.weather_icon_shower
-        71, 73, 75 -> R.drawable.weather_icon_snow
-        77 -> R.drawable.weather_icon_snow
-        80, 81, 82 -> R.drawable.weather_icon_thunder
-        85, 86 -> R.drawable.weather_icon_thunder
-        95 -> R.drawable.weather_icon_thunder
-        96, 99 -> R.drawable.weather_icon_thunder
-        else -> R.drawable.weather_icon_unknown
-    }
 
+    // onCreateViewHolder() 메서드에서 ViewHolder 생성
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_VERTICAL -> {
@@ -121,11 +97,14 @@ class WeatherHourlyForecastAdapter(
         }
     }
 
+    // DiffUtil.ItemCallback 클래스를 상속받아 아이템 비교 로직 구현
     private class WeatherHourlyForecastDiffCallback : DiffUtil.ItemCallback<WeatherHourlyForecastDto>() {
+        // 아이템 아이덴티티 비교
         override fun areItemsTheSame(oldItem: WeatherHourlyForecastDto, newItem: WeatherHourlyForecastDto): Boolean {
             return oldItem.tvHour == newItem.tvHour
         }
 
+        // 아이템 내용 비교
         override fun areContentsTheSame(oldItem: WeatherHourlyForecastDto, newItem: WeatherHourlyForecastDto): Boolean {
             return oldItem == newItem
         }
@@ -142,10 +121,11 @@ class WeatherHourlyForecastAdapter(
         private val temperatureLayoutParams = binding.temperature.layoutParams as ConstraintLayout.LayoutParams
         private val resources = context.resources
 
+        // bindItems() 메서드에서 아이템 데이터를 바인딩
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
-                tvHour.text = adapter.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
+                tvHour.text = CommonUtil.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
@@ -159,7 +139,7 @@ class WeatherHourlyForecastAdapter(
                 temperature.layoutParams = temperatureLayoutParams
 
                 // 온도 배경 설정
-                temperature.setBackgroundResource(getBackgroundForTemperature(temperatureDouble))
+                temperature.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperatureDouble))
             }
         }
 
@@ -174,16 +154,6 @@ class WeatherHourlyForecastAdapter(
             // 온도 차이에 따른 추가 마진 계산 (1도당 5dp)
             val additionalMargin = (tempDiff * resources.getDimensionPixelSize(R.dimen.dp_5)).toInt()
             return baseMargin + additionalMargin
-        }
-
-        // 온도에 따른 배경 리소스를 설정하는 메서드
-        private fun getBackgroundForTemperature(temp: Double): Int = when {
-            temp >= 30.0 -> R.drawable.sh_hourly_round_temperature_30
-            temp >= 25.0 -> R.drawable.sh_hourly_round_temperature_20
-            temp >= 20.0 -> R.drawable.sh_hourly_round_temperature_20
-            temp >= 15.0 -> R.drawable.sh_hourly_round_temperature_15
-            temp >= 10.0 -> R.drawable.sh_hourly_round_temperature_10
-            else -> R.drawable.sh_hourly_round_temperature_10
         }
     }
 
@@ -200,7 +170,7 @@ class WeatherHourlyForecastAdapter(
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
-                tvHour.text = adapter.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
+                tvHour.text = CommonUtil.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
@@ -221,16 +191,7 @@ class WeatherHourlyForecastAdapter(
                 vi01.layoutParams = layoutParams
 
                 // 온도 배경 설정
-                temperature.setBackgroundResource(
-                    when {
-                        temperatureDouble >= 30.0 -> R.drawable.sh_hourly_round_temperature_30
-                        temperatureDouble >= 25.0 -> R.drawable.sh_hourly_round_temperature_20
-                        temperatureDouble >= 20.0 -> R.drawable.sh_hourly_round_temperature_20
-                        temperatureDouble >= 15.0 -> R.drawable.sh_hourly_round_temperature_15
-                        temperatureDouble >= 10.0 -> R.drawable.sh_hourly_round_temperature_10
-                        else -> R.drawable.sh_hourly_round_temperature_10
-                    }
-                )
+                temperature.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperatureDouble))
             }
         }
     }
