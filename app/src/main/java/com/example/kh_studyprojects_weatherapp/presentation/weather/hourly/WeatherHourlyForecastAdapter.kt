@@ -133,6 +133,10 @@ class WeatherHourlyForecastAdapter(
                 // 날씨 코드에 따른 이미지 설정
                 imgWeather.setImageResource(WeatherCommon.getWeatherIcon(item.weatherCode))
 
+                // 체감온도에 따른 옷 아이콘 설정
+                val apparentTemp = item.apparent_temperature?.toDoubleOrNull() ?: 0.0
+                imgClothes.setImageResource(WeatherCommon.getClothingIcon(apparentTemp))
+
                 // 온도에 따른 마진 설정
                 val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
                 temperatureLayoutParams.topMargin = getMarginForTemperature(temperatureDouble)
@@ -177,6 +181,10 @@ class WeatherHourlyForecastAdapter(
 
                 // 날씨 코드에 따른 이미지 설정
                 imgWeather.setImageResource(WeatherCommon.getWeatherIcon(item.weatherCode))
+
+                // 체감온도에 따른 옷 아이콘 설정
+                val apparentTemp = item.apparent_temperature?.toDoubleOrNull() ?: 0.0
+                imgClothes.setImageResource(WeatherCommon.getClothingIcon(apparentTemp))
 
                 // item.temperature를 Double로 변환하여 마진 설정
                 val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
