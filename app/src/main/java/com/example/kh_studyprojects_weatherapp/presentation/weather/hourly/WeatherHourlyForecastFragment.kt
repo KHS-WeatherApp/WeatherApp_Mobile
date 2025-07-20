@@ -87,7 +87,6 @@ class WeatherHourlyForecastFragment : Fragment() {
                 // 로딩 상태 처리
                 launch {
                     viewModel.isLoading.collect { isLoading ->
-                        // 로딩 상태 처리
                     }
                 }
                 // 에러 처리
