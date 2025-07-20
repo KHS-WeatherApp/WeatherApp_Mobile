@@ -74,19 +74,23 @@ class WeatherHourlyForecastFragment : Fragment() {
         return root
     }
 
+    // 뷰모델 관찰
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // 시간별 예보 데이터 수신
                 launch {
                     viewModel.hourlyForecastItems.collect { items ->
                         adapter?.submitList(items)
                     }
                 }
+                // 로딩 상태 처리
                 launch {
                     viewModel.isLoading.collect { isLoading ->
                         // 로딩 상태 처리
                     }
                 }
+                // 에러 처리
                 launch {
                     viewModel.error.collect { error ->
                         error?.let {
@@ -98,7 +102,7 @@ class WeatherHourlyForecastFragment : Fragment() {
                 launch {
                     viewModel.locationInfo.collect { locationInfo ->
                         locationInfo?.let {
-                            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+//                            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                         }
                     }
                 }

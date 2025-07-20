@@ -39,15 +39,15 @@ class MainActivity : AppCompatActivity() {
         when {
             // 정확한 위치 권한이 승인된 경우 (GPS 사용 가능)
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                Toast.makeText(this, "정확한 위치 권한이 승인되었습니다.", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "정확한 위치 권한이 승인되었습니다.", Toast.LENGTH_SHORT).show()
             }
             // 대략적인 위치 권한이 승인된 경우 (네트워크 기반 위치)
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                Toast.makeText(this, "대략적인 위치 권한이 승인되었습니다.", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "대략적인 위치 권한이 승인되었습니다.", Toast.LENGTH_SHORT).show()
             }
             // 모든 위치 권한이 거부된 경우
             else -> {
-                Toast.makeText(this, "위치 권한이 거부되었습니다. 날씨 정보를 가져올 수 없습니다.", Toast.LENGTH_LONG).show()
+//                Toast.makeText(this, "위치 권한이 거부되었습니다. 날씨 정보를 가져올 수 없습니다.", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         when {
             // 이미 권한이 있는 경우( 디버깅용 Toast 메세지)
             hasLocationPermission() -> {
-                Toast.makeText(this, "위치 권한이 이미 승인되어 있습니다.", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "위치 권한이 이미 승인되어 있습니다.", Toast.LENGTH_SHORT).show()
             }
             // 권한이 없는 경우 요청
             else -> {
