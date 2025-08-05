@@ -278,11 +278,6 @@ class MainActivity : AppCompatActivity() {
         binding.sideMenuContent.llEditFavorite.setOnClickListener {
             handleEditFavoriteClick()
         }
-        
-        // 종료 메뉴 클릭
-        binding.sideMenuContent.llExit.setOnClickListener {
-            finish()
-        }
     }
     
     /**

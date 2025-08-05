@@ -248,34 +248,7 @@
         android:orientation="vertical"
         android:padding="@dimen/dp_8">
 
-        <!-- 종료 메뉴 아이템 -->
-        <LinearLayout
-            android:id="@+id/llExit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/dp_16"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="@dimen/dp_24"
-                android:layout_height="@dimen/dp_24"
-                android:layout_gravity="center_vertical"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:tint="@android:color/white"
-                android:layout_marginEnd="@dimen/dp_12" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="종료"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/sp_16" />
-
-        </LinearLayout>
+        <!-- 여기에 검색창이 들어갈 예정 -->
 
     </LinearLayout>
 
