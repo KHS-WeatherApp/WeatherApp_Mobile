@@ -83,6 +83,13 @@ class WeatherDailyFragment : Fragment() {
         }
     }
 
+    /**
+     * 날씨 데이터 새로고침
+     */
+    fun refreshWeatherData() {
+        viewModel.refreshWeatherData()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

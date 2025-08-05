@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.kh_studyprojects_weatherapp.databinding.FragmentAdditionalWeatherBinding
+import com.example.kh_studyprojects_weatherapp.databinding.WeatherAdditionalFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
  */
 @AndroidEntryPoint
 class AdditionalWeatherFragment : Fragment() {
-    private var _binding: FragmentAdditionalWeatherBinding? = null
+    private var _binding: WeatherAdditionalFragmentBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: AdditionalWeatherViewModel by viewModels()
@@ -38,7 +38,7 @@ class AdditionalWeatherFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAdditionalWeatherBinding.inflate(inflater, container, false)
+        _binding = WeatherAdditionalFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -294,6 +294,13 @@ class AdditionalWeatherFragment : Fragment() {
             value < 80 -> "많음"       // 20~80 mm
             else -> "집중호우"         // 80 mm 이상
         }
+    }
+
+    /**
+     * 날씨 데이터 새로고침
+     */
+    fun refreshWeatherData() {
+        viewModel.refreshWeatherData()
     }
 
     /**

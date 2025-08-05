@@ -8,14 +8,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.R
-import com.example.kh_studyprojects_weatherapp.databinding.FragmentCurrentWeatherBinding
+import com.example.kh_studyprojects_weatherapp.databinding.WeatherCurrentFragmentBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
+import com.example.kh_studyprojects_weatherapp.presentation.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CurrentWeatherFragment : Fragment() {
-    private var _binding: FragmentCurrentWeatherBinding? = null
+    private var _binding: WeatherCurrentFragmentBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: CurrentWeatherViewModel by viewModels()
@@ -25,13 +26,14 @@ class CurrentWeatherFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentCurrentWeatherBinding.inflate(inflater, container, false)
+        _binding = WeatherCurrentFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupWeatherDataObserver()
+        setupMenuButton()
     }
 
     private fun setupWeatherDataObserver() {
@@ -46,6 +48,9 @@ class CurrentWeatherFragment : Fragment() {
 
     private fun updateUI(weatherData: Map<String, Any>) {
         try {
+            // MainActivity에 데이터 업데이트 알림
+            (activity as? MainActivity)?.updateCurrentWeatherData(weatherData)
+            
             // 위치 정보 표시
             weatherData["location"]?.let { location ->
                 // 주소에서 thoroughfare(동/읍/면) 정보만 추출
@@ -166,6 +171,23 @@ class CurrentWeatherFragment : Fragment() {
             96, 99 -> "강한 뇌우"
             else -> "알 수 없음"
         }
+    }
+
+    /**
+     * 메뉴 버튼 설정
+     */
+    private fun setupMenuButton() {
+        binding.ivMenu.setOnClickListener {
+            // MainActivity의 사이드 메뉴 열기
+            (activity as? MainActivity)?.openDrawer()
+        }
+    }
+    
+    /**
+     * 날씨 데이터 새로고침
+     */
+    fun refreshWeatherData() {
+        viewModel.refreshWeatherData()
     }
 
     override fun onDestroyView() {

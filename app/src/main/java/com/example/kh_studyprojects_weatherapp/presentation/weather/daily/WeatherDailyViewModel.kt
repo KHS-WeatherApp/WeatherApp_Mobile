@@ -235,4 +235,18 @@ class WeatherDailyViewModel @Inject constructor(
     fun errorShown() {
         _error.value = null
     }
+    
+    /**
+     * 날씨 데이터 새로고침
+     */
+    fun refreshWeatherData() {
+        viewModelScope.launch {
+            val locationInfo = locationManager.getCurrentLocation()
+            if (locationInfo != null) {
+                fetchWeatherData(locationInfo.latitude, locationInfo.longitude)
+            } else {
+                fetchWeatherData(37.5606, 126.986) // 기본 위치
+            }
+        }
+    }
 }

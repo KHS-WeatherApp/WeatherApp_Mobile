@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="@dimen/dp_16"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- 위치 아이콘 -->
+    <ImageView
+        android:layout_width="@dimen/dp_24"
+        android:layout_height="@dimen/dp_24"
+        android:layout_gravity="center_vertical"
+        android:src="@android:drawable/ic_menu_mylocation"
+        android:tint="@android:color/white"
+        android:layout_marginEnd="@dimen/dp_12" />
+
+    <!-- 지역 정보 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
+
+        <!-- 지역 이름 -->
+        <TextView
+            android:id="@+id/tvLocationName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="서울특별시"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/sp_16"
+            android:textStyle="bold" />
+
+        <!-- 상세 주소 -->
+        <TextView
+            android:id="@+id/tvLocationAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="강남구"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/sp_12"
+            android:alpha="0.8"
+            android:layout_marginTop="@dimen/dp_2" />
+
+    </LinearLayout>
+
+    <!-- 날씨 정보 (오른쪽 끝) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/dp_8">
+
+        <!-- 날씨 아이콘 -->
+        <ImageView
+            android:id="@+id/ivWeatherIcon"
+            android:layout_width="@dimen/dp_32"
+            android:layout_height="@dimen/dp_32"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/weather_icon_sun"
+            android:layout_marginEnd="@dimen/dp_8" />
+
+        <!-- 온도 -->
+        <TextView
+            android:id="@+id/tvTemperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="25°"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/sp_18"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- 삭제 버튼 (편집 모드에서만 표시) -->
+    <ImageView
+        android:id="@+id/ivDelete"
+        android:layout_width="@dimen/dp_24"
+        android:layout_height="@dimen/dp_24"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/dp_8"
+        android:src="@android:drawable/ic_menu_delete"
+        android:tint="@android:color/white"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone" />
+
+</LinearLayout> 

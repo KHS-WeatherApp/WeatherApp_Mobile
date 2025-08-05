@@ -54,4 +54,11 @@ class CurrentWeatherViewModel @Inject constructor(
             }
         }
     }
+    
+    /**
+     * 날씨 데이터 새로고침 (외부에서 호출 가능)
+     */
+    fun refreshWeatherData() {
+        fetchWeatherData()
+    }
 } 

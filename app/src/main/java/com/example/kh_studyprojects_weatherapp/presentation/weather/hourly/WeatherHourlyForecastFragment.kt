@@ -109,6 +109,13 @@ class WeatherHourlyForecastFragment : Fragment() {
         }
     }
 
+    /**
+     * 날씨 데이터 새로고침
+     */
+    fun refreshWeatherData() {
+        viewModel.fetchHourlyForecast()
+    }
+
     // Fragment의 뷰가 파괴될 때 호출되는 메서드
     override fun onDestroyView() {
         super.onDestroyView()
