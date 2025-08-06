@@ -1,6 +1,5 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
-import android.location.Geocoder
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,8 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherHourlyForecastViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val locationManager: LocationManager,
-    private val geocoder: Geocoder
+    private val locationManager: LocationManager
 ) : ViewModel() {
 
     private val _hourlyForecastItems = MutableStateFlow<List<WeatherHourlyForecastDto>>(emptyList())

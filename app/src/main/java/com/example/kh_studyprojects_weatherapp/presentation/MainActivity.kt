@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.FavoriteLocation
+import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import com.example.kh_studyprojects_weatherapp.presentation.weather.adapter.FavoriteLocationAdapter
 import com.example.kh_studyprojects_weatherapp.presentation.weather.current.CurrentWeatherViewModel

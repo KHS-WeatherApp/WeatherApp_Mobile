@@ -1,7 +1,7 @@
 package com.example.kh_studyprojects_weatherapp.data.repository.weather
 
 import android.util.Log
-import com.example.kh_studyprojects_weatherapp.data.api.RetrofitInstance
+import com.example.kh_studyprojects_weatherapp.data.api.BackendRetrofitInstance
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.data.api.weather.WeatherRequest
 import javax.inject.Inject
@@ -9,7 +9,7 @@ import javax.inject.Inject
 class WeatherRepositoryImpl @Inject constructor(
     // 필요한 의존성들
 ) : WeatherRepository {
-    private val weatherApiService = RetrofitInstance.weatherApiService
+    private val weatherApiService = BackendRetrofitInstance.weatherApiService
 
     override suspend fun getWeatherInfo(
         latitude: Double,

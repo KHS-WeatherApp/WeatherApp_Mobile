@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.databinding.ItemFavoriteLocationBinding
-import com.example.kh_studyprojects_weatherapp.domain.model.weather.FavoriteLocation
+import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 
 class FavoriteLocationAdapter(
     private val onLocationClick: (FavoriteLocation) -> Unit,
