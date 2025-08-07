@@ -19,7 +19,7 @@
 
 ## 패키지 구조
 ```
-com.example.kh_studyprojects_weatherapp/
+app/src/main/java/com/example/kh_studyprojects/
 ├── data/
 │   ├── api/           # API 서비스 (Retrofit)
 │   │   ├── BackendRetrofitInstance.kt    # 백엔드 API 연결
