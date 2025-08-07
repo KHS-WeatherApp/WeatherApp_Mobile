@@ -1,7 +1,7 @@
 # WeatherApp 커서 규칙
 
 ## 프로젝트 개요
-안드로이드 날씨 앱 프로젝트입니다. MVVM 아키텍처, Hilt 의존성 주입, Room 데이터베이스를 사용합니다.
+안드로이드 날씨 앱 프로젝트입니다. MVVM 아키텍처, Hilt 의존성 주입, 백엔드 API를 통한 데이터베이스 연결을 사용합니다.
 
 ## 코딩 스타일
 - 언어: Kotlin
@@ -22,24 +22,29 @@
 com.example.kh_studyprojects_weatherapp/
 ├── data/
 │   ├── api/           # API 서비스 (Retrofit)
+│   │   ├── BackendRetrofitInstance.kt    # 백엔드 API 연결
+│   │   └── ExternalApiRetrofitInstance.kt # 외부 API 연결
 │   ├── model/         # DTO 클래스들
-│   ├── repository/    # Repository 구현체
-│   └── database/      # Room 데이터베이스
+│   └── repository/    # Repository 구현체
 ├── domain/
 │   ├── model/         # 도메인 모델
 │   ├── repository/    # Repository 인터페이스
 │   └── usecase/       # Use Case 클래스들
-└── presentation/
-    ├── weather/       # 날씨 관련 UI
-    ├── finedust/      # 미세먼지 관련 UI
-    ├── setting/       # 설정 관련 UI
-    └── location/      # 위치 관련 로직
+├── presentation/      # UI 레이어
+│   ├── weather/       # 날씨 관련 UI
+│   ├── finedust/      # 미세먼지 관련 UI
+│   ├── setting/       # 설정 관련 UI
+│   └── location/      # 위치 관련 로직
+├── di/                # 의존성 주입 (Hilt)
+└── util/              # 유틸리티 클래스들
 ```
 
 ## 네이밍 규칙
-- API 서비스: `*ApiService` (예: KakaoApiService)
+- API 서비스: `*ApiService` (예: KakaoApiService, WeatherApiService)
 - DTO 클래스: `*Dto` (예: WeatherDailyDto)
+- API 응답: `*Response` (예: WeatherResponse, KakaoAddressResponse)
 - Repository: `*Repository` (예: WeatherRepository)
+- Repository 구현체: `*RepositoryImpl` (예: WeatherRepositoryImpl)
 - ViewModel: `*ViewModel` (예: CurrentWeatherViewModel)
 - Fragment: `*Fragment` (예: WeatherFragment)
 - Adapter: `*Adapter` (예: FavoriteLocationAdapter)
@@ -51,15 +56,16 @@ com.example.kh_studyprojects_weatherapp/
 - 필드 주석: /** */ 형식 사용
 
 ## API 관련
-- 자체 백엔드: BackendRetrofitInstance 사용
-- 외부 API: ExternalApiRetrofitInstance 사용
+- 자체 백엔드: BackendRetrofitInstance 사용 (데이터베이스 연결)
+- 외부 API: ExternalApiRetrofitInstance 사용 (날씨 정보 등)
 - 카카오 로컬 API: 위도/경도 → 주소 변환
 - API 키: 보안을 위해 별도 관리
+- API 요청: `*Request` 접미사 (예: WeatherRequest)
 
 ## 데이터베이스 규칙
-- Room 사용
-- Entity: `*Entity` 접미사 (예: FavoriteLocationEntity)
-- DAO: `*Dao` 접미사 (예: FavoriteLocationDao)
+- 백엔드 API를 통한 데이터베이스 연결
+- DTO 클래스: `*Dto` 접미사 (예: WeatherDailyDto)
+- API 응답 모델: `*Response` 접미사 (예: WeatherResponse)
 - 컬럼명: snake_case (예: created_at)
 
 ## 의존성 주입
@@ -87,6 +93,8 @@ com.example.kh_studyprojects_weatherapp/
 - 이미지 로딩: Glide 또는 Coil 사용
 - 네트워크 요청: Retrofit + OkHttp
 - 비동기 처리: Coroutines 사용
+- API 캐싱: OkHttp Interceptor 활용
+- 메모리 효율성: ViewBinding 사용
 
 ## 보안
 - API 키는 코드에 하드코딩 금지
