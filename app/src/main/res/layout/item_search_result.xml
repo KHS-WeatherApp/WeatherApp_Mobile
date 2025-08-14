@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="@dimen/dp_16"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical">
+
+    <!-- 위치 아이콘 -->
+    <ImageView
+        android:layout_width="@dimen/dp_24"
+        android:layout_height="@dimen/dp_24"
+        android:layout_marginEnd="@dimen/dp_12"
+        android:src="@android:drawable/ic_menu_mylocation"
+        android:tint="@android:color/darker_gray" />
+
+    <!-- 주소 정보 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- 전체 주소 -->
+        <TextView
+            android:id="@+id/tvFullAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="서울특별시 영등포구 당산동"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/sp_14"
+            android:textStyle="bold" />
+
+        <!-- 상세 주소 -->
+        <TextView
+            android:id="@+id/tvDetailAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="당산동 1가"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/sp_12"
+            android:layout_marginTop="@dimen/dp_2" />
+
+    </LinearLayout>
+
+    <!-- 즐겨찾기 추가 버튼 -->
+    <ImageView
+        android:id="@+id/ivAddFavorite"
+        android:layout_width="@dimen/dp_24"
+        android:layout_height="@dimen/dp_24"
+        android:layout_marginStart="@dimen/dp_8"
+        android:src="@android:drawable/btn_star_big_off"
+        android:tint="@android:color/darker_gray"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+</LinearLayout>
+
+
+
+
