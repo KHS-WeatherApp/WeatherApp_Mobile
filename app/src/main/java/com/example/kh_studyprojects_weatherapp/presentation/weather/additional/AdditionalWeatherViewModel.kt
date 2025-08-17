@@ -70,4 +70,19 @@ class AdditionalWeatherViewModel @Inject constructor(
     fun refreshWeatherData() {
         fetchWeatherData()
     }
+    
+    /**
+     * UI 강제 갱신 (외부에서 호출 가능)
+     */
+    fun forceUIUpdate() {
+        // 현재 상태를 다시 방출하여 UI 갱신 트리거
+        val currentState = _weatherState.value
+        if (currentState.isNotEmpty()) {
+            _weatherState.value = currentState.toMutableMap().apply {
+                // 강제 갱신을 위한 임시 키 추가
+                put("_force_update", System.currentTimeMillis())
+            }
+            println("AdditionalWeatherViewModel: UI 강제 갱신 완료")
+        }
+    }
 } 

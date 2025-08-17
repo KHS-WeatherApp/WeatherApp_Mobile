@@ -82,6 +82,31 @@ class WeatherHourlyForecastViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 날씨 데이터 새로고침 (외부에서 호출 가능)
+     */
+    fun refreshWeatherData() {
+        fetchHourlyForecast()
+    }
+    
+    /**
+     * UI 강제 갱신 (외부에서 호출 가능)
+     */
+    fun forceUIUpdate() {
+        // 현재 상태를 다시 방출하여 UI 갱신 트리거
+        val currentItems = _hourlyForecastItems.value
+        if (currentItems.isNotEmpty()) {
+            _hourlyForecastItems.value = currentItems.toMutableList().apply {
+                // 강제 갱신을 위한 임시 데이터 추가
+                add(0, currentItems.first().copy(
+                    tvHour = "${currentItems.first().tvHour} (갱신됨)"
+                ))
+                removeAt(0)
+            }
+            println("WeatherHourlyForecastViewModel: UI 강제 갱신 완료")
+        }
+    }
+
     private fun convertToHourlyForecast(hourlyData: Map<String, Any>): List<WeatherHourlyForecastDto> {
         val times = hourlyData["time"] as? List<String> ?: return emptyList() // 시간 데이터
         val temperatures = hourlyData["temperature_2m"] as? List<Double> ?: return emptyList() // 온도 데이터

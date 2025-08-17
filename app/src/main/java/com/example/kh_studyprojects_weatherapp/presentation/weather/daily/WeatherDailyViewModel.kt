@@ -29,6 +29,9 @@ class WeatherDailyViewModel @Inject constructor(
     private val _weatherItems = MutableStateFlow<List<WeatherDailyDto>>(emptyList())
     val weatherItems: StateFlow<List<WeatherDailyDto>> = _weatherItems.asStateFlow()
 
+    private val _currentApiTime = MutableStateFlow<String?>(null)
+    val currentApiTime: StateFlow<String?> = _currentApiTime.asStateFlow()
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -68,6 +71,9 @@ class WeatherDailyViewModel @Inject constructor(
                         if (data != null) {
                             fullWeatherData = convertToWeatherDailyItems(data)
                             _weatherItems.value = fullWeatherData.subList(1, minOf(11, fullWeatherData.size))
+                            val daily = data["current"] as? Map<String, Any> ?: emptyMap();
+                            _currentApiTime.value = daily["time"] as? String;
+                            Log.i("WeatherVM", "Current API Time: ${_currentApiTime.value}")
                             _error.value = null
                             Log.i("WeatherVM", "Parsed daily items: ${fullWeatherData.size}")
                         } else {
@@ -237,7 +243,7 @@ class WeatherDailyViewModel @Inject constructor(
     }
     
     /**
-     * 날씨 데이터 새로고침
+     * 날씨 데이터 새로고침 (외부에서 호출 가능)
      */
     fun refreshWeatherData() {
         viewModelScope.launch {
@@ -247,6 +253,31 @@ class WeatherDailyViewModel @Inject constructor(
             } else {
                 fetchWeatherData(37.5606, 126.986) // 기본 위치
             }
+        }
+    }
+    
+    /**
+     * UI 강제 갱신 (외부에서 호출 가능)
+     */
+    fun forceUIUpdate() {
+        // 현재 상태를 다시 방출하여 UI 갱신 트리거
+        val currentItems = _weatherItems.value
+        val currentApiTime = _currentApiTime.value
+        
+        if (currentItems.isNotEmpty()) {
+            _weatherItems.value = currentItems.toMutableList().apply {
+                // 강제 갱신을 위한 임시 데이터 추가
+                add(0, currentItems.first().copy(
+                    date = "${currentItems.first().date} (갱신됨)"
+                ))
+                removeAt(0)
+            }
+            println("WeatherDailyViewModel: UI 강제 갱신 완료")
+        }
+        
+        if (currentApiTime != null) {
+            _currentApiTime.value = "${currentApiTime}_updated"
+            _currentApiTime.value = currentApiTime
         }
     }
 }

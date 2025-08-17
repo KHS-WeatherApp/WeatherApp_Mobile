@@ -6,63 +6,71 @@
     android:layout_height="match_parent"
     tools:context=".presentation.weather.WeatherFragment"
     android:background="@color/weather">
-    <!--스크롤 뷰-->
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scroll_view"
-        android:layout_width="match_parent"
+
+    <!-- Pull-to-Refresh -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/included_navigation_bottom">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- 스크롤 뷰 (SwipeRefresh의 유일한 자식) -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/dp_40"
-            android:orientation="vertical"
-            android:padding="@dimen/dp_16">
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/dp_40">
 
-            <!-- 현재 날씨 프래그먼트 컨테이너 -->
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/weather_current_container"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginBottom="@dimen/dp_40"
+                android:orientation="vertical"
+                android:padding="@dimen/dp_16">
 
-            <!-- 시간별 날씨 프래그먼트 컨테이너 -->
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/weather_hourly_forecast_fragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weather_current_container" />
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/weather_current_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- 일별 날씨 프래그먼트 컨테이너 -->
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/weather_daily_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weather_hourly_forecast_fragment" />
-            <!-- 기타 날씨 프래그먼트 컨테이너 -->
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/weather_additional_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weather_daily_container" />
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/weather_hourly_forecast_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/weather_current_container" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/weather_daily_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/weather_hourly_forecast_fragment" />
 
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/weather_additional_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/weather_daily_container" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- 하단 네비 -->
     <include
         android:id="@+id/included_navigation_bottom"
         layout="@layout/layout_navigation_bottom"
@@ -71,5 +79,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

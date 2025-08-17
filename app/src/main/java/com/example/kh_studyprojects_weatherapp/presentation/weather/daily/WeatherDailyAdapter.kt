@@ -26,8 +26,18 @@ class WeatherDailyAdapter : ListAdapter<WeatherDailyDto, WeatherDailyViewHolder>
         }
     }
 
+    // 🚀 1. API 시간을 저장할 변수 추가
+    private var currentApiTime: String = ""
+
+    // 🚀 2. List와 시간을 함께 받는 새로운 submitList 함수 추가
+    fun submitListWithTime(list: List<WeatherDailyDto>, currentApiTime: String) {
+        this.currentApiTime = currentApiTime
+        submitList(list)
+    }
+
     override fun onBindViewHolder(holder: WeatherDailyViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        //holder.bind(getItem(position))
+        holder.bind(getItem(position), currentApiTime)
     }
 
     override fun getItemViewType(position: Int) = getItem(position).type.ordinal

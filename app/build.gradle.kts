@@ -61,7 +61,8 @@ dependencies {
 
     // OkHttp
     implementation(libs.okhttp)                        // HTTP 클라이언트
-    implementation(libs.okhttp.logging)                // HTTP 요청/응답 로깅
+    implementation(libs.okhttp.logging)
+    implementation(libs.androidx.swiperefreshlayout)                // HTTP 요청/응답 로깅
 
     // 테스트
     // 단위 테스트

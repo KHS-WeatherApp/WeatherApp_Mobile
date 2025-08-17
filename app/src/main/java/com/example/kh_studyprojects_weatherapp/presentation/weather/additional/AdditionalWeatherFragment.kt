@@ -25,6 +25,10 @@ class AdditionalWeatherFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AdditionalWeatherViewModel by viewModels()
+    
+    // 외부에서 접근 가능하도록 viewModel 속성 추가
+    val viewModelInstance: AdditionalWeatherViewModel
+        get() = viewModel
 
     /**
      * 프래그먼트의 뷰를 생성하고 초기화

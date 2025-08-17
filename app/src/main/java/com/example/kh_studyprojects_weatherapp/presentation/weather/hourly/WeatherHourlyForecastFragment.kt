@@ -23,6 +23,10 @@ class WeatherHourlyForecastFragment : Fragment() {
     private val binding get() = _binding!! // 안전하게 접근할 수 있도록 get()을 통해 _binding의 값을 사용
     private lateinit var adapter: WeatherHourlyForecastAdapter // 리사이클러뷰의 어댑터를 늦은 초기화(Lateinit) 방식으로 선언
     private val viewModel: WeatherHourlyForecastViewModel by viewModels()
+    
+    // 외부에서 접근 가능하도록 viewModel 속성 추가
+    val viewModelInstance: WeatherHourlyForecastViewModel
+        get() = viewModel
 
     // Fragment가 생성될 때 호출되는 메서드로, UI를 초기화하고 구성하는 작업을 수행
     override fun onCreateView(

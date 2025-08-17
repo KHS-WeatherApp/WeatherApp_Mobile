@@ -20,6 +20,10 @@ class CurrentWeatherFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: CurrentWeatherViewModel by viewModels()
+    
+    // 외부에서 접근 가능하도록 viewModel 속성 추가
+    val viewModelInstance: CurrentWeatherViewModel
+        get() = viewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,

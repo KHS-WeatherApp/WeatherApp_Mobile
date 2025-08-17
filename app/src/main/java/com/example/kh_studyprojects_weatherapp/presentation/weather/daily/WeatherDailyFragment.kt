@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.catch  // 이 import 추가
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class WeatherDailyFragment : Fragment() {
@@ -24,8 +25,13 @@ class WeatherDailyFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: WeatherDailyViewModel by viewModels()
+    
+    // 외부에서 접근 가능하도록 viewModel 속성 추가
+    val viewModelInstance: WeatherDailyViewModel
+        get() = viewModel
 
-    private val adapter = WeatherDailyAdapter()
+    //private val adapter = WeatherDailyAdapter()
+    private lateinit var weatherDailyAdapter: WeatherDailyAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +39,10 @@ class WeatherDailyFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = WeatherDailyIncludeBinding.inflate(inflater, container, false)
+        
+        // 어댑터 초기화
+        weatherDailyAdapter = WeatherDailyAdapter()
+        
         setupButtons()
         return binding.root
     }
@@ -42,18 +52,30 @@ class WeatherDailyFragment : Fragment() {
 
         // RecyclerView 설정
         binding.weatherDailyRecyclerView.apply {
-            adapter = this@WeatherDailyFragment.adapter
+            //adapter = this@WeatherDailyFragment.weatherDailyAdapter
             layoutManager = LinearLayoutManager(context)
+            adapter = weatherDailyAdapter
         }
 
         // ViewModel의 데이터 관찰
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 try {
-                    viewModel.weatherItems.collect { items ->
-                        println("Submitting items to adapter: $items")
-                        adapter.submitList(items)
+                    // 🚀 1. weatherItems와 currentApiTime을 모두 관찰
+                    // 두 Flow를 zip() 등으로 묶어서 한 번에 처리하는 것이 효율적입니다.
+                    viewModel.weatherItems.collectLatest { dailyItems ->
+                        // 🚀 2. `currentApiTime`이 업데이트될 때까지 대기
+                        viewModel.currentApiTime.collectLatest { currentApiTime ->
+                            if (currentApiTime != null) {
+                                // 🚀 3. 어댑터에 데이터와 함께 API 시간을 전달
+                                weatherDailyAdapter.submitListWithTime(dailyItems, currentApiTime)
+                            }
+                        }
                     }
+//                    viewModel.weatherItems.collect { items ->
+//                        println("Submitting items to adapter: $items")
+//                        adapter.submitList(items)
+//                    }
                 } catch (e: Exception) {
                     println("Error collecting weather items: ${e.message}")
                     e.printStackTrace()

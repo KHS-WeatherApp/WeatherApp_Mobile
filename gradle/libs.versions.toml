@@ -18,6 +18,7 @@ gson = "2.10.1"
 junit = "4.13.2"
 androidxTestJunit = "1.1.5"
 androidxTestEspresso = "3.5.1"
+swiperefreshlayout = "1.1.0"
 
 [libraries]
 # AndroidX & Google
@@ -42,6 +43,7 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestJunit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidxTestEspresso" }
+androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

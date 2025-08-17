@@ -16,12 +16,13 @@ import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommo
 import java.util.*
 import android.util.Log
 import android.util.TypedValue
+import java.time.LocalDateTime
 
 sealed class WeatherDailyViewHolder(
     private val binding: androidx.viewbinding.ViewBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    abstract fun bind(item: WeatherDailyDto)
+    abstract fun bind(item: WeatherDailyDto, currentApiTime: String)
 
     class Today(
         private val binding: ItemWeatherDailyTodayBinding
@@ -30,9 +31,19 @@ sealed class WeatherDailyViewHolder(
         private var isHourlyMode = true // true: 1시간 단위, false: 2시간 단위
         private var isClickable = true
         private var currentItem: WeatherDailyDto? = null
+        private var currentApiHour: Int = -1 // 🚀 파싱된 시간을 저장할 변수
         
-        override fun bind(item: WeatherDailyDto) {
+        override fun bind(item: WeatherDailyDto, currentApiTime: String) {
             currentItem = item
+
+            // 🚀 3. API 시간을 파싱하여 사용
+            currentApiHour = try {
+                LocalDateTime.parse(currentApiTime).hour
+            } catch (e: Exception) {
+                Log.e("WeatherDailyViewHolder", "API 시간 파싱 실패: $currentApiTime", e)
+                -1 // 실패 시 기본값
+            }
+
             binding.apply {
                 textWeek.text = item.week
                 if (item.weatherCode !in intArrayOf(0, 1, 2)) {//, 3, 45, 48, 51, 53, 55
@@ -94,8 +105,8 @@ sealed class WeatherDailyViewHolder(
                 }
 
                 // 오후 10시(22시) 이후라면 더보기 버튼 숨김
-                val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-                dayExpandMore24Btn.visibility = if (currentHour >= 22) View.GONE else View.VISIBLE
+                //val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+                dayExpandMore24Btn.visibility = if (currentApiHour >= 22) View.GONE else View.VISIBLE
 
                 // 클릭 리스너 설정
                 val toggleListener = View.OnClickListener {
@@ -161,9 +172,17 @@ sealed class WeatherDailyViewHolder(
             val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
             val interval = if (isHourlyMode) 1 else 2
 
-            val filtered = if (data.size == 24 && currentHour < 23) {
-                data.subList(currentHour, data.size)
-                    .filterIndexed { index, _ -> index % interval == 0 } //data.subList(currentHour + 1, data.size)
+            val filtered = if (data.size == 24 && currentApiHour != -1 && currentApiHour < 23) {
+                // 현재 API 시간부터 표시 (이후가 아님)
+                println("🔍 Today 필터링: API 시간=$currentApiHour, 데이터 크기=${data.size}")
+                val result = data.filterIndexed { index, _ ->
+                    val hour = index
+                    val shouldInclude = hour >= currentApiHour && hour <= 23 && (hour - currentApiHour) % interval == 0
+                    println("  시간 $hour: ${if (shouldInclude) "포함" else "제외"}")
+                    shouldInclude
+                }
+                println("✅ 필터링 결과: ${result.size}개 시간대")
+                result
             } else {
                 data.filter {
                     val rawHour = it.tvHour?.toIntOrNull() ?: return@filter false
@@ -172,7 +191,10 @@ sealed class WeatherDailyViewHolder(
                     } else {
                         if (rawHour == 12) 12 else rawHour + 12
                     }
-                    hour in (currentHour + 1)..23 && ((hour - (currentHour + 1)) % interval == 0)
+                    // 현재 API 시간부터 표시 (이후가 아님)
+                    val shouldInclude = hour >= currentApiHour && hour <= 23 && ((hour - currentApiHour) % interval == 0)
+                    println("🔍 Other 필터링: $hour (API: $currentApiHour) -> ${if (shouldInclude) "포함" else "제외"}")
+                    shouldInclude
                 }
             }
 
@@ -259,7 +281,7 @@ sealed class WeatherDailyViewHolder(
         private var isClickable = true
         private var currentItem: WeatherDailyDto? = null
 
-        override fun bind(item: WeatherDailyDto) {
+        override fun bind(item: WeatherDailyDto, currentApiTime: String) {
             currentItem = item
             binding.apply {
                 textWeek.text = item.week
@@ -486,7 +508,7 @@ sealed class WeatherDailyViewHolder(
     class Yesterday(
         private val binding: ItemWeatherDailyYesterdayBinding
     ) : WeatherDailyViewHolder(binding) {
-        override fun bind(item: WeatherDailyDto) {
+        override fun bind(item: WeatherDailyDto, currentApiTime: String) {
             binding.apply {
                 textWeek.text = item.week
                 textMinTemp.text = item.minTemp
