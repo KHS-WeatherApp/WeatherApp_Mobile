@@ -113,23 +113,7 @@ class MainActivity : AppCompatActivity() {
         setupSideMenu()
         
         // 시스템 UI(상태 바, 네비게이션 바)와 앱 콘텐츠가 겹치지 않도록 여백 자동 조정
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.fragmentContainerView)) { view, windowInsets ->
-            // 현재 기기의 네비게이션 바와 상태 바의 크기 정보를 가져옴
-            val navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
-            val statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
-            
-            // 레이아웃 파라미터를 가져와서 마진 설정
-            val params = view.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
-            // 하단 시스템 네비게이션 바 높이만큼 여백 설정
-            params.bottomMargin = navigationBars.bottom
-            // 상단 상태 바 높이만큼 여백 설정
-            params.topMargin = statusBars.top
-            // 변경된 레이아웃 파라미터 적용
-            view.layoutParams = params
-            
-            // 인셋이 처리되었음을 시스템에 알림
-            WindowInsetsCompat.CONSUMED
-        }
+        setupWindowInsets(findViewById(R.id.fragmentContainerView), true, true)
 
         // 위치 권한 확인 및 요청
         checkLocationPermission()
@@ -184,6 +168,9 @@ class MainActivity : AppCompatActivity() {
      * 사이드 메뉴 설정
      */
     private fun setupSideMenu() {
+        // 사이드 메뉴의 윈도우 인셋 처리 설정
+        setupWindowInsets(binding.sideMenuContent.root, false, true)
+        
         // 즐겨찾기 지역 RecyclerView 설정
         setupFavoriteLocationsRecyclerView()
         
@@ -195,6 +182,40 @@ class MainActivity : AppCompatActivity() {
         
         // 임시 즐겨찾기 데이터 추가 (테스트용)
         addTestFavoriteLocations()
+    }
+    
+
+    
+    /**
+     * 윈도우 인셋 처리 공통 함수
+     * 
+     * @param view 처리할 뷰
+     * @param useTopMargin 상단 마진 사용 여부 (상태바)
+     * @param useBottomMargin 하단 마진 사용 여부 (네비게이션바)
+     */
+    private fun setupWindowInsets(view: android.view.View, useTopMargin: Boolean, useBottomMargin: Boolean) {
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+            // 현재 기기의 네비게이션 바와 상태 바의 크기 정보를 가져옴
+            val navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            val statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            
+            // 레이아웃 파라미터를 가져와서 마진 설정 (안전한 캐스팅)
+            val params = view.layoutParams
+            if (params is android.view.ViewGroup.MarginLayoutParams) {
+                // 설정에 따라 마진 적용
+                if (useBottomMargin) {
+                    params.bottomMargin = navigationBars.bottom
+                }
+                if (useTopMargin) {
+                    params.topMargin = statusBars.top
+                }
+                // 변경된 레이아웃 파라미터 적용
+                view.layoutParams = params
+            }
+            
+            // 인셋이 처리되었음을 시스템에 알림
+            WindowInsetsCompat.CONSUMED
+        }
     }
     
     /**
@@ -278,6 +299,9 @@ class MainActivity : AppCompatActivity() {
         binding.sideMenuContent.llEditFavorite.setOnClickListener {
             handleEditFavoriteClick()
         }
+        
+        // 검색창 포커스 리스너 설정
+        setupSearchFocusListeners()
     }
     
     /**
@@ -427,6 +451,429 @@ class MainActivity : AppCompatActivity() {
         // 2. UI 업데이트 (삭제 버튼 표시/숨김)
         // 3. 드래그 앤 드롭 활성화/비활성화
         favoriteLocationAdapter.toggleEditMode()
+    }
+    
+    /**
+     * 검색창 포커스 리스너 설정
+     */
+    private fun setupSearchFocusListeners() {
+        val searchEditText = binding.sideMenuContent.etSearchLocation
+        val searchContainer = binding.sideMenuContent.llSearchContainer
+        val favoriteHeader = binding.sideMenuContent.llFavoriteHeader
+        val clearButton = binding.sideMenuContent.ivClearSearch
+        
+        // 검색창 포커스 리스너
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                // 포커스 획득 시: 검색창을 확장 애니메이션
+                animateSearchContainerUp(searchContainer, favoriteHeader)
+                clearButton.visibility = android.view.View.VISIBLE
+            }
+            // 포커스 상실 시 애니메이션 제거
+        }
+        
+        // X 버튼 클릭 리스너
+        clearButton.setOnClickListener {
+            searchEditText.text.clear()
+            // 포커스 해제하지 않음 (검색창 확장 상태 유지)
+            clearButton.visibility = android.view.View.GONE
+        }
+        
+        // 검색창 텍스트 변경 리스너
+        searchEditText.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                // 텍스트가 있으면 X 버튼 표시, 없으면 숨김
+                clearButton.visibility = if (s.isNullOrEmpty()) android.view.View.GONE else android.view.View.VISIBLE
+            }
+        })
+        
+        // 검색창 클릭 리스너 (포커스 획득)
+        binding.sideMenuContent.llSearchBar.setOnClickListener {
+            searchEditText.requestFocus()
+        }
+        
+        // 검색창 키보드 액션 리스너
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                // 검색 실행
+                performSearch(searchEditText.text.toString())
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
+        
+        // 검색창 드래그 리스너 설정
+        setupSearchDragListener(searchContainer, favoriteHeader)
+        
+        // 사이드 메뉴 닫힐 때 검색창 초기화
+        setupDrawerListener(searchContainer, favoriteHeader)
+    }
+    
+    /**
+     * 검색창을 확장 애니메이션 (포커스 획득 시)
+     */
+    private fun animateSearchContainerUp(searchContainer: android.view.View, favoriteHeader: android.view.View) {
+        // 검색창을 제자리에서 확장하여 즐겨찾기 헤더를 완전히 덮음
+        val currentHeight = searchContainer.height
+        
+        // 즐겨찾기 헤더의 위치를 기준으로 검색창이 덮을 수 있는 높이 계산
+        val searchContainerTop = searchContainer.top
+        val favoriteHeaderTop = favoriteHeader.top
+        val distanceToCover = searchContainerTop - favoriteHeaderTop
+        
+        // 검색창이 즐겨찾기 헤더까지 덮을 수 있는 정확한 높이
+        val targetHeight = currentHeight + distanceToCover + favoriteHeader.height
+        
+        // 디버깅을 위한 로그
+        android.util.Log.d("SearchAnimation", "현재 높이: $currentHeight, 헤더 높이: ${favoriteHeader.height}, 목표 높이: $targetHeight")
+        android.util.Log.d("SearchAnimation", "검색창 top: $searchContainerTop, 즐겨찾기 헤더 top: $favoriteHeaderTop, 덮을 거리: $distanceToCover")
+        
+        // UI 스레드에서 안전하게 높이 변경
+        searchContainer.post {
+            // 높이만 애니메이션
+            val heightAnimator = android.animation.ValueAnimator.ofInt(currentHeight, targetHeight)
+            heightAnimator.duration = 300
+            heightAnimator.interpolator = android.view.animation.DecelerateInterpolator()
+            
+            heightAnimator.addUpdateListener { animator ->
+                val params = searchContainer.layoutParams
+                if (params is android.view.ViewGroup.LayoutParams) {
+                    val newHeight = animator.animatedValue as Int
+                    params.height = newHeight
+                    searchContainer.layoutParams = params
+                    // 레이아웃 재계산 강제
+                    searchContainer.requestLayout()
+                    
+
+                }
+            }
+            
+            heightAnimator.addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    // 검색 결과 영역 표시
+                    binding.sideMenuContent.llSearchResultsContainer.visibility = android.view.View.VISIBLE
+                    binding.sideMenuContent.llSearchResultsContainer.alpha = 0f
+                    binding.sideMenuContent.llSearchResultsContainer.animate()
+                        .alpha(1f)
+                        .setDuration(200)
+                        .start()
+                
+                    // 최대 확장 상태에서 키보드 표시 및 포커스 설정
+                    binding.sideMenuContent.etSearchLocation.requestFocus()
+                    
+                    // 키보드 표시 (약간의 지연 후)
+                    binding.sideMenuContent.etSearchLocation.postDelayed({
+                        val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                        imm.showSoftInput(binding.sideMenuContent.etSearchLocation, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+                    }, 100)
+                }
+            })
+            
+            heightAnimator.start()
+        }
+    }
+    
+    /**
+     * 검색창 드래그 리스너 설정
+     */
+    private fun setupSearchDragListener(searchContainer: android.view.View, favoriteHeader: android.view.View) {
+        var startY = 0f
+        var startHeight = 0
+        var isDragging = false
+        
+        // 검색창 영역에 터치 리스너 설정
+        searchContainer.setOnTouchListener { _, event ->
+            when (event.action) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    startY = event.rawY
+                    startHeight = searchContainer.height
+                    isDragging = true
+                    true
+                }
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    if (isDragging) {
+                        val deltaY = startY - event.rawY
+                        val newHeight = (startHeight + deltaY).toInt()
+                        
+                        // 안전한 최소/최대 높이 계산
+                        val minHeight = 100 // 최소 높이를 고정값으로 설정
+                        val currentTop = searchContainer.top
+                        val headerTop = favoriteHeader.top
+                        val headerHeight = favoriteHeader.height
+                        
+                        // 최대 높이 계산 (즐겨찾기 헤더까지 덮을 수 있는 높이)
+                        val maxHeight = if (currentTop > headerTop) {
+                            startHeight + (currentTop - headerTop) + headerHeight
+                        } else {
+                            startHeight + headerHeight + 200 // 안전한 기본값
+                        }
+                        
+                        // 최소값이 최대값보다 크지 않도록 보장
+                        val safeMinHeight = minOf(minHeight, maxHeight - 1)
+                        val safeMaxHeight = maxOf(maxHeight, safeMinHeight + 1)
+                        
+                        val clampedHeight = newHeight.coerceIn(safeMinHeight, safeMaxHeight)
+                        
+                        // 디버깅 로그
+                        android.util.Log.d("DragDebug", "현재 높이: $newHeight, 최소: $safeMinHeight, 최대: $safeMaxHeight, 클램프: $clampedHeight")
+                        
+                        // 키보드 자동 숨김 (검색창이 30% 이상 줄어들면)
+                        val heightReduction = startHeight - clampedHeight
+                        val reductionPercentage = (heightReduction.toFloat() / startHeight.toFloat()) * 100
+                        
+                        if (reductionPercentage >= 30f) {
+                            // 키보드 숨기기
+                            val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                            imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
+                            
+                            // 포커스 해제
+                            binding.sideMenuContent.etSearchLocation.clearFocus()
+                        }
+                        
+                        // 실시간으로 높이 변경
+                        val params = searchContainer.layoutParams
+                        if (params is android.view.ViewGroup.LayoutParams) {
+                            params.height = clampedHeight
+                            searchContainer.layoutParams = params
+                            searchContainer.requestLayout()
+                        }
+                    }
+                    true
+                }
+                android.view.MotionEvent.ACTION_UP -> {
+                    if (isDragging) {
+                        isDragging = false
+                        
+                        // 드래그 방향에 따라 최종 상태 결정
+                        val deltaY = startY - event.rawY
+                        val threshold = 100f // 드래그 임계값
+                        
+                        if (deltaY > threshold) {
+                            // 위로 드래그: 최대 확장
+                            animateToMaxHeight(searchContainer, favoriteHeader)
+                        } else if (deltaY < -threshold) {
+                            // 아래로 드래그: 최소 축소
+                            animateToMinHeight(searchContainer)
+                        } else {
+                            // 임계값 미달: 원래 상태로 복원
+                            animateToOriginalHeight(searchContainer, startHeight)
+                        }
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+    
+    /**
+     * 최대 높이로 애니메이션
+     */
+    private fun animateToMaxHeight(searchContainer: android.view.View, favoriteHeader: android.view.View) {
+        val currentHeight = searchContainer.height
+        val searchContainerTop = searchContainer.top
+        val favoriteHeaderTop = favoriteHeader.top
+        val distanceToCover = searchContainerTop - favoriteHeaderTop
+        val targetHeight = currentHeight + distanceToCover + favoriteHeader.height
+        
+        val heightAnimator = android.animation.ValueAnimator.ofInt(currentHeight, targetHeight)
+        heightAnimator.duration = 200
+        heightAnimator.interpolator = android.view.animation.DecelerateInterpolator()
+        
+        heightAnimator.addUpdateListener { animator ->
+            val params = searchContainer.layoutParams
+            if (params is android.view.ViewGroup.LayoutParams) {
+                params.height = animator.animatedValue as Int
+                searchContainer.layoutParams = params
+                searchContainer.requestLayout()
+            }
+        }
+        
+        heightAnimator.addListener(object : android.animation.AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: android.animation.Animator) {
+                // 검색 결과 영역 표시
+                binding.sideMenuContent.llSearchResultsContainer.visibility = android.view.View.VISIBLE
+                binding.sideMenuContent.llSearchResultsContainer.alpha = 0f
+                binding.sideMenuContent.llSearchResultsContainer.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
+                
+                // 최대 확장 상태에서 키보드 표시 및 포커스 설정
+                binding.sideMenuContent.etSearchLocation.requestFocus()
+                
+                // 키보드 표시 (약간의 지연 후)
+                binding.sideMenuContent.etSearchLocation.postDelayed({
+                    val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                    imm.showSoftInput(binding.sideMenuContent.etSearchLocation, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+                }, 100)
+            }
+        })
+        
+        heightAnimator.start()
+    }
+    
+    /**
+     * 최소 높이로 애니메이션
+     */
+    private fun animateToMinHeight(searchContainer: android.view.View) {
+        val currentHeight = searchContainer.height
+        val minHeight = 100 // 최소 높이를 안전한 값으로 설정
+        
+        val heightAnimator = android.animation.ValueAnimator.ofInt(currentHeight, minHeight)
+        heightAnimator.duration = 200
+        heightAnimator.interpolator = android.view.animation.DecelerateInterpolator()
+        
+        heightAnimator.addUpdateListener { animator ->
+            val params = searchContainer.layoutParams
+            if (params is android.view.ViewGroup.LayoutParams) {
+                params.height = animator.animatedValue as Int
+                searchContainer.layoutParams = params
+                searchContainer.requestLayout()
+            }
+        }
+        
+        heightAnimator.addListener(object : android.animation.AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: android.animation.Animator) {
+                // 검색 결과 영역 숨김
+                binding.sideMenuContent.llSearchResultsContainer.visibility = android.view.View.GONE
+                
+                // 키보드 숨기기 (검색창이 완전히 내려갔을 때)
+                val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
+                
+                // 포커스 해제
+                binding.sideMenuContent.etSearchLocation.clearFocus()
+                
+                // 높이를 WRAP_CONTENT로 복원
+                val params = searchContainer.layoutParams
+                if (params is android.view.ViewGroup.LayoutParams) {
+                    params.height = android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+                    searchContainer.layoutParams = params
+                    searchContainer.requestLayout()
+                }
+            }
+        })
+        
+        heightAnimator.start()
+    }
+    
+    /**
+     * 원래 높이로 애니메이션
+     */
+    private fun animateToOriginalHeight(searchContainer: android.view.View, originalHeight: Int) {
+        val currentHeight = searchContainer.height
+        
+        val heightAnimator = android.animation.ValueAnimator.ofInt(currentHeight, originalHeight)
+        heightAnimator.duration = 200
+        heightAnimator.interpolator = android.view.animation.DecelerateInterpolator()
+        
+        heightAnimator.addUpdateListener { animator ->
+            val params = searchContainer.layoutParams
+            if (params is android.view.ViewGroup.LayoutParams) {
+                params.height = animator.animatedValue as Int
+                searchContainer.layoutParams = params
+                searchContainer.requestLayout()
+            }
+        }
+        
+        heightAnimator.start()
+    }
+    
+    /**
+     * 사이드 메뉴 닫힐 때 검색창 초기화
+     */
+    private fun setupDrawerListener(searchContainer: android.view.View, favoriteHeader: android.view.View) {
+        binding.drawerLayout.addDrawerListener(object : androidx.drawerlayout.widget.DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: android.view.View, slideOffset: Float) {
+                // 드로어가 슬라이드되는 동안
+            }
+            
+            override fun onDrawerOpened(drawerView: android.view.View) {
+                // 드로어가 열렸을 때
+            }
+            
+            override fun onDrawerClosed(drawerView: android.view.View) {
+                // 드로어가 닫혔을 때 검색창 초기화
+                resetSearchContainer(searchContainer, favoriteHeader)
+            }
+            
+            override fun onDrawerStateChanged(newState: Int) {
+                // 드로어 상태 변경
+            }
+        })
+    }
+    
+    /**
+     * 검색창을 초기 상태로 복원
+     */
+    private fun resetSearchContainer(searchContainer: android.view.View, favoriteHeader: android.view.View) {
+        // 검색창 높이를 원래대로 복원
+        val currentHeight = searchContainer.height
+        val originalHeight = android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        
+        // 높이 애니메이션으로 부드럽게 복원
+        val heightAnimator = android.animation.ValueAnimator.ofInt(currentHeight, 0)
+        heightAnimator.duration = 300
+        heightAnimator.interpolator = android.view.animation.DecelerateInterpolator()
+        
+        heightAnimator.addUpdateListener { animator ->
+            val params = searchContainer.layoutParams
+            if (params is android.view.ViewGroup.LayoutParams) {
+                params.height = animator.animatedValue as Int
+                searchContainer.layoutParams = params
+                searchContainer.requestLayout()
+            }
+        }
+        
+        heightAnimator.addListener(object : android.animation.AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: android.animation.Animator) {
+                // 검색 결과 영역 숨김
+                binding.sideMenuContent.llSearchResultsContainer.visibility = android.view.View.GONE
+                
+                // 검색창 텍스트 초기화
+                binding.sideMenuContent.etSearchLocation.setText("")
+                
+                // 검색창 포커스 해제
+                binding.sideMenuContent.etSearchLocation.clearFocus()
+                
+                // 높이를 WRAP_CONTENT로 복원
+                val params = searchContainer.layoutParams
+                if (params is android.view.ViewGroup.LayoutParams) {
+                    params.height = originalHeight
+                    searchContainer.layoutParams = params
+                    searchContainer.requestLayout()
+                }
+                
+                // 키보드 숨기기
+                val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
+            }
+        })
+        
+        heightAnimator.start()
+    }
+    
+
+    
+    /**
+     * 검색 실행
+     */
+    private fun performSearch(query: String) {
+        if (query.isNotEmpty()) {
+            // TODO: 카카오 로컬 API를 사용하여 주소 검색 실행
+            android.widget.Toast.makeText(
+                this,
+                "'$query' 검색을 실행합니다.",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            
+            // 키보드 숨기기
+            val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
+        }
     }
     
 

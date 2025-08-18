@@ -12,16 +12,15 @@ import com.example.kh_studyprojects_weatherapp.data.api.kakao.KakaoDocument
 /**
  * 검색 결과 어댑터
  * 
- * @author 개발자명
- * @since 2024.01.01
+ * @author 김효동
+ * @since 2025.08.14
  * @version 1.0
  * 
  * 개정이력:
- * - 2024.01.01: 최초 작성
+ * - 2024.08.14: 최초 작성
  */
 class SearchResultAdapter(
-    private val onItemClick: (KakaoDocument) -> Unit,
-    private val onAddFavoriteClick: (KakaoDocument) -> Unit
+    private val onItemClick: (KakaoDocument) -> Unit
 ) : RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder>() {
 
     private var searchResults: List<KakaoDocument> = emptyList()
@@ -57,7 +56,6 @@ class SearchResultAdapter(
     inner class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvFullAddress: TextView = itemView.findViewById(R.id.tvFullAddress)
         private val tvDetailAddress: TextView = itemView.findViewById(R.id.tvDetailAddress)
-        private val ivAddFavorite: ImageView = itemView.findViewById(R.id.ivAddFavorite)
 
         fun bind(document: KakaoDocument) {
             // 전체 주소 설정
@@ -81,14 +79,11 @@ class SearchResultAdapter(
             itemView.setOnClickListener {
                 onItemClick(document)
             }
-
-            // 즐겨찾기 추가 버튼 클릭 리스너
-            ivAddFavorite.setOnClickListener {
-                onAddFavoriteClick(document)
-            }
         }
     }
 }
+
+
 
 
 

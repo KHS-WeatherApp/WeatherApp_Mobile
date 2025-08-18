@@ -45,20 +45,9 @@
             android:layout_marginTop="@dimen/dp_2" />
 
     </LinearLayout>
-
-    <!-- 즐겨찾기 추가 버튼 -->
-    <ImageView
-        android:id="@+id/ivAddFavorite"
-        android:layout_width="@dimen/dp_24"
-        android:layout_height="@dimen/dp_24"
-        android:layout_marginStart="@dimen/dp_8"
-        android:src="@android:drawable/btn_star_big_off"
-        android:tint="@android:color/darker_gray"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?android:attr/selectableItemBackgroundBorderless" />
-
 </LinearLayout>
+
+
 
 
 
