@@ -218,8 +218,6 @@ class MainActivity : AppCompatActivity() {
         addTestFavoriteLocations()
     }
 
-
-
     /**
      * 윈도우 인셋 처리 공통 함수
      *
@@ -633,8 +631,6 @@ class MainActivity : AppCompatActivity() {
                     searchContainer.layoutParams = params
                     // 레이아웃 재계산 강제
                     searchContainer.requestLayout()
-
-
                 }
             }
 
@@ -944,8 +940,6 @@ class MainActivity : AppCompatActivity() {
         heightAnimator.start()
     }
 
-
-
     /**
      * 검색 실행
      */
@@ -956,7 +950,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // 카카오 키워드 검색은 1글자/공백 등 잘못된 파라미터로 400이 발생할 수 있어 2자 이상일 때만 호출
+        // 카카오 주소 검색은 1글자/공백 등 잘못된 파라미터로 400이 발생할 수 있어 2자 이상일 때만 호출
         if (query.length < 2) {
             searchResultAdapter.clearSearchResults()
             binding.sideMenuContent.llSearchResultsContainer.visibility = View.GONE
@@ -986,15 +980,20 @@ class MainActivity : AppCompatActivity() {
                         size = 30
                     )
                 }
+                
                 if (response.documents.isEmpty()) {
                     searchResultAdapter.clearSearchResults()
                     binding.sideMenuContent.llSearchResultsContainer.visibility = View.GONE
                 } else {
+                    // 첫 페이지 결과 표시
                     searchResultAdapter.updateSearchResults(response.documents)
                     binding.sideMenuContent.llSearchResultsContainer.visibility = View.VISIBLE
-                    // 다음 페이지 준비
+                    
+                    // 다음 페이지 준비 (무한 스크롤을 위해)
                     currentSearchPage = 2
                     isSearchEnd = response.meta.isEnd
+                    
+                    Log.d("Search", "첫 페이지 로드 완료: ${response.documents.size}개, 다음 페이지: $currentSearchPage, 마지막 페이지: $isSearchEnd")
                 }
             } catch (e: HttpException) {
                 val code = e.code()
@@ -1089,8 +1088,6 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
     }
 
-
-
     /**
      * 앱 정보 다이얼로그 표시
      */
@@ -1130,8 +1127,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     /*
-    * 뷰바인딩 해제(메모리 누수방지)
-    */
+     * 뷰바인딩 해제(메모리 누수방지)
+     */
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
