@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherCurrentFragmentBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
-import com.example.kh_studyprojects_weatherapp.presentation.MainActivity
+import com.example.kh_studyprojects_weatherapp.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
