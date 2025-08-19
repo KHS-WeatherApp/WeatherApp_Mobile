@@ -302,6 +302,7 @@
                 android:textSize="@dimen/sp_14"
                 android:inputType="text"
                 android:imeOptions="actionSearch"
+                android:maxLength="30"
                 android:maxLines="1"
                 android:singleLine="true" />
 

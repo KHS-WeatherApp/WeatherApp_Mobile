@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="@dimen/dp_16"
+    android:padding="@dimen/dp_5"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"

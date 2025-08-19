@@ -20,6 +20,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.kh_studyprojects_weatherapp.data.api.ExternalApiRetrofitInstance
+import com.example.kh_studyprojects_weatherapp.presentation.weather.adapter.SearchResultAdapter
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
@@ -46,9 +52,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     // 즐겨찾기 지역 어댑터
     private lateinit var favoriteLocationAdapter: FavoriteLocationAdapter
+    // 검색 결과 어댑터
+    private lateinit var searchResultAdapter: SearchResultAdapter
     
     // 현재 날씨 데이터 콜백
     private var onWeatherDataUpdated: ((Map<String, Any>) -> Unit)? = null
+    // 검색 디바운스용 잡
+    private var searchJob: Job? = null
+    // 검색 페이징 상태
+    private var currentSearchQuery: String = ""
+    private var currentSearchPage: Int = 1
+    private var isSearchLoading: Boolean = false
+    private var isSearchEnd: Boolean = false
 
     /**
      * 위치 권한 요청을 위한 런처
@@ -174,6 +189,9 @@ class MainActivity : AppCompatActivity() {
         // 즐겨찾기 지역 RecyclerView 설정
         setupFavoriteLocationsRecyclerView()
         
+        // 검색 결과 RecyclerView 설정
+        setupSearchResultsRecyclerView()
+
         // 메뉴 아이템 클릭 리스너 설정
         setupMenuClickListeners()
         
@@ -238,6 +256,57 @@ class MainActivity : AppCompatActivity() {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = favoriteLocationAdapter
+        }
+    }
+
+    /**
+     * 검색 결과 RecyclerView 설정
+     */
+    private fun setupSearchResultsRecyclerView() {
+        val recyclerView = binding.sideMenuContent.rvSearchResults
+        searchResultAdapter = SearchResultAdapter { document ->
+            android.widget.Toast.makeText(
+                this,
+                "${document.placeName.ifEmpty { document.addressName }} 선택됨",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = searchResultAdapter
+            
+            // 스크롤 성능 최적화
+            setHasFixedSize(true)
+            setItemViewCacheSize(20)
+            
+            // 무한 스크롤 리스너 추가 (안전한 방식)
+            addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                private var isScrolling = false
+                
+                override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    isScrolling = newState == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
+                }
+                
+                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    
+                    // 위로 스크롤할 때는 무시
+                    if (dy <= 0) return
+                    
+                    // 이미 로딩 중이거나 마지막 페이지면 무시
+                    if (isSearchLoading || isSearchEnd) return
+                    
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val totalItemCount = layoutManager.itemCount
+                    val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                    
+                    // 마지막 아이템에서 5개 전에 도달하면 다음 페이지 로드 (더 안전한 임계값)
+                    if (lastVisibleItemPosition >= totalItemCount - 5 && !isScrolling) {
+                        loadNextSearchPage()
+                    }
+                }
+            })
         }
     }
     
@@ -486,6 +555,9 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: android.text.Editable?) {
                 // 텍스트가 있으면 X 버튼 표시, 없으면 숨김
                 clearButton.visibility = if (s.isNullOrEmpty()) android.view.View.GONE else android.view.View.VISIBLE
+
+                val query = s?.toString()?.trim().orEmpty()
+                triggerDebouncedSearch(query)
             }
         })
         
@@ -862,18 +934,139 @@ class MainActivity : AppCompatActivity() {
      * 검색 실행
      */
     private fun performSearch(query: String) {
-        if (query.isNotEmpty()) {
-            // TODO: 카카오 로컬 API를 사용하여 주소 검색 실행
-            android.widget.Toast.makeText(
-                this,
-                "'$query' 검색을 실행합니다.",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
-            
-            // 키보드 숨기기
-            val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-            imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
+        if (query.isBlank()) {
+            searchResultAdapter.clearSearchResults()
+            binding.sideMenuContent.llSearchResultsContainer.visibility = android.view.View.GONE
+            return
         }
+
+        // 카카오 키워드 검색은 1글자/공백 등 잘못된 파라미터로 400이 발생할 수 있어 2자 이상일 때만 호출
+        if (query.length < 2) {
+            searchResultAdapter.clearSearchResults()
+            binding.sideMenuContent.llSearchResultsContainer.visibility = android.view.View.GONE
+            return
+        }
+
+        // 카카오 API 제한: 검색어 최대 30자
+        val trimmedQuery = if (query.length > 30) query.substring(0, 30) else query
+        
+        // 검색 상태 초기화
+        currentSearchQuery = trimmedQuery
+        currentSearchPage = 1
+        isSearchEnd = false
+        isSearchLoading = false
+        
+        // 로딩 상태 초기화
+        searchResultAdapter.setLoading(false)
+
+        // 첫 페이지 호출
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ExternalApiRetrofitInstance.kakaoApiService.searchByAddress(query = trimmedQuery, page = 1, size = 30)
+                }
+                if (response.documents.isEmpty()) {
+                    searchResultAdapter.clearSearchResults()
+                    binding.sideMenuContent.llSearchResultsContainer.visibility = android.view.View.GONE
+                } else {
+                    searchResultAdapter.updateSearchResults(response.documents)
+                    binding.sideMenuContent.llSearchResultsContainer.visibility = android.view.View.VISIBLE
+                    // 다음 페이지 준비
+                    currentSearchPage = 2
+                    isSearchEnd = response.meta.isEnd
+                }
+            } catch (e: retrofit2.HttpException) {
+                val code = e.code()
+                val msg = e.response()?.errorBody()?.string().orEmpty()
+                android.util.Log.e("KakaoAddressSearch", "HTTP $code: $msg", e)
+                showLoadingIndicator(false)
+                showErrorMessage("검색 오류 (HTTP $code)")
+            } catch (e: java.io.IOException) {
+                android.util.Log.e("KakaoAddressSearch", "네트워크 오류", e)
+                showLoadingIndicator(false)
+                showErrorMessage("네트워크 오류가 발생했습니다")
+            } catch (e: Exception) {
+                android.util.Log.e("KakaoAddressSearch", "기타 오류", e)
+                showLoadingIndicator(false)
+                showErrorMessage("검색 중 오류가 발생했습니다")
+            }
+        }
+    }
+
+    private fun triggerDebouncedSearch(query: String) {
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            kotlinx.coroutines.delay(350)
+            performSearch(query)
+        }
+    }
+
+    /**
+     * 다음 페이지 로드
+     */
+    private fun loadNextSearchPage() {
+        if (currentSearchQuery.isBlank()) return
+        if (isSearchLoading || isSearchEnd) return
+        
+        // 중복 호출 방지
+        isSearchLoading = true
+        showLoadingIndicator(true)
+        
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ExternalApiRetrofitInstance.kakaoApiService.searchByAddress(
+                        query = currentSearchQuery,
+                        page = currentSearchPage,
+                        size = 30
+                    )
+                }
+                
+                if (response.documents.isNotEmpty()) {
+                    // 데이터 추가 전에 로딩 상태 해제
+                    showLoadingIndicator(false)
+                    
+                    searchResultAdapter.appendSearchResults(response.documents)
+                    currentSearchPage += 1
+                    isSearchEnd = response.meta.isEnd
+                } else {
+                    isSearchEnd = true
+                    showLoadingIndicator(false)
+                }
+                
+            } catch (e: retrofit2.HttpException) {
+                val code = e.code()
+                val msg = e.response()?.errorBody()?.string().orEmpty()
+                android.util.Log.e("KakaoAddressSearch", "HTTP $code: $msg", e)
+                showLoadingIndicator(false)
+                showErrorMessage("검색 오류 (HTTP $code)")
+            } catch (e: java.io.IOException) {
+                android.util.Log.e("KakaoAddressSearch", "네트워크 오류", e)
+                showLoadingIndicator(false)
+                showErrorMessage("네트워크 오류가 발생했습니다")
+            } catch (e: Exception) {
+                android.util.Log.e("KakaoAddressSearch", "기타 오류", e)
+                showLoadingIndicator(false)
+                showErrorMessage("검색 중 오류가 발생했습니다")
+            } finally {
+                isSearchLoading = false
+            }
+        }
+    }
+    
+    /**
+     * 로딩 인디케이터 표시/숨김
+     */
+    private fun showLoadingIndicator(show: Boolean) {
+        searchResultAdapter.setLoading(show)
+    }
+    
+    /**
+     * 에러 메시지 표시
+     */
+    private fun showErrorMessage(message: String) {
+        android.widget.Toast.makeText(this@MainActivity, message, android.widget.Toast.LENGTH_SHORT).show()
     }
     
 

@@ -45,4 +45,17 @@ interface KakaoApiService {
         @Query("x") longitude: String,
         @Query("y") latitude: String
     ): KakaoAddressResponse
+
+    /**
+     * 주소로 좌표 변환 검색 (페이지네이션 지원)
+     * @param query 검색어
+     * @param page 페이지 번호(1부터)
+     * @param size 페이지 당 개수(최대 30)
+     */
+    @GET("v2/local/search/address.json")
+    suspend fun searchByAddress(
+        @Query("query") query: String,
+        @Query("page") page: Int = 1,
+        @Query("size") size: Int = 30
+    ): KakaoSearchResponse
 } 
