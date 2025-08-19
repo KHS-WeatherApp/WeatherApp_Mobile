@@ -213,9 +213,6 @@ class MainActivity : AppCompatActivity() {
 
         // 현재 날씨 데이터 구독
         setupCurrentWeatherObserver()
-
-        // 임시 즐겨찾기 데이터 추가 (테스트용)
-        addTestFavoriteLocations()
     }
 
     /**
@@ -446,37 +443,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * 테스트용 즐겨찾기 지역 추가
-     */
-    private fun addTestFavoriteLocations() {
-        val testLocations = listOf(
-            FavoriteLocation(
-                id = "1",
-                name = "서울특별시",
-                latitude = 37.5665,
-                longitude = 126.9780,
-                address = "서울특별시 강남구"
-            ),
-            FavoriteLocation(
-                id = "2",
-                name = "부산광역시",
-                latitude = 35.1796,
-                longitude = 129.0756,
-                address = "부산광역시 해운대구"
-            ),
-            FavoriteLocation(
-                id = "3",
-                name = "대구광역시",
-                latitude = 35.8714,
-                longitude = 128.6014,
-                address = "대구광역시 중구"
-            )
-        )
-
-        favoriteLocationAdapter.updateLocations(testLocations)
-    }
-
-    /**
      * 즐겨찾기 지역 클릭 처리
      */
     private fun handleFavoriteLocationClick(location: FavoriteLocation) {
@@ -501,7 +467,7 @@ class MainActivity : AppCompatActivity() {
             Toast.LENGTH_SHORT
         ).show()
 
-        // 현재는 테스트 데이터에서만 제거
+        // 현재 리스트에서 해당 지역 제거
         val currentLocations = favoriteLocationAdapter.getCurrentLocations().toMutableList()
         currentLocations.remove(location)
         favoriteLocationAdapter.updateLocations(currentLocations)
