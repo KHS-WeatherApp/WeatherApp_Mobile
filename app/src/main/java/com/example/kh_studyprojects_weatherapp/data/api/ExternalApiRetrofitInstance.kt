@@ -1,6 +1,7 @@
 package com.example.kh_studyprojects_weatherapp.data.api
 
 import android.util.Log
+import com.example.kh_studyprojects_weatherapp.BuildConfig
 import com.example.kh_studyprojects_weatherapp.data.api.kakao.KakaoApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -34,8 +35,7 @@ object ExternalApiRetrofitInstance {
         .addInterceptor { chain ->
             val original = chain.request()
             val request = original.newBuilder()
-//                .header("Authorization", "KakaoAK 6a3bf63639cce406d91c00591660495a") // 카카오 REST API 키 테스트앱 쿼터 작음
-                .header("Authorization", "KakaoAK 0e7dd6b47912ee6141a3728ac33bd0af") // 카카오 REST API 키
+                .header("Authorization", "KakaoAK ${BuildConfig.KAKAO_API_KEY}") // BuildConfig에서 API 키 가져오기
                 .method(original.method, original.body)
                 .build()
             Log.d("ExternalApiRetrofitInstance", "카카오 API 요청 URL: ${request.url}")
