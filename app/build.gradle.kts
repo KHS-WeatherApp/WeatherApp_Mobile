@@ -1,18 +1,8 @@
-import java.util.Properties
-import java.io.FileInputStream
-
 plugins {
     alias(libs.plugins.android.application)         // 안드로이드 애플리케이션 플러그인을 사용합니다.
     alias(libs.plugins.jetbrains.kotlin.android)    // 코틀린과 안드로이드를 함께 사용하기 위한 플러그인을 사용합니다.
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
-}
-
-// local.properties에서 API 키 읽기
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localProperties.load(FileInputStream(localPropertiesFile))
 }
 
 android {
@@ -27,9 +17,6 @@ android {
         versionName = "1.0.0"   // 앱 버전 이름, 사용자에게 보여지는 앱 버전입니다.
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" // 테스트를 실행할 때 사용할 러너를 지정합니다.
-        
-        // API 키를 BuildConfig에 추가
-        buildConfigField("String", "KAKAO_API_KEY", "\"${localProperties.getProperty("KAKAO_API_KEY", "")}\"")
     }
 
     buildTypes {
@@ -51,7 +38,6 @@ android {
     buildFeatures {
         viewBinding = true // 뷰 바인딩을 활성화합니다. XML 레이아웃과 코드를 더 쉽게 연결할 수 있습니다.
         dataBinding = true // 데이터 바인딩을 활성화하여 뷰와 모델 데이터 간의 연결을 도와줍니다.
-        buildConfig = true // BuildConfig 클래스 생성을 활성화합니다.
     }
 }
 

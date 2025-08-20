@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
  */
 object BackendRetrofitInstance {
 //    private const val DEVICE_URL = "http://10.62.163.40:8080"  // 내부 WiFi IP 김효동
-    private const val DEVICE_URL = "http://192.168.0.5:8080"  // 내부 WiFi IP 김효동 회사
+    private const val DEVICE_URL = "http://192.168.0.65:8080"  // 내부 WiFi IP 김효동 회사
 //    private const val DEVICE_URL = "http://172.30.1.53:8080"  // 내부 WiFi IP 김지윤
     private const val EMULATOR_URL = "http://10.0.2.2:8080"
 
