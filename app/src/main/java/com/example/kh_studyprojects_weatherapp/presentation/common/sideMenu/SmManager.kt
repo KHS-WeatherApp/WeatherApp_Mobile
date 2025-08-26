@@ -3,10 +3,9 @@ package com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
-import com.example.kh_studyprojects_weatherapp.presentation.weather.adapter.FavoriteLocationAdapter
-import com.example.kh_studyprojects_weatherapp.presentation.weather.adapter.SearchResultAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmFavoriteLocationAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmSearchResultAdapter
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import com.example.kh_studyprojects_weatherapp.presentation.weather.WeatherFragment
@@ -22,18 +21,35 @@ import androidx.core.view.WindowInsetsCompat
 import android.view.ViewGroup
 import android.app.AlertDialog
 
-class SideMenuManager(
+/**
+ * 사이드메뉴 전체를 관리하는 Manager 클래스
+ * 
+ * 검색, 즐겨찾기, 애니메이션 등의 기능을 담당하는 하위 Manager들을 조율합니다.
+ * MainActivity와 하위 Manager들 간의 중재자 역할을 수행하며, 전체적인 사이드메뉴 동작을 제어합니다.
+ * 
+ * 주요 기능:
+ * - 하위 Manager들의 초기화 및 의존성 설정
+ * - 윈도우 인셋 처리
+ * - 메뉴 아이템 클릭 리스너 설정
+ * - 현재 위치 날씨 정보 업데이트
+ * - 즐겨찾기 지역 클릭/삭제 처리
+ * 
+ * @author 김효동
+ * @since 2025.08.26
+ * @version 1.0
+ */
+class SmManager(
     private val context: Context,
     private val binding: ActivityMainBinding,
     private val lifecycleScope: LifecycleCoroutineScope,
-    private val favoriteLocationAdapter: FavoriteLocationAdapter,
-    private val searchResultAdapter: SearchResultAdapter,
+    private val favoriteLocationAdapter: SmFavoriteLocationAdapter,
+    private val searchResultAdapter: SmSearchResultAdapter,
     private val navController: NavController,
     private val activity: FragmentActivity
 ) {
-    private lateinit var sideMenuSearchManager: SideMenuSearchManager
-    private lateinit var sideMenuFavoriteManager: SideMenuFavoriteManager
-    private lateinit var sideMenuAnimationManager: SideMenuAnimationManager
+    private lateinit var sideMenuSearchManager: SmSearchManager
+    private lateinit var sideMenuFavoriteManager: SmFavoriteManager
+    private lateinit var sideMenuAnimationManager: SmAnimationManager
 
     // 현재 날씨 데이터 콜백
     private var onWeatherDataUpdated: ((Map<String, Any>) -> Unit)? = null
@@ -59,9 +75,9 @@ class SideMenuManager(
     }
 
     private fun initializeManagers() {
-        sideMenuSearchManager = SideMenuSearchManager(context, binding, lifecycleScope, searchResultAdapter)
-        sideMenuFavoriteManager = SideMenuFavoriteManager(context, binding, favoriteLocationAdapter)
-        sideMenuAnimationManager = SideMenuAnimationManager(binding)
+        sideMenuSearchManager = SmSearchManager(context, binding, lifecycleScope, searchResultAdapter)
+        sideMenuFavoriteManager = SmFavoriteManager(context, binding, favoriteLocationAdapter)
+        sideMenuAnimationManager = SmAnimationManager(binding)
         
         // Manager 간 의존성 설정
         sideMenuSearchManager.setAnimationManager(sideMenuAnimationManager)

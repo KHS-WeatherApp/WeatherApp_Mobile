@@ -2,17 +2,14 @@ package com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu
 
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
-import com.example.kh_studyprojects_weatherapp.presentation.weather.adapter.SearchResultAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmSearchResultAdapter
 import com.example.kh_studyprojects_weatherapp.data.api.ExternalApiRetrofitInstance
-import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.SideMenuAnimationManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -24,11 +21,21 @@ import android.text.Editable
 import android.text.TextWatcher
 import androidx.drawerlayout.widget.DrawerLayout
 
-class SideMenuSearchManager(
+/**
+ * 사이드메뉴 검색 기능을 관리하는 Manager 클래스
+ * 
+ * 검색창 포커스, 텍스트 변경, 무한 스크롤 등의 기능을 담당합니다.
+ * 카카오 로컬 API를 사용하여 주소 검색을 수행하고, 검색 결과를 관리합니다.
+ * 
+ * @author 김효동
+ * @since 2025.08.26
+ * @version 1.0
+ */
+class SmSearchManager(
     private val context: Context,
     private val binding: ActivityMainBinding,
     private val lifecycleScope: LifecycleCoroutineScope,
-    private val searchResultAdapter: SearchResultAdapter
+    private val searchResultAdapter: SmSearchResultAdapter
 ) {
     private var searchJob: Job? = null
     private var currentSearchQuery: String = ""
@@ -36,12 +43,29 @@ class SideMenuSearchManager(
     private var isSearchLoading: Boolean = false
     private var isSearchEnd: Boolean = false
 
-    private lateinit var sideMenuAnimationManager: SideMenuAnimationManager
+    private lateinit var sideMenuAnimationManager: SmAnimationManager
 
-    fun setAnimationManager(animationManager: SideMenuAnimationManager) {
+    /**
+     * 애니메이션 Manager를 설정합니다.
+     * 검색창 확장/축소 애니메이션을 위해 필요합니다.
+     * 
+     * @param animationManager 애니메이션을 담당하는 Manager
+     */
+    fun setAnimationManager(animationManager: SmAnimationManager) {
         this.sideMenuAnimationManager = animationManager
     }
 
+    /**
+     * 검색창 포커스 리스너를 설정합니다.
+     * 검색창 확장/축소 애니메이션과 관련된 이벤트를 처리합니다.
+     * 
+     * 주요 기능:
+     * - 검색창 포커스 획득/상실 시 애니메이션
+     * - X 버튼 클릭 시 텍스트 초기화
+     * - 텍스트 변경 시 디바운스 검색
+     * - 키보드 액션 처리
+     * - 드래그 리스너 및 드로어 리스너 설정
+     */
     fun setupSearchFocusListeners() {
         val searchEditText = binding.sideMenuContent.etSearchLocation
         val searchContainer = binding.sideMenuContent.llSearchContainer
@@ -100,6 +124,16 @@ class SideMenuSearchManager(
         setupDrawerListener(searchContainer, favoriteHeader)
     }
 
+    /**
+     * 검색 결과 RecyclerView를 설정합니다.
+     * 무한 스크롤 기능과 성능 최적화를 포함합니다.
+     * 
+     * 주요 기능:
+     * - LinearLayoutManager 설정
+     * - 어댑터 연결
+     * - 성능 최적화 (고정 크기, 아이템 캐시)
+     * - 무한 스크롤 리스너 추가
+     */
     fun setupSearchResultsRecyclerView() {
         val recyclerView = binding.sideMenuContent.rvSearchResults
 

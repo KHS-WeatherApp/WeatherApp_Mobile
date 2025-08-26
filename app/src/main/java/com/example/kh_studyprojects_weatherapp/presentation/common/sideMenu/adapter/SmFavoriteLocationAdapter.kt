@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.presentation.weather.adapter
+package com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,21 +6,37 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.databinding.ItemFavoriteLocationBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 
-class FavoriteLocationAdapter(
+/**
+ * 사이드메뉴 즐겨찾기 지역 어댑터
+ * 
+ * 사이드메뉴에서 즐겨찾기 지역 목록을 표시하고 관리합니다.
+ * 편집 모드와 일반 모드를 지원하며, 클릭 및 삭제 이벤트를 처리합니다.
+ * 
+ * @author 김효동
+ * @since 2025.08.26
+ * @version 1.0
+ */
+class SmFavoriteLocationAdapter(
     private val onLocationClick: (FavoriteLocation) -> Unit,
     private val onDeleteClick: (FavoriteLocation) -> Unit = {}
-) : RecyclerView.Adapter<FavoriteLocationAdapter.FavoriteLocationViewHolder>() {
+) : RecyclerView.Adapter<SmFavoriteLocationAdapter.FavoriteLocationViewHolder>() {
 
     private var locations: List<FavoriteLocation> = emptyList()
     private var isEditMode = false
 
+    /**
+     * 즐겨찾기 지역 목록을 업데이트합니다.
+     * 
+     * @param newLocations 새로운 즐겨찾기 지역 목록
+     */
     fun updateLocations(newLocations: List<FavoriteLocation>) {
         locations = newLocations
         notifyDataSetChanged()
     }
     
     /**
-     * 편집 모드 토글
+     * 편집 모드를 토글합니다.
+     * 편집 모드에서는 삭제 버튼이 표시되고 아이템 클릭이 비활성화됩니다.
      */
     fun toggleEditMode() {
         isEditMode = !isEditMode
@@ -28,7 +44,9 @@ class FavoriteLocationAdapter(
     }
     
     /**
-     * 현재 즐겨찾기 목록 반환
+     * 현재 즐겨찾기 목록을 반환합니다.
+     * 
+     * @return 현재 즐겨찾기 지역 목록
      */
     fun getCurrentLocations(): List<FavoriteLocation> {
         return locations
@@ -49,10 +67,18 @@ class FavoriteLocationAdapter(
 
     override fun getItemCount(): Int = locations.size
 
+    /**
+     * 즐겨찾기 지역 아이템을 표시하는 ViewHolder
+     */
     inner class FavoriteLocationViewHolder(
         private val binding: ItemFavoriteLocationBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        /**
+         * 즐겨찾기 지역 데이터를 바인딩합니다.
+         * 
+         * @param location 바인딩할 즐겨찾기 지역 정보
+         */
         fun bind(location: FavoriteLocation) {
             binding.tvLocationName.text = location.addressName
             binding.tvLocationAddress.text = location.addressName
@@ -81,4 +107,4 @@ class FavoriteLocationAdapter(
             }
         }
     }
-} 
+}

@@ -7,7 +7,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.common.utils
  * @since 2025.07.20
  * @version 1.0
  */
-object CommonUtil {
+object ComUtil {
     
     /**
      * 24시간 형식을 12시간 형식으로 변환

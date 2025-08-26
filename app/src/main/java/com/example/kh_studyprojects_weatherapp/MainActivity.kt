@@ -1,30 +1,25 @@
 package com.example.kh_studyprojects_weatherapp
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
-import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
-import com.example.kh_studyprojects_weatherapp.presentation.weather.adapter.FavoriteLocationAdapter
-import com.example.kh_studyprojects_weatherapp.presentation.weather.adapter.SearchResultAdapter
-import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.SideMenuManager
+import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmFavoriteLocationAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmSearchResultAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.SmManager
 import dagger.hilt.android.AndroidEntryPoint
 
 // 사용하지 않는 변수, 변경된 파라미터 이름 등에 대한 컴파일러 경고를 억제합니다.
@@ -41,12 +36,12 @@ class MainActivity : AppCompatActivity() {
     // 드로어 레이아웃
     private lateinit var drawerLayout: DrawerLayout
     // 즐겨찾기 지역 어댑터
-    private lateinit var favoriteLocationAdapter: FavoriteLocationAdapter
+    private lateinit var favoriteLocationAdapter: SmFavoriteLocationAdapter
     // 검색 결과 어댑터
-    private lateinit var searchResultAdapter: SearchResultAdapter
+    private lateinit var searchResultAdapter: SmSearchResultAdapter
 
     // 사이드메뉴 관리자
-    private lateinit var sideMenuManager: SideMenuManager
+    private lateinit var sideMenuManager: SmManager
 
 
 
@@ -114,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         setupAdapters()
         
         // 사이드메뉴 관리자 초기화
-        sideMenuManager = SideMenuManager(
+        sideMenuManager = SmManager(
             context = this,
             binding = binding,
             lifecycleScope = lifecycleScope,
@@ -123,12 +118,12 @@ class MainActivity : AppCompatActivity() {
             navController = navController,
             activity = this
         )
-        
+
         // 사이드 메뉴 설정
         sideMenuManager.setupSideMenu()
         
         // 어댑터 콜백 설정 (sideMenuManager 초기화 후)
-        favoriteLocationAdapter = FavoriteLocationAdapter(
+        favoriteLocationAdapter = SmFavoriteLocationAdapter(
             onLocationClick = { location ->
                 sideMenuManager.handleFavoriteLocationClick(location)
             },
@@ -193,13 +188,13 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupAdapters() {
         // 즐겨찾기 지역 어댑터 초기화 (빈 콜백으로)
-        favoriteLocationAdapter = FavoriteLocationAdapter(
+        favoriteLocationAdapter = SmFavoriteLocationAdapter(
             onLocationClick = { },
             onDeleteClick = { }
         )
         
         // 검색 결과 어댑터 초기화
-        searchResultAdapter = SearchResultAdapter { document ->
+        searchResultAdapter = SmSearchResultAdapter { document ->
             // document는 SearchDocument 타입
             Toast.makeText(
                 this,

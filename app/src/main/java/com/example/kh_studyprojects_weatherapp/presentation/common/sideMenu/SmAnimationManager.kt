@@ -11,9 +11,26 @@ import android.view.inputmethod.InputMethodManager
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
 import android.util.Log
 
-class SideMenuAnimationManager(
+/**
+ * 사이드메뉴 애니메이션을 관리하는 Manager 클래스
+ * 
+ * 검색창의 확장/축소, 드래그 제스처, 높이 애니메이션 등을 담당합니다.
+ * 사용자 경험을 향상시키는 부드러운 UI 전환을 제공합니다.
+ * 
+ * @author 김효동
+ * @since 2025.08.26
+ * @version 1.0
+ */
+class SmAnimationManager(
     private val binding: ActivityMainBinding
 ) {
+    /**
+     * 검색창을 위로 확장하는 애니메이션을 실행합니다.
+     * 검색창이 즐겨찾기 헤더를 완전히 덮을 때까지 부드럽게 확장됩니다.
+     * 
+     * @param searchContainer 확장할 검색창 컨테이너
+     * @param favoriteHeader 덮을 즐겨찾기 헤더
+     */
     fun animateSearchContainerUp(searchContainer: View, favoriteHeader: View) {
         // 검색창을 제자리에서 확장하여 즐겨찾기 헤더를 완전히 덮음
         val currentHeight = searchContainer.height
@@ -73,6 +90,19 @@ class SideMenuAnimationManager(
         }
     }
 
+    /**
+     * 검색창 드래그 리스너를 설정합니다.
+     * 사용자가 검색창을 드래그하여 높이를 조절할 수 있게 합니다.
+     * 
+     * 주요 기능:
+     * - 드래그 시작/이동/종료 감지
+     * - 실시간 높이 조절
+     * - 키보드 자동 숨김/표시
+     * - 드래그 방향에 따른 최종 상태 결정
+     * 
+     * @param searchContainer 드래그할 검색창 컨테이너
+     * @param favoriteHeader 즐겨찾기 헤더 (높이 계산용)
+     */
     fun setupSearchDragListener(searchContainer: View, favoriteHeader: View) {
         var startY = 0f
         var startHeight = 0

@@ -4,23 +4,43 @@ import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
-import com.example.kh_studyprojects_weatherapp.presentation.weather.adapter.FavoriteLocationAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmFavoriteLocationAdapter
 import android.widget.Toast
 
-class SideMenuFavoriteManager(
+/**
+ * 사이드메뉴 즐겨찾기 기능을 관리하는 Manager 클래스
+ * 
+ * 즐겨찾기 지역의 RecyclerView 설정, 클릭/삭제 처리, 편집 모드 등을 담당합니다.
+ * 사용자가 등록한 즐겨찾기 지역을 효율적으로 관리하고 표시합니다.
+ * 
+ * @author 김효동
+ * @since 2025.08.26
+ * @version 1.0
+ */
+class SmFavoriteManager(
     private val context: Context,
     private val binding: ActivityMainBinding,
-    private val adapter: FavoriteLocationAdapter
+    private val adapter: SmFavoriteLocationAdapter
 ) {
+    /**
+     * 즐겨찾기 지역 RecyclerView를 설정합니다.
+     * LinearLayoutManager와 어댑터를 연결하여 즐겨찾기 목록을 표시합니다.
+     */
     fun setupFavoriteLocationsRecyclerView() {
         val recyclerView = binding.sideMenuContent.rvFavoriteLocations
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = this@SideMenuFavoriteManager.adapter
+            adapter = this@SmFavoriteManager.adapter
         }
     }
 
+    /**
+     * 즐겨찾기 지역 클릭을 처리합니다.
+     * 해당 지역의 날씨 정보를 가져와서 표시하는 기능을 담당합니다.
+     * 
+     * @param location 클릭된 즐겨찾기 지역 정보
+     */
     fun handleFavoriteLocationClick(location: FavoriteLocation) {
         // TODO: 해당 지역의 날씨 정보를 가져와서 표시
         // 현재는 Toast 메시지로 표시

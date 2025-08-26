@@ -12,7 +12,7 @@ import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecast
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
-import com.example.kh_studyprojects_weatherapp.presentation.common.utils.CommonUtil
+import com.example.kh_studyprojects_weatherapp.presentation.common.utils.ComUtil
 import java.util.*
 
 // RecyclerView 어댑터 클래스
@@ -125,7 +125,7 @@ class WeatherHourlyForecastAdapter(
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
-                tvHour.text = CommonUtil.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
+                tvHour.text = ComUtil.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
@@ -174,7 +174,7 @@ class WeatherHourlyForecastAdapter(
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
-                tvHour.text = CommonUtil.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
+                tvHour.text = ComUtil.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
