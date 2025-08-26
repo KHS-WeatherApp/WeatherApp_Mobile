@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu
+package com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu
 
 import android.content.Context
 import android.view.View
@@ -8,7 +8,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
-import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmSearchResultAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adapter.SmSearchResultAdapter
 import com.example.kh_studyprojects_weatherapp.data.api.ExternalApiRetrofitInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

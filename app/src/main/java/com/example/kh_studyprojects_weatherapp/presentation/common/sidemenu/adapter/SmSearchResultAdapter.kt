@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter
+package com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adapter
 
 import android.view.LayoutInflater
 import android.view.View

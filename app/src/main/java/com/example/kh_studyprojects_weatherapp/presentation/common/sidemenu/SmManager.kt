@@ -1,11 +1,11 @@
-package com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu
+package com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu
 
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
-import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmFavoriteLocationAdapter
-import com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu.adapter.SmSearchResultAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adapter.SmFavoriteLocationAdapter
+import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adapter.SmSearchResultAdapter
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import com.example.kh_studyprojects_weatherapp.presentation.weather.WeatherFragment

@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.presentation.common.sideMenu
+package com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu
 
 import android.view.View
 import android.view.ViewGroup
