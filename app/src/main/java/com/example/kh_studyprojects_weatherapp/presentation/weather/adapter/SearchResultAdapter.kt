@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.R
-import com.example.kh_studyprojects_weatherapp.data.api.kakao.KakaoDocument
+import com.example.kh_studyprojects_weatherapp.data.api.kakao.SearchDocument
 
 /**
  * 검색 결과 어댑터
@@ -22,10 +22,10 @@ import com.example.kh_studyprojects_weatherapp.data.api.kakao.KakaoDocument
  * - 2024.12.19: IndexOutOfBoundsException 방지를 위한 안전한 로딩 상태 관리
  */
 class SearchResultAdapter(
-    private val onItemClick: (KakaoDocument) -> Unit
+    private val onItemClick: (SearchDocument) -> Unit  // 타입만 변경
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var searchResults: MutableList<KakaoDocument> = mutableListOf()
+    private var searchResults: MutableList<SearchDocument> = mutableListOf()  // 타입만 변경
     private var isLoading = false
     
     companion object {
@@ -36,13 +36,13 @@ class SearchResultAdapter(
     /**
      * 검색 결과 업데이트
      */
-    fun updateSearchResults(results: List<KakaoDocument>) {
+    fun updateSearchResults(results: List<SearchDocument>) {  // 타입만 변경
         searchResults = results.toMutableList()
         isLoading = false
         notifyDataSetChanged()
     }
 
-    fun appendSearchResults(more: List<KakaoDocument>) {
+    fun appendSearchResults(more: List<SearchDocument>) {  // 타입만 변경
         val start = searchResults.size
         searchResults.addAll(more)
         isLoading = false
@@ -107,19 +107,19 @@ class SearchResultAdapter(
         private val tvFullAddress: TextView = itemView.findViewById(R.id.tvFullAddress)
         private val tvDetailAddress: TextView = itemView.findViewById(R.id.tvDetailAddress)
 
-        fun bind(document: KakaoDocument) {
+        fun bind(document: SearchDocument) {  // 타입만 변경
             // 전체 주소 설정
             tvFullAddress.text = document.addressName
 
-            // 상세 주소 설정
+            // 상세 주소 설정 (SearchDocument에 맞게 수정)
             val detailAddress = when {
                 document.address != null -> {
                     val address = document.address
-                    "${address.region3depthName} ${address.mainAddressNo}${if (address.subAddressNo.isNotEmpty()) "-${address.subAddressNo}" else ""}"
+                    "${address.region1depthName} ${address.region2depthName} ${address.region3depthName}"
                 }
                 document.roadAddress != null -> {
                     val roadAddress = document.roadAddress
-                    "${roadAddress.roadName} ${roadAddress.mainBuildingNo}${if (roadAddress.subBuildingNo.isNotEmpty()) "-${roadAddress.subBuildingNo}" else ""}"
+                    roadAddress.roadName
                 }
                 else -> ""
             }

@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.util
+package com.example.kh_studyprojects_weatherapp.presentation.common.utils
 
 /**
  * 공통 유틸리티 함수들을 모아놓은 클래스

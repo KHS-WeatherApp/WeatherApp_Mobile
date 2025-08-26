@@ -12,7 +12,7 @@ import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecast
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
-import com.example.kh_studyprojects_weatherapp.util.CommonUtil
+import com.example.kh_studyprojects_weatherapp.presentation.common.utils.CommonUtil
 import java.util.*
 
 // RecyclerView 어댑터 클래스

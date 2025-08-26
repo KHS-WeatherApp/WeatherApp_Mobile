@@ -54,8 +54,8 @@ class FavoriteLocationAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(location: FavoriteLocation) {
-            binding.tvLocationName.text = location.name
-            binding.tvLocationAddress.text = location.address
+            binding.tvLocationName.text = location.addressName
+            binding.tvLocationAddress.text = location.addressName
 
             // TODO: 실제 날씨 데이터를 가져와서 표시
             // 임시로 기본값 설정

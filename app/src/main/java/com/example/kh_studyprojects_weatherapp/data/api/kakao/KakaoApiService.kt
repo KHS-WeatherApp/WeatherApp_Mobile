@@ -30,13 +30,6 @@ interface KakaoApiService {
      * @return KakaoAddressResponse 카카오 API 응답 데이터
      * 
      * @example
-     * ```
-     * // 서울 시청 좌표 (위도: 37.5665, 경도: 126.9780)
-     * val response = kakaoApiService.getAddressFromCoordinates(
-     *     longitude = "126.9780",
-     *     latitude = "37.5665"
-     * )
-     * ```
      */
     @GET("v2/local/geo/coord2regioncode.json")
     suspend fun getAddressFromCoordinates(
@@ -44,7 +37,7 @@ interface KakaoApiService {
         @Query("output_coord") outputCoord: String = "WGS84",
         @Query("x") longitude: String,
         @Query("y") latitude: String
-    ): KakaoAddressResponse
+    ): CoordToAddressResponse
 
     /**
      * 주소로 좌표 변환 검색 (페이지네이션 지원)
@@ -57,5 +50,5 @@ interface KakaoApiService {
         @Query("query") query: String,
         @Query("page") page: Int = 1,
         @Query("size") size: Int = 30
-    ): KakaoSearchResponse
+    ): KeywordSearchResponse
 } 
