@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.databinding.ActivityMainBinding
 import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adapter.SmSearchResultAdapter
-import com.example.kh_studyprojects_weatherapp.data.api.ExternalApiRetrofitInstance
+import com.example.kh_studyprojects_weatherapp.data.api.ApiServiceProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -207,7 +207,7 @@ class SmSearchManager(
         searchJob = lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ExternalApiRetrofitInstance.kakaoApiService.searchByAddress(
+                    ApiServiceProvider.kakaoApiService.searchByAddress(
                         query = trimmedQuery,
                         page = 1,
                         size = 30
@@ -263,7 +263,7 @@ class SmSearchManager(
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ExternalApiRetrofitInstance.kakaoApiService.searchByAddress(
+                    ApiServiceProvider.kakaoApiService.searchByAddress(
                         query = currentSearchQuery,
                         page = currentSearchPage,
                         size = 30
