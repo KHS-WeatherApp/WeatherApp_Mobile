@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.presentation.location
+package com.example.kh_studyprojects_weatherapp.presentation.common.location
 
 /**
  *################################################################################
@@ -31,7 +31,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import com.example.kh_studyprojects_weatherapp.data.api.ExternalApiRetrofitInstance
+import com.example.kh_studyprojects_weatherapp.data.api.ApiServiceProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -51,7 +51,7 @@ class LocationManager @Inject constructor(
     private val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     
     /** 카카오 로컬 API 서비스 */
-    private val kakaoApiService = ExternalApiRetrofitInstance.kakaoApiService
+    private val kakaoApiService = ApiServiceProvider.kakaoApiService
 
     /**
      * 위치 정보를 담는 데이터 클래스
@@ -125,8 +125,19 @@ class LocationManager @Inject constructor(
      */
     private suspend fun getLastLocation(): Location? = suspendCancellableCoroutine { continuation ->
         try {
+            // 권한 체크 추가
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.w("LocationManager", "위치 권한이 없습니다.")
+                continuation.resume(null)
+                return@suspendCancellableCoroutine
+            }
+            
             val cancellationToken = CancellationTokenSource()
-            val addOnFailureListener = fusedLocationClient.getCurrentLocation(
+            fusedLocationClient.getCurrentLocation(
                 Priority.PRIORITY_HIGH_ACCURACY,
                 cancellationToken.token
             ).addOnSuccessListener { location ->
