@@ -131,9 +131,6 @@ class MainActivity : AppCompatActivity() {
                 sideMenuManager.handleFavoriteLocationDelete(location)
             }
         )
-
-
-
         // 위치 권한 확인 및 요청
         checkLocationPermission()
     }
@@ -203,30 +200,6 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * 사이드 메뉴 열기
