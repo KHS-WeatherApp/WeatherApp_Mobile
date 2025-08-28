@@ -23,6 +23,7 @@ import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.SmMa
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.sidemenu.SmFavoriteLocationRepository
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import android.util.Log
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -165,7 +166,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupSideMenu() {
-        // 어댑터들 생성 (임시 콜백으로)
+        // 어댑터들 생성
         val favoriteLocationAdapter = SmFavoriteLocationAdapter(
             onLocationClick = { location ->
                 // SmManager가 초기화된 후에 실제 콜백으로 교체
@@ -174,7 +175,7 @@ class MainActivity : AppCompatActivity() {
                 // SmManager가 초기화된 후에 실제 콜백으로 교체
             }
         )
-        
+
         val searchResultAdapter = SmSearchResultAdapter()
         
         // 사이드 메뉴 매니저 초기화
@@ -193,20 +194,46 @@ class MainActivity : AppCompatActivity() {
         sideMenuManager.setupSideMenu()
         
         // SmManager 초기화 후 어댑터 콜백을 실제 구현으로 교체
-        val updatedFavoriteLocationAdapter = SmFavoriteLocationAdapter(
-            onLocationClick = { location ->
-                sideMenuManager.handleFavoriteLocationClick(location)
-            },
-            onDeleteClick = { location ->
-                sideMenuManager.handleFavoriteLocationDelete(location)
-            }
-        )
+        favoriteLocationAdapter.updateOnLocationClick { location ->
+            sideMenuManager.handleFavoriteLocationClick(location)
+        }
         
-        // RecyclerView에 새로운 어댑터 설정
-        binding.sideMenuContent.rvFavoriteLocations.adapter = updatedFavoriteLocationAdapter
+        favoriteLocationAdapter.updateOnDeleteClick { location ->
+            sideMenuManager.handleFavoriteLocationDelete(location)
+        }
+        
+        // 사이드메뉴 열림/닫힘 리스너 설정
+        setupDrawerListener()
         
         // 위치 권한 확인 및 요청
         checkLocationPermission()
+        
+        // 최종 어댑터 상태 확인
+        Log.d("MainActivity", "최종 어댑터 상태 - 아이템 개수: ${favoriteLocationAdapter.itemCount}")
+    }
+
+    /**
+     * 사이드메뉴 열림/닫힘 리스너를 설정합니다.
+     */
+    private fun setupDrawerListener() {
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                // 슬라이드 중일 때는 아무것도 하지 않음
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                // 사이드메뉴가 열렸을 때 즐겨찾기 목록 새로고침
+                sideMenuManager.onSideMenuOpened()
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                // 사이드메뉴가 닫혔을 때는 아무것도 하지 않음
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                // 상태 변경 시에는 아무것도 하지 않음
+            }
+        })
     }
 
     override fun onDestroy() {

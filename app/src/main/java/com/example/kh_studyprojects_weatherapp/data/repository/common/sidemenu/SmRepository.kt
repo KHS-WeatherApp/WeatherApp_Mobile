@@ -30,7 +30,23 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
             Log.d("SmRepository", "즐겨찾기 지역 목록 조회 시작: deviceId=$deviceId")
             
             val response = apiService.getFavoriteLocations(deviceId)
-            val locations = response.body()?.map { dto ->
+
+            if (!response.isSuccessful) {
+                Log.e("SmRepository", "API 호출 실패: ${response.code()} - ${response.message()}")
+                val errorBody = response.errorBody()?.string()
+                Log.e("SmRepository", "에러 응답 본문: $errorBody")
+                return null
+            }
+            
+            val responseBody = response.body()
+            Log.d("SmRepository", "응답 본문: $responseBody")
+            
+            if (responseBody == null) {
+                Log.w("SmRepository", "응답 본문이 null")
+                return null
+            }
+            
+            val locations = responseBody.map { dto ->
                 FavoriteLocation(
                     deviceId = dto.deviceId,
                     latitude = dto.latitude,
@@ -41,9 +57,12 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
                     region3depthName = dto.region3DepthName ?: "",
                     sortOrder = dto.sortOrder
                 )
-            } ?: emptyList()
+            }
             
             Log.d("SmRepository", "즐겨찾기 지역 목록 조회 성공: ${locations.size}개")
+            locations.forEach { location ->
+                Log.d("SmRepository", "위치: ${location.addressName} (${location.latitude}, ${location.longitude})")
+            }
             locations
             
         } catch (e: HttpException) {
@@ -55,7 +74,8 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
             Log.e("SmRepository", "네트워크 오류", e)
             null
         } catch (e: Exception) {
-            Log.e("SmRepository", "기타 오류", e)
+            Log.e("SmRepository", "기타 오류: ${e.message}", e)
+            Log.e("SmRepository", "오류 스택 트레이스", e)
             null
         }
     }

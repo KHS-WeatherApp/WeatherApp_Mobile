@@ -17,8 +17,8 @@ import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLoc
  * @version 1.0
  */
 class SmFavoriteLocationAdapter(
-    private val onLocationClick: (FavoriteLocation) -> Unit,
-    private val onDeleteClick: (FavoriteLocation) -> Unit = {}
+    private var onLocationClick: (FavoriteLocation) -> Unit,
+    private var onDeleteClick: (FavoriteLocation) -> Unit = {}
 ) : RecyclerView.Adapter<SmFavoriteLocationAdapter.FavoriteLocationViewHolder>() {
 
     private var locations: List<FavoriteLocation> = emptyList()
@@ -50,6 +50,20 @@ class SmFavoriteLocationAdapter(
      */
     fun getCurrentLocations(): List<FavoriteLocation> {
         return locations
+    }
+
+    /**
+     * 위치 클릭 콜백을 업데이트합니다.
+     */
+    fun updateOnLocationClick(callback: (FavoriteLocation) -> Unit) {
+        onLocationClick = callback
+    }
+
+    /**
+     * 삭제 클릭 콜백을 업데이트합니다.
+     */
+    fun updateOnDeleteClick(callback: (FavoriteLocation) -> Unit) {
+        onDeleteClick = callback
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteLocationViewHolder {

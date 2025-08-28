@@ -107,8 +107,16 @@ class SmManager(
             handleSearchResultClick(document)
         }
 
-        // 초기 즐겨찾기 목록 로드
-        refreshFavoriteLocations()
+        Log.d("SmManager", "사이드메뉴 기본 설정 완료")
+        
+        // 초기 즐겨찾기 목록 로드는 별도로 처리
+        lifecycleScope.launch {
+            delay(500) // 기본 설정 완료 후 0.5초 대기
+            Log.d("SmManager", "초기 즐겨찾기 목록 로드 시작")
+            refreshFavoriteLocations()
+        }
+        
+        Log.d("SmManager", "사이드메뉴 설정 완료")
     }
 
     // ==================== 즐겨찾기 관리 ====================
@@ -192,15 +200,47 @@ class SmManager(
     /**
      * 즐겨찾기 목록을 새로고침합니다.
      */
-    private fun refreshFavoriteLocations() {
+    fun refreshFavoriteLocations() {
         lifecycleScope.launch {
             try {
-                val locations = favoriteLocationRepository.getFavoriteLocations(getDeviceId())
-                locations?.let { locationList ->
-                    favoriteLocationAdapter.updateLocations(locationList)
+                Log.d("SmManager", "즐겨찾기 목록 새로고침 시작")
+                val deviceId = getDeviceId()
+                Log.d("SmManager", "디바이스 ID: $deviceId")
+                
+                // 어댑터 참조 확인
+                val recyclerView = binding.sideMenuContent.rvFavoriteLocations
+                Log.d("SmManager", "RecyclerView 어댑터 해시코드: ${recyclerView.adapter?.hashCode()}")
+                Log.d("SmManager", "SmManager 어댑터 해시코드: ${favoriteLocationAdapter.hashCode()}")
+                Log.d("SmManager", "어댑터 참조 일치 여부: ${recyclerView.adapter === favoriteLocationAdapter}")
+                
+                Log.d("SmManager", "Repository 호출 시작")
+                val locations = favoriteLocationRepository.getFavoriteLocations(deviceId)
+                Log.d("SmManager", "Repository 호출 완료")
+                Log.d("SmManager", "즐겨찾기 목록 조회 결과: ${locations?.size ?: 0}개")
+                
+                if (locations != null) {
+                    if (locations.isNotEmpty()) {
+                        Log.d("SmManager", "즐겨찾기 목록 업데이트: ${locations.map { it.addressName }}")
+                        favoriteLocationAdapter.updateLocations(locations)
+                        
+                        // 업데이트 후 어댑터 상태 확인 (UI 스레드에서 실행)
+                        withContext(Dispatchers.Main) {
+                            delay(100) // 어댑터 업데이트 완료 대기
+                            Log.d("SmManager", "업데이트 후 어댑터 아이템 개수: ${favoriteLocationAdapter.itemCount}")
+                            Log.d("SmManager", "업데이트 후 RecyclerView 어댑터 아이템 개수: ${recyclerView.adapter?.itemCount}")
+                        }
+                    } else {
+                        Log.d("SmManager", "즐겨찾기 목록이 비어있음")
+                        favoriteLocationAdapter.updateLocations(emptyList())
+                    }
+                } else {
+                    Log.w("SmManager", "즐겨찾기 목록이 null - 빈 리스트로 설정")
+                    favoriteLocationAdapter.updateLocations(emptyList())
                 }
             } catch (e: Exception) {
                 Log.e("SmManager", "즐겨찾기 목록 새로고침 실패", e)
+                Log.e("SmManager", "오류 스택 트레이스", e)
+                favoriteLocationAdapter.updateLocations(emptyList())
             }
         }
     }
@@ -900,12 +940,10 @@ class SmManager(
     }
 
     /**
-     * 즐겨찾기 어댑터를 업데이트합니다.
-     * 
-     * @param newAdapter 새로운 어댑터
+     * 사이드메뉴가 열릴 때 호출되어 즐겨찾기 목록을 새로고침합니다.
      */
-    fun updateFavoriteLocationAdapter(newAdapter: SmFavoriteLocationAdapter) {
-        // RecyclerView에 새로운 어댑터 설정
-        binding.sideMenuContent.rvFavoriteLocations.adapter = newAdapter
+    fun onSideMenuOpened() {
+        Log.d("SmManager", "사이드메뉴 열림 - 즐겨찾기 목록 새로고침")
+        refreshFavoriteLocations()
     }
 }
