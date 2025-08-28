@@ -18,10 +18,13 @@ import com.example.kh_studyprojects_weatherapp.presentation.weather.WeatherViewM
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.cancel
 
 /**
  * 날씨 메인 프래그먼트
@@ -40,6 +43,8 @@ class WeatherFragment : Fragment() {
 
     private val viewModel: WeatherViewModel by viewModels()
 
+    private lateinit var loadingOverlay: View
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -49,6 +54,9 @@ class WeatherFragment : Fragment() {
 
         // include된 네비게이션 바인딩
         _navigationBinding = LayoutNavigationBottomBinding.bind(binding.includedNavigationBottom.root)
+
+        // 로딩 오버레이 뷰 참조
+        loadingOverlay = binding.root.findViewById(R.id.loadingOverlay)
 
         setupNavigation()
         setupChildFragments(savedInstanceState)
@@ -64,11 +72,59 @@ class WeatherFragment : Fragment() {
             refreshWeatherData()
         }
 
+        // 초기 진입 로딩 오버레이 표시
+        loadingOverlay.visibility = View.VISIBLE
+
         // ViewModel의 갱신 상태 관찰
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.isRefreshing.collect { isRefreshing ->
                 binding.swipeRefreshLayout.isRefreshing = isRefreshing
             }
+        }
+
+        // 초기 데이터 로드 트리거
+        viewLifecycleOwner.lifecycleScope.launch {
+            refreshWeatherData()
+        }
+
+        // 모든 섹션 데이터가 준비되면 로딩 오버레이 숨김
+        observeInitialLoadingCompletion()
+    }
+
+    private fun observeInitialLoadingCompletion() {
+        // 자식 프래그먼트들이 트랜잭션을 마치도록 보장
+        childFragmentManager.executePendingTransactions()
+
+        val current = childFragmentManager
+            .findFragmentById(R.id.weather_current_container) as? CurrentWeatherFragment
+        val daily = childFragmentManager
+            .findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment
+        val hourly = childFragmentManager
+            .findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment
+
+        if (current == null || daily == null || hourly == null) {
+            // 프래그먼트가 아직 준비되지 않은 경우 조금 후 다시 시도
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(100)
+                observeInitialLoadingCompletion()
+            }
+            return
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // 각 뷰모델의 데이터 준비 여부를 Boolean Flow로 변환
+            val currentReady = current.viewModelInstance.weatherState.map { it.isNotEmpty() }
+            val dailyReady = daily.viewModelInstance.weatherItems.map { it.isNotEmpty() }
+            val hourlyReady = hourly.viewModelInstance.hourlyForecastItems.map { it.isNotEmpty() }
+
+            combine(currentReady, dailyReady, hourlyReady) { c, d, h -> c && d && h }
+                .collect { allReady ->
+                    if (allReady) {
+                        loadingOverlay.visibility = View.GONE
+                        // 관찰 종료를 위해 this coroutine 취소
+                        this.cancel()
+                    }
+                }
         }
     }
 
