@@ -3,7 +3,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.weather.daily
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
-import com.example.kh_studyprojects_weatherapp.presentation.location.LocationManager
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
 
 class WeatherDailyViewModelFactory(
     private val weatherRepository: WeatherRepository,

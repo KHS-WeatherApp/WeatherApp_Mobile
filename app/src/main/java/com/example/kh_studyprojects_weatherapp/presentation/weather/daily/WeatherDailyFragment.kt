@@ -10,12 +10,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.kh_studyprojects_weatherapp.data.repository.weather.WeatherRepositoryImpl
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherDailyIncludeBinding
-import com.example.kh_studyprojects_weatherapp.presentation.location.LocationManager
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.catch  // 이 import 추가
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 

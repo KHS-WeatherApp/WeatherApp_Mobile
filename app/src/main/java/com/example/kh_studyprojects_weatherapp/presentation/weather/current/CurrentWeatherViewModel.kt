@@ -3,7 +3,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.weather.current
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
-import com.example.kh_studyprojects_weatherapp.presentation.location.LocationManager
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
