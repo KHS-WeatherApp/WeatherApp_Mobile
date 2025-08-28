@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.activity)              // 액티비티 관련 기능
     implementation(libs.androidx.constraintlayout)      // 제약 레이아웃
     implementation(libs.material)                       // 머티리얼 디자인 컴포넌트
+    implementation(libs.androidx.recyclerview)
 
     // 네비게이션 컴포넌트
     implementation(libs.androidx.navigation.fragment.ktx)  // 네비게이션 프래그먼트 기능
