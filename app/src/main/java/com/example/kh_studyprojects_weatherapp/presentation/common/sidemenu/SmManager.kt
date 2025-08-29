@@ -35,6 +35,7 @@ import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.A
 import com.example.kh_studyprojects_weatherapp.data.api.ApiServiceProvider
 import com.example.kh_studyprojects_weatherapp.data.api.kakao.SearchDocument
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.sidemenu.SmFavoriteLocationRepository
+import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.util.DeviceIdUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -71,7 +72,8 @@ class SmManager(
     private val searchResultAdapter: SmSearchResultAdapter,
     private val navController: NavController,
     private val activity: FragmentActivity,
-    private val favoriteLocationRepository: SmFavoriteLocationRepository
+    private val favoriteLocationRepository: SmFavoriteLocationRepository,
+    private val weatherRepository: WeatherRepository
 ) {
     // 검색 관련 변수
     private var searchJob: Job? = null
@@ -703,7 +705,7 @@ class SmManager(
     }
 
     /**
-     * 사이드 메뉴 닫힐 때 검색창 초기화
+     * 사이드 메뉴 닫힐 때 검색창 초기화 및 편집모드 초기화
      */
     private fun setupDrawerListener(searchContainer: View, favoriteHeader: View) {
         val drawerLayout = binding.drawerLayout
@@ -714,6 +716,8 @@ class SmManager(
             
             override fun onDrawerClosed(drawerView: View) {
                 resetSearchContainer(searchContainer, favoriteHeader)
+                // 편집모드 초기화
+                favoriteLocationAdapter.resetEditMode()
             }
         })
     }
