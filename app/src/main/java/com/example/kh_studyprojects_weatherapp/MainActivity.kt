@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Edge-to-edge 설정
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
 
         // 상태바와 네비게이션 바 설정
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
