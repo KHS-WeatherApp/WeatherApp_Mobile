@@ -2,10 +2,13 @@ package com.example.kh_studyprojects_weatherapp.data.repository.common.sidemenu
 
 import android.util.Log
 import com.example.kh_studyprojects_weatherapp.data.api.ApiServiceProvider
+import com.example.kh_studyprojects_weatherapp.data.api.common.ApiResponse
 import com.example.kh_studyprojects_weatherapp.data.api.sidemenu.SmFavoriteLocationRequest
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.sidemenu.SmFavoriteLocationRepository
 import retrofit2.HttpException
+import org.json.JSONObject
+import org.json.JSONException
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,26 +30,19 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
 
     override suspend fun getFavoriteLocations(deviceId: String): List<FavoriteLocation>? {
         return try {
-            Log.d("SmRepository", "즐겨찾기 지역 목록 조회 시작: deviceId=$deviceId")
-            
             val response = apiService.getFavoriteLocations(deviceId)
 
             if (!response.isSuccessful) {
-                Log.e("SmRepository", "API 호출 실패: ${response.code()} - ${response.message()}")
-                val errorBody = response.errorBody()?.string()
-                Log.e("SmRepository", "에러 응답 본문: $errorBody")
+                Log.e("SmRepository", "API 호출 실패: ${response.code()}")
                 return null
             }
             
             val responseBody = response.body()
-            Log.d("SmRepository", "응답 본문: $responseBody")
-            
             if (responseBody == null) {
-                Log.w("SmRepository", "응답 본문이 null")
                 return null
             }
             
-            val locations = responseBody.map { dto ->
+            val locations = responseBody.data?.map { dto ->
                 FavoriteLocation(
                     deviceId = dto.deviceId,
                     latitude = dto.latitude,
@@ -59,10 +55,6 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
                 )
             }
             
-            Log.d("SmRepository", "즐겨찾기 지역 목록 조회 성공: ${locations.size}개")
-            locations.forEach { location ->
-                Log.d("SmRepository", "위치: ${location.addressName} (${location.latitude}, ${location.longitude})")
-            }
             locations
             
         } catch (e: HttpException) {
@@ -80,10 +72,8 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
         }
     }
 
-    override suspend fun addFavoriteLocation(location: FavoriteLocation): Boolean {
+    override suspend fun addFavoriteLocation(location: FavoriteLocation): Pair<Boolean, String> {
         return try {
-            Log.d("SmRepository", "즐겨찾기 지역 추가 시작: ${location.addressName}")
-            
             val request = SmFavoriteLocationRequest(
                 addressName = location.addressName,
                 latitude = location.latitude,
@@ -96,44 +86,87 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
             )
             
             val response = apiService.addFavoriteLocation(request)
-            Log.d("SmRepository", "즐겨찾기 지역 추가 성공: addressName=${response.body()?.addressName}")
-            true
+            if (response.isSuccessful) {
+                val body = response.body()
+                // ApiResponse에서 message 추출
+                val message = body?.message ?: "${location.addressName}이(가) 즐겨찾기에 추가되었습니다"
+                Pair(true, message)
+            } else {
+                val errorBody = response.errorBody()?.string().orEmpty()
+                val msg = extractServerMessage(errorBody).ifBlank { response.message().orEmpty() }
+                Pair(false, if (msg.isNotBlank()) msg else "즐겨찾기 추가에 실패했습니다.")
+            }
             
         } catch (e: HttpException) {
             val code = e.code()
             val msg = e.response()?.errorBody()?.string().orEmpty()
-            Log.e("SmRepository", "HTTP 오류 $code: $msg", e)
-            false
+            Log.e("SmRepository", "HTTP 오류 $code", e)
+            
+            val parsed = extractServerMessage(msg)
+            Pair(false, if (parsed.isNotBlank()) parsed else "즐겨찾기 추가에 실패했습니다.")
         } catch (e: IOException) {
             Log.e("SmRepository", "네트워크 오류", e)
-            false
+            Pair(false, "네트워크 오류가 발생했습니다.")
         } catch (e: Exception) {
             Log.e("SmRepository", "기타 오류", e)
-            false
+            Pair(false, "즐겨찾기 추가 중 오류가 발생했습니다.")
         }
+    }
+
+    private fun extractServerMessage(errorBody: String): String {
+        if (errorBody.isBlank()) return ""
+        try {
+            val json = JSONObject(errorBody)
+            
+            val message = json.optString("message")
+            if (message.isNotBlank()) {
+                return message
+            }
+            
+            if (json.has("error")) {
+                val err = json.opt("error")
+                if (err is JSONObject) {
+                    val nested = json.optString("message")
+                    if (nested.isNotBlank()) return nested
+                }
+            }
+        } catch (e: JSONException) {
+            // JSON 파싱 실패 시 원본 텍스트 반환
+        }
+        return errorBody.trim()
     }
 
     override suspend fun deleteFavoriteLocation(
         latitude: Double,
         longitude: Double,
         deviceId: String
-    ): Boolean {
+    ): Pair<Boolean, String> {
         return try {
-            Log.d("SmRepository", "즐겨찾기 지역 삭제 시작: lat=$latitude, lng=$longitude, deviceId=$deviceId")
             val result = apiService.deleteFavoriteLocation(latitude, longitude, deviceId)
-            Log.d("SmRepository", "즐겨찾기 지역 삭제 결과: ${result.isSuccessful}")
-            result.isSuccessful
+            
+            if (result.isSuccessful) {
+                val body = result.body()
+                val message = body?.message ?: "즐겨찾기가 삭제되었습니다"
+                Pair(true, message)
+            } else {
+                val errorBody = result.errorBody()?.string().orEmpty()
+                val msg = extractServerMessage(errorBody).ifBlank { result.message().orEmpty() }
+                Pair(false, if (msg.isNotBlank()) msg else "즐겨찾기 삭제에 실패했습니다.")
+            }
+            
         } catch (e: HttpException) {
             val code = e.code()
             val msg = e.response()?.errorBody()?.string().orEmpty()
-            Log.e("SmRepository", "HTTP 오류 $code: $msg", e)
-            false
+            Log.e("SmRepository", "HTTP 오류 $code", e)
+            
+            val parsed = extractServerMessage(msg)
+            Pair(false, if (parsed.isNotBlank()) parsed else "즐겨찾기 삭제에 실패했습니다.")
         } catch (e: IOException) {
             Log.e("SmRepository", "네트워크 오류", e)
-            false
+            Pair(false, "네트워크 오류가 발생했습니다.")
         } catch (e: Exception) {
             Log.e("SmRepository", "기타 오류", e)
-            false
+            Pair(false, "즐겨찾기 삭제 중 오류가 발생했습니다.")
         }
     }
 
@@ -142,23 +175,33 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
         longitude: Double,
         deviceId: String,
         sortOrder: Int
-    ): Boolean {
+    ): Pair<Boolean, String> {
         return try {
-            Log.d("SmRepository", "정렬 순서 업데이트 시작: lat=$latitude, lng=$longitude, deviceId=$deviceId, sortOrder=$sortOrder")
             val response = apiService.updateFavoriteLocationSortOrder(latitude, longitude, deviceId, sortOrder)
-            Log.d("SmRepository", "정렬 순서 업데이트 성공: ${response.isSuccessful}")
-            response.isSuccessful
+            
+            if (response.isSuccessful) {
+                val body = response.body()
+                val message = body?.message ?: "정렬 순서가 변경되었습니다"
+                Pair(true, message)
+            } else {
+                val errorBody = response.errorBody()?.string().orEmpty()
+                val msg = extractServerMessage(errorBody).ifBlank { response.message().orEmpty() }
+                Pair(false, if (msg.isNotBlank()) msg else "정렬 순서 변경에 실패했습니다.")
+            }
+            
         } catch (e: HttpException) {
             val code = e.code()
             val msg = e.response()?.errorBody()?.string().orEmpty()
-            Log.e("SmRepository", "HTTP 오류 $code: $msg", e)
-            false
+            Log.e("SmRepository", "HTTP 오류 $code", e)
+            
+            val parsed = extractServerMessage(msg)
+            Pair(false, if (parsed.isNotBlank()) parsed else "정렬 순서 변경에 실패했습니다.")
         } catch (e: IOException) {
             Log.e("SmRepository", "네트워크 오류", e)
-            false
+            Pair(false, "네트워크 오류가 발생했습니다.")
         } catch (e: Exception) {
             Log.e("SmRepository", "기타 오류", e)
-            false
+            Pair(false, "정렬 순서 변경 중 오류가 발생했습니다.")
         }
     }
 }
