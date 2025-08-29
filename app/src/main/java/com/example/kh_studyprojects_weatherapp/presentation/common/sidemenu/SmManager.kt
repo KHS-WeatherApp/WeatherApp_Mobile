@@ -287,6 +287,7 @@ class SmManager(
                     region1depthName = document.address?.region1depthName ?: "",
                     region2depthName = document.address?.region2depthName ?: "",
                     region3depthName = document.address?.region3depthName ?: "",
+                    region3depthHName = document.address?.region3depthHName ?: "",
                     sortOrder = 0
                 )
 

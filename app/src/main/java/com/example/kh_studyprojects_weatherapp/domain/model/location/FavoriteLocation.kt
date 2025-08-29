@@ -34,6 +34,9 @@ data class FavoriteLocation(
     /** 동/읍/면 (3depth 주소) */
     val region3depthName: String? = null,
     
+    /** 동/읍/면 한글명 (3depth 한글 주소) */
+    val region3depthHName: String? = null,
+    
     /** 사용자 정렬순서 */
     val sortOrder: Int = 0
 ) 

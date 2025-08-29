@@ -48,9 +48,10 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
                     latitude = dto.latitude,
                     longitude = dto.longitude,
                     addressName = dto.addressName,
-                    region1depthName = dto.region1DepthName ?: "",
-                    region2depthName = dto.region2DepthName ?: "",
-                    region3depthName = dto.region3DepthName ?: "",
+                    region1depthName = dto.region1DepthName?.takeIf { it.isNotBlank() },
+                    region2depthName = dto.region2DepthName?.takeIf { it.isNotBlank() },
+                    region3depthName = dto.region3DepthName?.takeIf { it.isNotBlank() },
+                    region3depthHName = dto.region3DepthHName?.takeIf { it.isNotBlank() },
                     sortOrder = dto.sortOrder
                 )
             }
@@ -74,16 +75,17 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
 
     override suspend fun addFavoriteLocation(location: FavoriteLocation): Pair<Boolean, String> {
         return try {
-            val request = SmFavoriteLocationRequest(
-                addressName = location.addressName,
-                latitude = location.latitude,
-                longitude = location.longitude,
-                region1DepthName = location.region1depthName ?: "",
-                region2DepthName = location.region2depthName ?: "",
-                region3DepthName = location.region3depthName ?: "",
-                deviceId = location.deviceId,
-                sortOrder = location.sortOrder
-            )
+                    val request = SmFavoriteLocationRequest(
+            addressName = location.addressName,
+            latitude = location.latitude,
+            longitude = location.longitude,
+            region1DepthName = location.region1depthName ?: "",
+            region2DepthName = location.region2depthName ?: "",
+            region3DepthName = location.region3depthName ?: "",
+            region3DepthHName = location.region3depthHName ?: "",
+            deviceId = location.deviceId,
+            sortOrder = location.sortOrder
+        )
             
             val response = apiService.addFavoriteLocation(request)
             if (response.isSuccessful) {

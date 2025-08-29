@@ -94,7 +94,15 @@ class SmFavoriteLocationAdapter(
          * @param location 바인딩할 즐겨찾기 지역 정보
          */
         fun bind(location: FavoriteLocation) {
-            binding.tvLocationName.text = location.addressName
+            // tvLocationName: 동/읍/면 한글명 → 동/읍/면 → 구/군 → 시/도 순으로 우선 표시
+            val displayName =
+                location.region3depthHName?.takeIf { it.isNotBlank() }
+                ?: location.region3depthName?.takeIf { it.isNotBlank() }
+                ?: location.region2depthName?.takeIf { it.isNotBlank() } 
+                ?: location.region1depthName?.takeIf { it.isNotBlank() }
+            binding.tvLocationName.text = displayName
+            
+            // tvLocationAddress: 전체 주소 그대로 표시
             binding.tvLocationAddress.text = location.addressName
 
             // TODO: 실제 날씨 데이터를 가져와서 표시
