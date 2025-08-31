@@ -5,6 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.databinding.ItemFavoriteLocationBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
+import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * 사이드메뉴 즐겨찾기 지역 어댑터
@@ -18,7 +23,8 @@ import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLoc
  */
 class SmFavoriteLocationAdapter(
     private var onLocationClick: (FavoriteLocation) -> Unit,
-    private var onDeleteClick: (FavoriteLocation) -> Unit = {}
+    private var onDeleteClick: (FavoriteLocation) -> Unit = {},
+    private var weatherRepository: WeatherRepository? = null
 ) : RecyclerView.Adapter<SmFavoriteLocationAdapter.FavoriteLocationViewHolder>() {
 
     private var locations: List<FavoriteLocation> = emptyList()
@@ -44,6 +50,61 @@ class SmFavoriteLocationAdapter(
     }
     
     /**
+     * 편집 모드를 초기화합니다.
+     * 편집 모드를 비활성화하고 일반 모드로 돌아갑니다.
+     */
+    fun resetEditMode() {
+        if (isEditMode) {
+            isEditMode = false
+            notifyDataSetChanged()
+        }
+    }
+    
+    /**
+     * 날씨 데이터를 로딩합니다.
+     * 
+     * @param location 날씨 데이터를 가져올 위치 정보
+     * @param binding ViewHolder의 바인딩 객체
+     */
+    private fun loadWeatherData(location: FavoriteLocation, binding: ItemFavoriteLocationBinding) {
+        weatherRepository?.let { repo ->
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val result = repo.getWeatherInfo(location.latitude, location.longitude)
+                    result.onSuccess { weatherData ->
+                        withContext(Dispatchers.Main) {
+                            // 온도 데이터 추출 및 표시
+                            val current = weatherData["current"] as? Map<*, *>
+                            val temperature = current?.get("temperature_2m") as? Double
+                            if (temperature != null) {
+                                binding.tvTemperature.text = "${temperature.toInt()}°"
+                            } else {
+                                binding.tvTemperature.text = "N/A"
+                            }
+                            
+                            // 날씨 아이콘 설정 (기본값)
+                            binding.ivWeatherIcon.setImageResource(
+                                com.example.kh_studyprojects_weatherapp.R.drawable.weather_icon_sun
+                            )
+                        }
+                    }.onFailure { exception ->
+                        withContext(Dispatchers.Main) {
+                            binding.tvTemperature.text = "오류"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        binding.tvTemperature.text = "오류"
+                    }
+                }
+            }
+        } ?: run {
+            // WeatherRepository가 없으면 기본값 표시
+            binding.tvTemperature.text = "N/A"
+        }
+    }
+    
+    /**
      * 현재 즐겨찾기 목록을 반환합니다.
      * 
      * @return 현재 즐겨찾기 지역 목록
@@ -64,6 +125,13 @@ class SmFavoriteLocationAdapter(
      */
     fun updateOnDeleteClick(callback: (FavoriteLocation) -> Unit) {
         onDeleteClick = callback
+    }
+    
+    /**
+     * WeatherRepository를 설정합니다.
+     */
+    fun setWeatherRepository(repository: WeatherRepository) {
+        weatherRepository = repository
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoriteLocationViewHolder {
@@ -94,13 +162,19 @@ class SmFavoriteLocationAdapter(
          * @param location 바인딩할 즐겨찾기 지역 정보
          */
         fun bind(location: FavoriteLocation) {
-            binding.tvLocationName.text = location.addressName
+            // tvLocationName: 동/읍/면 한글명 → 동/읍/면 → 구/군 → 시/도 순으로 우선 표시
+            val displayName =
+                location.region3depthHName?.takeIf { it.isNotBlank() }
+                ?: location.region3depthName?.takeIf { it.isNotBlank() }
+                ?: location.region2depthName?.takeIf { it.isNotBlank() } 
+                ?: location.region1depthName?.takeIf { it.isNotBlank() }
+            binding.tvLocationName.text = displayName
+            
+            // tvLocationAddress: 전체 주소 그대로 표시
             binding.tvLocationAddress.text = location.addressName
 
-            // TODO: 실제 날씨 데이터를 가져와서 표시
-            // 임시로 기본값 설정
-            binding.ivWeatherIcon.setImageResource(com.example.kh_studyprojects_weatherapp.R.drawable.weather_icon_sun)
-            binding.tvTemperature.text = "25°"
+            // 날씨 데이터 로딩 시작
+            loadWeatherData(location, binding)
 
             // 편집 모드에 따른 UI 변경
             if (isEditMode) {

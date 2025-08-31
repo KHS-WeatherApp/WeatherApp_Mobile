@@ -21,6 +21,7 @@ import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adap
 import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adapter.SmSearchResultAdapter
 import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.SmManager
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.sidemenu.SmFavoriteLocationRepository
+import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import android.util.Log
@@ -42,6 +43,9 @@ class MainActivity : AppCompatActivity() {
     
     @Inject
     lateinit var favoriteLocationRepository: SmFavoriteLocationRepository
+    
+    @Inject
+    lateinit var weatherRepository: WeatherRepository
 
     /**
      * 위치 권한 요청을 위한 런처
@@ -69,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Edge-to-edge 설정
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, true) // true 안겹침 , false 시스템바 겹침
 
         // 상태바와 네비게이션 바 설정
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
@@ -175,6 +179,9 @@ class MainActivity : AppCompatActivity() {
                 // SmManager가 초기화된 후에 실제 콜백으로 교체
             }
         )
+        
+        // WeatherRepository 설정
+        favoriteLocationAdapter.setWeatherRepository(weatherRepository)
 
         val searchResultAdapter = SmSearchResultAdapter()
         
@@ -187,7 +194,8 @@ class MainActivity : AppCompatActivity() {
             searchResultAdapter = searchResultAdapter,
             navController = navController,
             activity = this,
-            favoriteLocationRepository = favoriteLocationRepository
+            favoriteLocationRepository = favoriteLocationRepository,
+            weatherRepository = weatherRepository
         )
 
         // 사이드 메뉴 설정

@@ -35,6 +35,7 @@ import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.A
 import com.example.kh_studyprojects_weatherapp.data.api.ApiServiceProvider
 import com.example.kh_studyprojects_weatherapp.data.api.kakao.SearchDocument
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.sidemenu.SmFavoriteLocationRepository
+import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.util.DeviceIdUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -71,7 +72,8 @@ class SmManager(
     private val searchResultAdapter: SmSearchResultAdapter,
     private val navController: NavController,
     private val activity: FragmentActivity,
-    private val favoriteLocationRepository: SmFavoriteLocationRepository
+    private val favoriteLocationRepository: SmFavoriteLocationRepository,
+    private val weatherRepository: WeatherRepository
 ) {
     // 검색 관련 변수
     private var searchJob: Job? = null
@@ -136,11 +138,7 @@ class SmManager(
      * 즐겨찾기 지역 클릭을 처리합니다.
      */
     fun handleFavoriteLocationClick(location: FavoriteLocation) {
-        Toast.makeText(
-            context,
-            "${location.addressName}의 날씨 정보를 가져옵니다.",
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast.makeText(context, "${location.addressName}의 날씨 정보를 가져옵니다.", Toast.LENGTH_SHORT).show()
         // TODO: 해당 지역의 날씨 정보를 가져와서 표시
     }
 
@@ -150,37 +148,29 @@ class SmManager(
     fun handleFavoriteLocationDelete(location: FavoriteLocation) {
         lifecycleScope.launch {
             try {
-                val isSuccess = favoriteLocationRepository.deleteFavoriteLocation(
+                val result = favoriteLocationRepository.deleteFavoriteLocation(
                     latitude = location.latitude,
                     longitude = location.longitude,
                     deviceId = location.deviceId
                 )
                 
+                val isSuccess = result.first
+                val message = result.second
+                
                 if (isSuccess) {
-                    Toast.makeText(
-                        context,
-                        "${location.addressName}이(가) 삭제되었습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     
                     // 현재 리스트에서 해당 지역 제거
                     val currentLocations = favoriteLocationAdapter.getCurrentLocations().toMutableList()
                     currentLocations.remove(location)
                     favoriteLocationAdapter.updateLocations(currentLocations)
                 } else {
-                    Toast.makeText(
-                        context,
-                        "삭제에 실패했습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Log.e("SmManager", "즐겨찾기 삭제 실패", e)
-                Toast.makeText(
-                    context,
-                    "삭제 중 오류가 발생했습니다.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val errorMessage = e.message ?: "삭제 중 오류가 발생했습니다."
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -189,11 +179,7 @@ class SmManager(
      * 편집 모드를 토글합니다.
      */
     fun handleEditFavoriteClick() {
-        Toast.makeText(
-            context,
-            "편집 모드가 활성화되었습니다.",
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast.makeText(context, "편집 모드가 활성화되었습니다.", Toast.LENGTH_SHORT).show()
         favoriteLocationAdapter.toggleEditMode()
     }
 
@@ -303,46 +289,26 @@ class SmManager(
                     region1depthName = document.address?.region1depthName ?: "",
                     region2depthName = document.address?.region2depthName ?: "",
                     region3depthName = document.address?.region3depthName ?: "",
+                    region3depthHName = document.address?.region3depthHName ?: "",
                     sortOrder = 0
                 )
 
-                // 즐겨찾기에 추가
-                val isSuccess = favoriteLocationRepository.addFavoriteLocation(favoriteLocation)
+                // 즐겨찾기에 추가 (서버에서 중복 체크 수행)
+                val result = favoriteLocationRepository.addFavoriteLocation(favoriteLocation)
+                val isSuccess = result.first
+                val message = result.second
                 
                 if (isSuccess) {
-                    Toast.makeText(
-                        context,
-                        "${document.addressName}이(가) 즐겨찾기에 추가되었습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    
-                    // 검색 결과 숨기기
-                    // binding.sideMenuContent.llSearchResultsContainer.visibility = View.GONE
-
-                    // 검색창 초기화
-                    // binding.sideMenuContent.etSearchLocation.text.clear()
-                    // binding.sideMenuContent.etSearchLocation.clearFocus()
-                    
-                    // 즐겨찾기 목록 새로고침
-                    refreshFavoriteLocations()
-                    
-                    // 사이드메뉴는 닫지 않음 (사용자가 직접 닫도록)
-                    
+                    Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
+                    refreshFavoriteLocations() // 즐겨찾기 목록 새로고침
                 } else {
-                    Toast.makeText(
-                        context,
-                        "즐겨찾기 추가에 실패했습니다.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
                 }
                 
             } catch (e: Exception) {
                 Log.e("SmManager", "즐겨찾기 추가 실패", e)
-                Toast.makeText(
-                    context,
-                    "즐겨찾기 추가 중 오류가 발생했습니다.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val errorMessage = e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다."
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -395,11 +361,8 @@ class SmManager(
             return@setOnEditorActionListener false
         }
 
-        // 검색창 드래그 리스너 설정
-        setupSearchDragListener(searchContainer, favoriteHeader)
-
-        // 사이드 메뉴 닫힐 때 검색창 초기화
-        setupDrawerListener(searchContainer, favoriteHeader)
+        setupSearchDragListener(searchContainer, favoriteHeader) // 검색창 드래그 리스너 설정
+        setupDrawerListener(searchContainer, favoriteHeader)    // 사이드 메뉴 닫힐 때 검색창 초기화
     }
 
     /**
@@ -452,15 +415,18 @@ class SmManager(
                 val msg = e.response()?.errorBody()?.string().orEmpty()
                 Log.e("KakaoAddressSearch", "HTTP $code: $msg", e)
                 showLoadingIndicator(false)
-                showErrorMessage("검색 오류 (HTTP $code)")
+                val errorMessage = e.message ?: "검색 오류 (HTTP $code)"
+                showErrorMessage(errorMessage)
             } catch (e: IOException) {
                 Log.e("KakaoAddressSearch", "네트워크 오류", e)
                 showLoadingIndicator(false)
-                showErrorMessage("네트워크 오류가 발생했습니다")
+                val errorMessage = e.message ?: "네트워크 오류가 발생했습니다"
+                showErrorMessage(errorMessage)
             } catch (e: Exception) {
                 Log.e("KakaoAddressSearch", "기타 오류", e)
                 showLoadingIndicator(false)
-                showErrorMessage("검색 중 오류가 발생했습니다")
+                val errorMessage = e.message ?: "검색 중 오류가 발생했습니다"
+                showErrorMessage(errorMessage)
             }
         }
     }
@@ -511,15 +477,18 @@ class SmManager(
                 val msg = e.response()?.errorBody()?.string().orEmpty()
                 Log.e("KakaoAddressSearch", "HTTP $code: $msg", e)
                 showLoadingIndicator(false)
-                showErrorMessage("검색 오류 (HTTP $code)")
+                val errorMessage = e.message ?: "검색 오류 (HTTP $code)"
+                showErrorMessage(errorMessage)
             } catch (e: IOException) {
                 Log.e("KakaoAddressSearch", "네트워크 오류", e)
                 showLoadingIndicator(false)
-                showErrorMessage("네트워크 오류가 발생했습니다")
+                val errorMessage = e.message ?: "네트워크 오류가 발생했습니다"
+                showErrorMessage(errorMessage)
             } catch (e: Exception) {
                 Log.e("KakaoAddressSearch", "기타 오류", e)
                 showLoadingIndicator(false)
-                showErrorMessage("검색 중 오류가 발생했습니다")
+                val errorMessage = e.message ?: "검색 중 오류가 발생했습니다"
+                showErrorMessage(errorMessage)
             } finally {
                 isSearchLoading = false
             }
@@ -736,7 +705,7 @@ class SmManager(
     }
 
     /**
-     * 사이드 메뉴 닫힐 때 검색창 초기화
+     * 사이드 메뉴 닫힐 때 검색창 초기화 및 편집모드 초기화
      */
     private fun setupDrawerListener(searchContainer: View, favoriteHeader: View) {
         val drawerLayout = binding.drawerLayout
@@ -747,6 +716,8 @@ class SmManager(
             
             override fun onDrawerClosed(drawerView: View) {
                 resetSearchContainer(searchContainer, favoriteHeader)
+                // 편집모드 초기화
+                favoriteLocationAdapter.resetEditMode()
             }
         })
     }
@@ -897,18 +868,10 @@ class SmManager(
                 }
             }
 
-            Toast.makeText(
-                context,
-                "현재 위치의 날씨 정보를 새로고침합니다.",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(context, "현재 위치의 날씨 정보를 새로고침합니다.", Toast.LENGTH_SHORT).show()
         } else {
             navController.navigate(com.example.kh_studyprojects_weatherapp.R.id.weatherFragment)
-            Toast.makeText(
-                context,
-                "날씨 화면으로 이동합니다.",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -919,9 +882,7 @@ class SmManager(
         AlertDialog.Builder(context)
             .setTitle("앱 정보")
             .setMessage("날씨 앱 v2.0\n\n날씨 정보와 미세먼지 정보를 제공하는 앱입니다.")
-            .setPositiveButton("확인") { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
             .show()
     }
 

@@ -26,9 +26,9 @@ interface SmFavoriteLocationRepository {
      * 새로운 즐겨찾기 지역을 추가합니다.
      * 
      * @param location 추가할 즐겨찾기 지역 정보
-     * @return 추가 성공 여부
+     * @return Pair<성공 여부, 메시지> (성공 시 true와 성공 메시지, 실패 시 false와 실패 메시지)
      */
-    suspend fun addFavoriteLocation(location: FavoriteLocation): Boolean
+    suspend fun addFavoriteLocation(location: FavoriteLocation): Pair<Boolean, String>
 
     /**
      * 즐겨찾기 지역을 삭제합니다.
@@ -36,13 +36,13 @@ interface SmFavoriteLocationRepository {
      * @param latitude 삭제할 즐겨찾기 지역의 위도
      * @param longitude 삭제할 즐겨찾기 지역의 경도
      * @param deviceId 디바이스 고유 식별자
-     * @return 삭제 성공 여부
+     * @return Pair<성공 여부, 메시지> (성공 시 true와 성공 메시지, 실패 시 false와 실패 메시지)
      */
     suspend fun deleteFavoriteLocation(
         latitude: Double,
         longitude: Double,
         deviceId: String
-    ): Boolean
+    ): Pair<Boolean, String>
 
     /**
      * 즐겨찾기 지역의 정렬 순서를 업데이트합니다.
@@ -51,13 +51,13 @@ interface SmFavoriteLocationRepository {
      * @param longitude 업데이트할 즐겨찾기 지역의 경도
      * @param deviceId 디바이스 고유 식별자
      * @param sortOrder 새로운 정렬 순서
-     * @return 업데이트 성공 여부
+     * @return Pair<성공 여부, 메시지> (성공 시 true와 성공 메시지, 실패 시 false와 실패 메시지)
      */
     suspend fun updateSortOrder(
         latitude: Double,
         longitude: Double,
         deviceId: String,
         sortOrder: Int
-    ): Boolean
+    ): Pair<Boolean, String>
 }
 

@@ -1,5 +1,6 @@
 package com.example.kh_studyprojects_weatherapp.data.api.sidemenu
 
+import com.example.kh_studyprojects_weatherapp.data.api.common.ApiResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -18,7 +19,7 @@ interface SmFavoriteLocationApiService {
      * 즐겨찾기 지역 목록 조회
      */
     @GET("/api/sidemenu/locations")
-    suspend fun getFavoriteLocations(@Query("deviceId") deviceId: String): Response<List<SmFavoriteLocationResponse>>
+    suspend fun getFavoriteLocations(@Query("deviceId") deviceId: String): Response<ApiResponse<List<SmFavoriteLocationResponse>>>
     
     /**
      * 즐겨찾기 지역 추가
@@ -26,7 +27,7 @@ interface SmFavoriteLocationApiService {
     @POST("/api/sidemenu/locations")
     suspend fun addFavoriteLocation(
         @Body request: SmFavoriteLocationRequest
-    ): Response<SmFavoriteLocationResponse>
+    ): Response<ApiResponse<SmFavoriteLocationResponse>>
     
     /**
      * 즐겨찾기 지역 삭제
@@ -36,7 +37,7 @@ interface SmFavoriteLocationApiService {
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
         @Query("deviceId") deviceId: String
-    ): Response<Unit>
+    ): Response<ApiResponse<Unit>>
     
     /**
      * 즐겨찾기 지역 정렬 순서 수정
@@ -47,6 +48,6 @@ interface SmFavoriteLocationApiService {
         @Query("longitude") longitude: Double,
         @Query("deviceId") deviceId: String,
         @Query("sortOrder") sortOrder: Int
-    ): Response<Unit>
+    ): Response<ApiResponse<Unit>>
 }
 
