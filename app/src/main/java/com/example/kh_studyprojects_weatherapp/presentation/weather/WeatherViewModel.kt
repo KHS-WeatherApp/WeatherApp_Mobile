@@ -29,6 +29,14 @@ class WeatherViewModel @Inject constructor() : ViewModel() {
     private val _refreshCount = MutableStateFlow(0)
     val refreshCount: StateFlow<Int> = _refreshCount.asStateFlow()
 
+    // 앱 시작 시 한 번만 초기 로딩 오버레이를 보여줬는지 확인하는 플래그
+    private val _hasShownInitialOverlay = MutableStateFlow(false)
+    val hasShownInitialOverlay: StateFlow<Boolean> = _hasShownInitialOverlay.asStateFlow()
+
+    fun markInitialOverlayShown() {
+        _hasShownInitialOverlay.value = true
+    }
+
     /**
      * 날씨 데이터 새로고침
      */

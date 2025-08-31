@@ -1,18 +1,15 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.daily
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherDailyDto
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,7 +21,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 class WeatherDailyViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val locationManager: LocationManager
-) : ViewModel() {
+) : BaseLoadViewModel() {
 
     private val _weatherItems = MutableStateFlow<List<WeatherDailyDto>>(emptyList())
     val weatherItems: StateFlow<List<WeatherDailyDto>> = _weatherItems.asStateFlow()
@@ -32,11 +29,8 @@ class WeatherDailyViewModel @Inject constructor(
     private val _currentApiTime = MutableStateFlow<String?>(null)
     val currentApiTime: StateFlow<String?> = _currentApiTime.asStateFlow()
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
-
-    private val _error = MutableLiveData<String?>()
-    val error: LiveData<String?> = _error
+    // 펼침 상태 (date 또는 고유 키)
+    private val expandedKeys = MutableStateFlow<Set<String>>(emptySet())
 
     private var fullWeatherData: List<WeatherDailyDto> = emptyList()
     private var isYesterdayShown = false
@@ -46,82 +40,65 @@ class WeatherDailyViewModel @Inject constructor(
     val locationInfo: StateFlow<String?> = _locationInfo.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val locationInfo = locationManager.getCurrentLocation()
-
-            if (locationInfo != null) {
-                val currentLatitude = locationInfo.latitude
-                val currentLongitude = locationInfo.longitude
-                fetchWeatherData(currentLatitude, currentLongitude)
-            } else {
-                fetchWeatherData(37.5606, 126.986) // 기본 위치
-            }
-        }
+        loadInitial { fetchByCurrentLocation() }
     }
 
-    fun fetchWeatherData(latitude: Double, longitude: Double) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                Log.i("WeatherVM", "Start fetching weather data: lat=$latitude, lon=$longitude")
-                weatherRepository.getWeatherInfo(latitude, longitude)
-                    .onSuccess { response ->
-                        Log.i("WeatherVM", "Weather data fetch success")
-                        val data = response as? Map<String, Any>
-                        if (data != null) {
-                            fullWeatherData = convertToWeatherDailyItems(data)
-                            _weatherItems.value = fullWeatherData.subList(1, minOf(11, fullWeatherData.size))
-                            val daily = data["current"] as? Map<String, Any> ?: emptyMap();
-                            _currentApiTime.value = daily["time"] as? String;
-                            Log.i("WeatherVM", "Current API Time: ${_currentApiTime.value}")
-                            _error.value = null
-                            Log.i("WeatherVM", "Parsed daily items: ${fullWeatherData.size}")
-                        } else {
-                            _error.value = "날씨 데이터 형식이 올바르지 않습니다"
-                            _weatherItems.value = emptyList()
-                            Log.e("WeatherVM", "Invalid data format")
-                        }
-                    }
-                    .onFailure { exception ->
-                        _error.value = exception.message ?: "알 수 없는 오류가 발생했습니다"
-                        _weatherItems.value = emptyList()
-                        Log.e("WeatherVM", "Weather data fetch failed", exception)
-                    }
-            } catch (e: Exception) {
-                _error.value = e.message
-                _weatherItems.value = emptyList()
-                Log.e("WeatherVM", "Exception in fetchWeatherData", e)
-            } finally {
-                _isLoading.value = false
-                Log.i("WeatherVM", "Fetching weather data done")
-            }
+    private suspend fun fetchByCurrentLocation() {
+        val locationInfo = locationManager.getCurrentLocation()
+        val (lat, lon) = if (locationInfo != null) {
+            locationInfo.latitude to locationInfo.longitude
+        } else {
+            37.5606 to 126.986
         }
+        fetchWeatherData(lat, lon)
     }
 
+    private suspend fun fetchWeatherData(latitude: Double, longitude: Double) {
+        Log.i("WeatherVM", "Start fetching weather data: lat=$latitude, lon=$longitude")
+        weatherRepository.getWeatherInfo(latitude, longitude)
+            .onSuccess { response ->
+                Log.i("WeatherVM", "Weather data fetch success")
+                val data = response as? Map<String, Any>
+                if (data != null) {
+                    fullWeatherData = convertToWeatherDailyItems(data)
+                    
+                    // 어댑터가 동일 아이템으로 인식하지 않도록 '펼친 행'은 반드시 copy + 깊은 copy
+                    val target = baseSlice(fullWeatherData).map { item ->
+                        val key = item.date  // 또는 (date + week) 등 고유 키
+                        if (key in expandedKeys.value) {
+                            item.copy(
+                                hourlyForecast = item.hourlyForecast.map { it.copy() } // 깊은 복사
+                            )
+                        } else item
+                    }
+                    _weatherItems.value = target
+
+                    val current = (data["current"] as? Map<*, *>) ?: emptyMap<String, Any>()
+                    _currentApiTime.value = current["time"] as? String
+                    Log.i("WeatherVM", "Current API Time: ${_currentApiTime.value}")
+                    Log.i("WeatherVM", "Parsed daily items: ${fullWeatherData.size}")
+                } else {
+                    throw Exception("날씨 데이터 형식이 올바르지 않습니다")
+                }
+            }
+            .onFailure { throw it }
+    }
+
+
+    private fun baseSlice(source: List<WeatherDailyDto>): List<WeatherDailyDto> {
+        // 어제 포함/15일 토글 반영, subList 대신 drop/take로 '완전히 새 리스트'
+        val body = if (is15DaysShown) source.drop(1).take(15) else source.drop(1).take(10)
+        return if (isYesterdayShown && source.isNotEmpty()) listOf(source.first()) + body else body
+    }
 
     fun toggleYesterdayWeather() {
-        val currentData = _weatherItems.value
-        if (fullWeatherData.isEmpty() || fullWeatherData.firstOrNull() == null) return
-
         isYesterdayShown = !isYesterdayShown
-
-        _weatherItems.value = if (isYesterdayShown) {
-            listOf(fullWeatherData[0]) + currentData
-        } else {
-            currentData.filter { it.type != WeatherDailyDto.Type.YESTERDAY }
-        }
+        _weatherItems.value = baseSlice(fullWeatherData)
     }
 
     fun toggle15DaysWeather() {
-        if (fullWeatherData.isEmpty()) return
-
         is15DaysShown = !is15DaysShown
-
-        _weatherItems.value = if (is15DaysShown) {
-            fullWeatherData.subList(1, minOf(16, fullWeatherData.size))
-        } else {
-            fullWeatherData.subList(1, minOf(11, fullWeatherData.size))
-        }
+        _weatherItems.value = baseSlice(fullWeatherData)
     }
 
     private fun convertToWeatherDailyItems(data: Map<String, Any>): List<WeatherDailyDto> {
@@ -239,45 +216,18 @@ class WeatherDailyViewModel @Inject constructor(
     }
 
     fun errorShown() {
-        _error.value = null
+        // BaseLoadViewModel의 error StateFlow 사용
+    }
+    
+    // 프래그먼트/어댑터에서 펼침 토글할 때 호출
+    fun setExpanded(key: String, expanded: Boolean) {
+        expandedKeys.value = expandedKeys.value.toMutableSet().apply {
+            if (expanded) add(key) else remove(key)
+        }
     }
     
     /**
      * 날씨 데이터 새로고침 (외부에서 호출 가능)
      */
-    fun refreshWeatherData() {
-        viewModelScope.launch {
-            val locationInfo = locationManager.getCurrentLocation()
-            if (locationInfo != null) {
-                fetchWeatherData(locationInfo.latitude, locationInfo.longitude)
-            } else {
-                fetchWeatherData(37.5606, 126.986) // 기본 위치
-            }
-        }
-    }
-    
-    /**
-     * UI 강제 갱신 (외부에서 호출 가능)
-     */
-    fun forceUIUpdate() {
-        // 현재 상태를 다시 방출하여 UI 갱신 트리거
-        val currentItems = _weatherItems.value
-        val currentApiTime = _currentApiTime.value
-        
-        if (currentItems.isNotEmpty()) {
-            _weatherItems.value = currentItems.toMutableList().apply {
-                // 강제 갱신을 위한 임시 데이터 추가
-                add(0, currentItems.first().copy(
-                    date = "${currentItems.first().date} (갱신됨)"
-                ))
-                removeAt(0)
-            }
-            println("WeatherDailyViewModel: UI 강제 갱신 완료")
-        }
-        
-        if (currentApiTime != null) {
-            _currentApiTime.value = "${currentApiTime}_updated"
-            _currentApiTime.value = currentApiTime
-        }
-    }
+    fun refreshWeatherData() = load { fetchByCurrentLocation() }
 }

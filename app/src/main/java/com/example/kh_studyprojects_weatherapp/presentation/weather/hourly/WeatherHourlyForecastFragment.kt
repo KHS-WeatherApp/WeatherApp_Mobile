@@ -72,7 +72,7 @@ class WeatherHourlyForecastFragment : Fragment() {
         observeViewModel()
 
         // 데이터 가져오기
-        viewModel.fetchHourlyForecast()
+        viewModel.refreshWeatherData()
 
         // 루트 뷰를 반환하여 Fragment의 UI를 화면에 표시
         return root
@@ -117,7 +117,7 @@ class WeatherHourlyForecastFragment : Fragment() {
      * 날씨 데이터 새로고침
      */
     fun refreshWeatherData() {
-        viewModel.fetchHourlyForecast()
+        viewModel.refreshWeatherData()
     }
 
     // Fragment의 뷰가 파괴될 때 호출되는 메서드

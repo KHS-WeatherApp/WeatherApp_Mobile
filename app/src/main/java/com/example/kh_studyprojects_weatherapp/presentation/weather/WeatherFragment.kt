@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.LayoutNavigationBottomBinding
@@ -17,6 +17,10 @@ import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.A
 import com.example.kh_studyprojects_weatherapp.presentation.weather.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.lifecycle.lifecycleScope
+import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.AdditionalWeatherViewModel
+import com.example.kh_studyprojects_weatherapp.presentation.weather.current.CurrentWeatherViewModel
+import com.example.kh_studyprojects_weatherapp.presentation.weather.daily.WeatherDailyViewModel
+import com.example.kh_studyprojects_weatherapp.presentation.weather.hourly.WeatherHourlyForecastViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -41,7 +45,7 @@ class WeatherFragment : Fragment() {
     private var _navigationBinding: LayoutNavigationBottomBinding? = null
     private val navigationBinding get() = _navigationBinding!!
 
-    private val viewModel: WeatherViewModel by viewModels()
+    private val viewModel: WeatherViewModel by activityViewModels()
 
     private lateinit var loadingOverlay: View
 
@@ -72,8 +76,10 @@ class WeatherFragment : Fragment() {
             refreshWeatherData()
         }
 
-        // 초기 진입 로딩 오버레이 표시
-        loadingOverlay.visibility = View.VISIBLE
+        // 초기 진입 로딩 오버레이 표시 (한 번만 보여줌)
+        if (!viewModel.hasShownInitialOverlay.value) {
+            loadingOverlay.visibility = View.VISIBLE
+        }
 
         // ViewModel의 갱신 상태 관찰
         viewLifecycleOwner.lifecycleScope.launch {
@@ -89,6 +95,15 @@ class WeatherFragment : Fragment() {
 
         // 모든 섹션 데이터가 준비되면 로딩 오버레이 숨김
         observeInitialLoadingCompletion()
+        
+        // 초기 로딩 오버레이 상태 관찰
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.hasShownInitialOverlay.collect { hasShown ->
+                if (hasShown) {
+                    loadingOverlay.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun observeInitialLoadingCompletion() {
@@ -121,6 +136,7 @@ class WeatherFragment : Fragment() {
                 .collect { allReady ->
                     if (allReady) {
                         loadingOverlay.visibility = View.GONE
+                        viewModel.markInitialOverlayShown()   // 이제부터 다시는 안 보이게 플래그 세팅
                         // 관찰 종료를 위해 this coroutine 취소
                         this.cancel()
                     }
@@ -132,72 +148,31 @@ class WeatherFragment : Fragment() {
      * 날씨 데이터 새로고침
      */
     private fun refreshWeatherData() {
-        // ViewModel을 통해 갱신 시작 알림
-        viewModel.refreshWeatherData()
-        
-        // 각 자식 프래그먼트의 ViewModel에 데이터 갱신 요청
-        try {
-            // 현재 날씨 데이터 갱신
-            val currentWeatherFragment = childFragmentManager
-                .findFragmentById(R.id.weather_current_container) as? CurrentWeatherFragment
-            currentWeatherFragment?.let { fragment ->
-                fragment.viewModelInstance.refreshWeatherData()
-                // UI 강제 갱신을 위한 지연 처리
-                viewLifecycleOwner.lifecycleScope.launch {
-                    kotlinx.coroutines.delay(100)
-                    fragment.viewModelInstance.forceUIUpdate()
-                }
-            }
-            
-            // 일별 날씨 데이터 갱신
-            val dailyWeatherFragment = childFragmentManager
-                .findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment
-            dailyWeatherFragment?.let { fragment ->
-                fragment.viewModelInstance.refreshWeatherData()
-                // UI 강제 갱신을 위한 지연 처리
-                viewLifecycleOwner.lifecycleScope.launch {
-                    kotlinx.coroutines.delay(100)
-                    fragment.viewModelInstance.forceUIUpdate()
-                }
-            }
-            
-            // 시간별 날씨 데이터 갱신
-            val hourlyWeatherFragment = childFragmentManager
-                .findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment
-            hourlyWeatherFragment?.let { fragment ->
-                fragment.viewModelInstance.refreshWeatherData()
-                // UI 강제 갱신을 위한 지연 처리
-                viewLifecycleOwner.lifecycleScope.launch {
-                    kotlinx.coroutines.delay(100)
-                    fragment.viewModelInstance.forceUIUpdate()
-                }
-            }
-            
-            // 추가 날씨 데이터 갱신
-            val additionalWeatherFragment = childFragmentManager
-                .findFragmentById(R.id.weather_additional_container) as? AdditionalWeatherFragment
-            additionalWeatherFragment?.let { fragment ->
-                fragment.viewModelInstance.refreshWeatherData()
-                // UI 강제 갱신을 위한 지연 처리
-                viewLifecycleOwner.lifecycleScope.launch {
-                    kotlinx.coroutines.delay(100)
-                    fragment.viewModelInstance.forceUIUpdate()
-                }
-            }
-            
-            // 실제 데이터 갱신 완료를 기다리는 대신, 
-            // 적절한 시간 후 프로그레스바 종료 (API 호출 시간 고려)
-            // 이는 임시 해결책이며, 실제로는 각 ViewModel의 갱신 완료 상태를 관찰해야 함
-            viewLifecycleOwner.lifecycleScope.launch {
-                kotlinx.coroutines.delay(1500) // 1.5초 대기 (실제 API 호출 시간에 맞춤)
-                binding.swipeRefreshLayout.isRefreshing = false
-                println("데이터 갱신 완료 (타이머 기반)")
-            }
-            
-        } catch (e: Exception) {
-            // 오류 발생 시 로그 출력 및 프로그레스바 종료
-            println("자식 프래그먼트 데이터 갱신 중 오류: ${e.message}")
-            binding.swipeRefreshLayout.isRefreshing = false
+        childFragmentManager.executePendingTransactions()
+
+        val current = (childFragmentManager.findFragmentById(R.id.weather_current_container) as? CurrentWeatherFragment)?.viewModelInstance
+        val daily   = (childFragmentManager.findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment)?.viewModelInstance
+        val hourly  = (childFragmentManager.findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment)?.viewModelInstance
+        val addi    = (childFragmentManager.findFragmentById(R.id.weather_additional_container) as? AdditionalWeatherFragment)?.viewModelInstance
+
+        // 1) 실제 새로고침 트리거
+        (current as? CurrentWeatherViewModel)?.refreshWeatherData()
+        (daily   as? WeatherDailyViewModel)?.refreshWeatherData()
+        (hourly  as? WeatherHourlyForecastViewModel)?.refreshWeatherData()
+        (addi    as? AdditionalWeatherViewModel)?.refreshWeatherData()
+
+
+        // 2) 로딩 묶어서 스피너/오버레이 제어
+        viewLifecycleOwner.lifecycleScope.launch {
+            combine(
+                current?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                daily?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                hourly?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                addi?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+            ) { arr -> arr.any { it } }
+             .collect { anyLoading ->
+                binding.swipeRefreshLayout.isRefreshing = anyLoading
+             }
         }
     }
 

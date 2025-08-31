@@ -1,16 +1,15 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -18,16 +17,13 @@ import javax.inject.Inject
 class WeatherHourlyForecastViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val locationManager: LocationManager
-) : ViewModel() {
+) : BaseLoadViewModel() {
 
     private val _hourlyForecastItems = MutableStateFlow<List<WeatherHourlyForecastDto>>(emptyList())
     val hourlyForecastItems: StateFlow<List<WeatherHourlyForecastDto>> = _hourlyForecastItems.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+
 
     private val _locationInfo = MutableStateFlow<String?>(null)
     val locationInfo: StateFlow<String?> = _locationInfo.asStateFlow()
@@ -36,76 +32,46 @@ class WeatherHourlyForecastViewModel @Inject constructor(
     private var currentLatitude: Double = -28.1662 // 기본값 좌표 설정
     private var currentLongitude: Double = 29.1732
 
-    fun fetchHourlyForecast() {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                _error.value = null
-                
-                Log.d("WeatherHourlyForecast", "위치 정보 요청 시작")
-                
-                // 현재 위치 가져오기
-                val locationInfo = locationManager.getCurrentLocation()
-                if (locationInfo != null) {
-                    currentLatitude = locationInfo.latitude
-                    currentLongitude = locationInfo.longitude
-                    _locationInfo.value = "${locationInfo.address}\n위도: $currentLatitude, 경도: $currentLongitude"
-                    Log.d("WeatherHourlyForecast", "GPS 위치 정보 획득 성공 - ${locationInfo.address}")
-                } else {
-                    _locationInfo.value = "기본 위치(서울)\n위도: $currentLatitude, 경도: $currentLongitude"
-                    Log.w("WeatherHourlyForecast", "GPS 위치 정보 획득 실패 - 기본값(서울) 사용")
-                }
-                
-                // 가져온 위치 정보로 날씨 데이터 요청
-                Log.d("WeatherHourlyForecast", "날씨 정보 요청 시작 - 위도: $currentLatitude, 경도: $currentLongitude")
-                val result = weatherRepository.getWeatherInfo(currentLatitude, currentLongitude)
-                result.onSuccess { response ->
-                    val hourlyData = response["hourly"] as? Map<String, Any>
-                    if (hourlyData != null) {
-                        val items = convertToHourlyForecast(hourlyData)
-                        _hourlyForecastItems.value = items
-                        Log.d("WeatherHourlyForecast", "날씨 정보 획득 성공 - ${items.size}개의 시간대 데이터")
-                    } else {
-                        _error.value = "날씨 데이터 형식이 올바르지 않습니다."
-                        Log.e("WeatherHourlyForecast", "날씨 데이터 형식 오류")
-                    }
-                }.onFailure { e ->
-                    _error.value = "날씨 정보를 가져오는데 실패했습니다: ${e.message}"
-                    Log.e("WeatherHourlyForecast", "날씨 정보를 가져오는데 실패했습니다.", e)
-                }
-            } catch (e: Exception) {
-                _error.value = "오류가 발생했습니다: ${e.message}"
-                Log.e("WeatherHourlyForecast", "날씨 정보를 가져오는 중 오류가 발생했습니다.", e)
-            } finally {
-                _isLoading.value = false
+    init {
+        loadInitial { fetch() }
+    }
+
+    private suspend fun fetch() {
+        Log.d("WeatherHourlyForecast", "위치 정보 요청 시작")
+        
+        // 현재 위치 가져오기
+        val locationInfo = locationManager.getCurrentLocation()
+        if (locationInfo != null) {
+            currentLatitude = locationInfo.latitude
+            currentLongitude = locationInfo.longitude
+            _locationInfo.value = "${locationInfo.address}\n위도: $currentLatitude, 경도: $currentLongitude"
+            Log.d("WeatherHourlyForecast", "GPS 위치 정보 획득 성공 - ${locationInfo.address}")
+        } else {
+            _locationInfo.value = "기본 위치(서울)\n위도: $currentLatitude, 경도: $currentLongitude"
+            Log.w("WeatherHourlyForecast", "GPS 위치 정보 획득 실패 - 기본값(서울) 사용")
+        }
+        
+        // 가져온 위치 정보로 날씨 데이터 요청
+        Log.d("WeatherHourlyForecast", "날씨 정보 요청 시작 - 위도: $currentLatitude, 경도: $currentLongitude")
+        val result = weatherRepository.getWeatherInfo(currentLatitude, currentLongitude)
+        result.onSuccess { response ->
+            val hourlyData = response["hourly"] as? Map<String, Any>
+            if (hourlyData != null) {
+                val items = convertToHourlyForecast(hourlyData)
+                _hourlyForecastItems.value = items
+                Log.d("WeatherHourlyForecast", "날씨 정보 획득 성공 - ${items.size}개의 시간대 데이터")
+            } else {
+                throw Exception("날씨 데이터 형식이 올바르지 않습니다.")
             }
+        }.onFailure { e ->
+            throw e
         }
     }
 
     /**
      * 날씨 데이터 새로고침 (외부에서 호출 가능)
      */
-    fun refreshWeatherData() {
-        fetchHourlyForecast()
-    }
-    
-    /**
-     * UI 강제 갱신 (외부에서 호출 가능)
-     */
-    fun forceUIUpdate() {
-        // 현재 상태를 다시 방출하여 UI 갱신 트리거
-        val currentItems = _hourlyForecastItems.value
-        if (currentItems.isNotEmpty()) {
-            _hourlyForecastItems.value = currentItems.toMutableList().apply {
-                // 강제 갱신을 위한 임시 데이터 추가
-                add(0, currentItems.first().copy(
-                    tvHour = "${currentItems.first().tvHour} (갱신됨)"
-                ))
-                removeAt(0)
-            }
-            println("WeatherHourlyForecastViewModel: UI 강제 갱신 완료")
-        }
-    }
+    fun refreshWeatherData() = load { fetch() }
 
     private fun convertToHourlyForecast(hourlyData: Map<String, Any>): List<WeatherHourlyForecastDto> {
         val times = hourlyData["time"] as? List<String> ?: return emptyList() // 시간 데이터
