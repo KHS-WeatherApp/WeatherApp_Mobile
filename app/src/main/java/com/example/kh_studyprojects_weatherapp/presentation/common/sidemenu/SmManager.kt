@@ -81,6 +81,7 @@ class SmManager(
     private var currentSearchPage: Int = 1
     private var isSearchLoading: Boolean = false
     private var isSearchEnd: Boolean = false
+    private var isSearchExpanded: Boolean = false
 
     // 현재 날씨 데이터 콜백
     private var onWeatherDataUpdated: ((Map<String, Any>) -> Unit)? = null
@@ -503,6 +504,14 @@ class SmManager(
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
+    private fun setDrawerLockForSearch(expanded: Boolean) {
+        val drawerLayout = binding.drawerLayout
+        val mode = if (expanded) DrawerLayout.LOCK_MODE_LOCKED_OPEN else DrawerLayout.LOCK_MODE_UNLOCKED
+        drawerLayout.setDrawerLockMode(mode, GravityCompat.START)
+        isSearchExpanded = expanded
+        Log.d("SmManager", "Drawer lock changed: expanded=${expanded}")
+    }
+
     // ==================== 애니메이션 기능 ====================
 
     /**
@@ -556,6 +565,7 @@ class SmManager(
                             "SmManagerDrag",
                             "animateUp end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
                         )
+                        setDrawerLockForSearch(true)
                     }, 100)
                 }
             })
@@ -682,6 +692,7 @@ class SmManager(
                         "SmManagerDrag",
                         "animateToMax end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
                     )
+                    setDrawerLockForSearch(true)
                 }, 100)
             }
         })
@@ -721,6 +732,7 @@ class SmManager(
                     searchContainer.layoutParams = params
                     searchContainer.requestLayout()
                 }
+                setDrawerLockForSearch(false)
             }
         })
 
@@ -796,6 +808,7 @@ class SmManager(
 
                 val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
                 imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
+                setDrawerLockForSearch(false)
             }
         })
 
