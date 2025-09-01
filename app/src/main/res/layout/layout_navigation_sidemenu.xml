@@ -288,7 +288,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="@dimen/dp_12"
+                android:padding="@dimen/dp_8"
                 android:background="@drawable/sh_nav_search_bg"
                 android:clickable="true"
                 android:focusable="true">
