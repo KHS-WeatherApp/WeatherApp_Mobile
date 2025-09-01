@@ -513,7 +513,15 @@ class SmManager(
         val searchContainerTop = searchContainer.top
         val favoriteHeaderTop = favoriteHeader.top
         val distanceToCover = searchContainerTop - favoriteHeaderTop
-        val targetHeight = currentHeight + distanceToCover + favoriteHeader.height
+        val rawTarget = currentHeight + distanceToCover + favoriteHeader.height
+        val parentHeight = (searchContainer.parent as? View)?.height ?: rawTarget
+        val minHeightPx = maxOf(searchContainer.minimumHeight, 60)
+        val targetHeight = rawTarget.coerceIn(minHeightPx, parentHeight)
+
+        Log.d(
+            "SmManagerDrag",
+            "animateUp start: sc.h=${currentHeight}, sc.top=${searchContainerTop}, sc.bottom=${searchContainer.bottom}, parent.h=${parentHeight}, ref.top=${favoriteHeaderTop}, ref.h=${favoriteHeader.height}, dist=${distanceToCover}, rawTarget=${rawTarget}, clampedTarget=${targetHeight}"
+        )
 
         searchContainer.post {
             val heightAnimator = ValueAnimator.ofInt(currentHeight, targetHeight)
@@ -544,6 +552,10 @@ class SmManager(
                     binding.sideMenuContent.etSearchLocation.postDelayed({
                         val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
                         imm.showSoftInput(binding.sideMenuContent.etSearchLocation, InputMethodManager.SHOW_IMPLICIT)
+                        Log.d(
+                            "SmManagerDrag",
+                            "animateUp end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
+                        )
                     }, 100)
                 }
             })
@@ -559,6 +571,9 @@ class SmManager(
         var startY = 0f
         var startHeight = 0
         var isDragging = false
+        var parentHeightAtStart = 0
+        var startTop = 0
+        var startBottom = 0
 
         searchContainer.setOnTouchListener { _, event ->
             when (event.action) {
@@ -566,6 +581,13 @@ class SmManager(
                     startY = event.rawY
                     startHeight = searchContainer.height
                     isDragging = true
+                    parentHeightAtStart = (searchContainer.parent as? View)?.height ?: 0
+                    startTop = searchContainer.top
+                    startBottom = searchContainer.bottom
+                    Log.d(
+                        "SmManagerDrag",
+                        "drag DOWN: startY=${startY}, startH=${startHeight}, sc.top=${startTop}, sc.bottom=${startBottom}, parent.h=${parentHeightAtStart}, ref.top=${favoriteHeader.top}, ref.h=${favoriteHeader.height}"
+                    )
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -573,8 +595,13 @@ class SmManager(
                         val deltaY = startY - event.rawY
                         val newHeight = (startHeight + deltaY).toInt()
                         val minHeight = 100
-                        val maxHeight = startHeight + favoriteHeader.height + 200
+                        val parentHeight = (searchContainer.parent as? View)?.height ?: Int.MAX_VALUE
+                        val maxHeight = parentHeight
                         val clampedHeight = newHeight.coerceIn(minHeight, maxHeight)
+                        Log.d(
+                            "SmManagerDrag",
+                            "drag MOVE: deltaY=${deltaY}, newH=${newHeight}, clamp[${minHeight}..${maxHeight}]=${clampedHeight}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, parent.h=${parentHeight}"
+                        )
 
                         val params = searchContainer.layoutParams
                         if (params is ViewGroup.LayoutParams) {
@@ -590,6 +617,10 @@ class SmManager(
                         isDragging = false
                         val deltaY = startY - event.rawY
                         val threshold = 100f
+                        Log.d(
+                            "SmManagerDrag",
+                            "drag UP: deltaY=${deltaY}, sc.h.now=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}"
+                        )
 
                         if (deltaY > threshold) {
                             animateToMaxHeight(searchContainer, favoriteHeader)
@@ -611,7 +642,14 @@ class SmManager(
         val searchContainerTop = searchContainer.top
         val favoriteHeaderTop = favoriteHeader.top
         val distanceToCover = searchContainerTop - favoriteHeaderTop
-        val targetHeight = currentHeight + distanceToCover + favoriteHeader.height
+        val rawTarget = currentHeight + distanceToCover + favoriteHeader.height
+        val parentHeight = (searchContainer.parent as? View)?.height ?: rawTarget
+        val minHeightPx = maxOf(searchContainer.minimumHeight, 60)
+        val targetHeight = rawTarget.coerceIn(minHeightPx, parentHeight)
+        Log.d(
+            "SmManagerDrag",
+            "animateToMax start: sc.h=${currentHeight}, sc.top=${searchContainerTop}, sc.bottom=${searchContainer.bottom}, parent.h=${parentHeight}, ref.top=${favoriteHeaderTop}, ref.h=${favoriteHeader.height}, dist=${distanceToCover}, rawTarget=${rawTarget}, clampedTarget=${targetHeight}"
+        )
 
         val heightAnimator = ValueAnimator.ofInt(currentHeight, targetHeight)
         heightAnimator.duration = 200
@@ -640,6 +678,10 @@ class SmManager(
                 binding.sideMenuContent.etSearchLocation.postDelayed({
                     val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
                     imm.showSoftInput(binding.sideMenuContent.etSearchLocation, InputMethodManager.SHOW_IMPLICIT)
+                    Log.d(
+                        "SmManagerDrag",
+                        "animateToMax end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
+                    )
                 }, 100)
             }
         })
