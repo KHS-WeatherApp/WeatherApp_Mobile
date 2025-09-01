@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -69,28 +71,48 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // 다크 모드 강제 적용
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-
+        
         super.onCreate(savedInstanceState)
-
-        // Edge-to-edge 설정
-        WindowCompat.setDecorFitsSystemWindows(window, true) // true 안겹침 , false 시스템바 겹침
-
-        // 상태바와 네비게이션 바 설정
+        
+        // Edge-to-edge 설정 - 앱이 시스템 UI 영역까지 그려지도록 함
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
+        // 상태바와 네비게이션 바의 아이콘 색상 설정
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.apply {
-            isAppearanceLightStatusBars = false
-            isAppearanceLightNavigationBars = true
+            isAppearanceLightStatusBars = false      // 상단 상태바 아이콘 색상 (false: 흰색)
+            isAppearanceLightNavigationBars = true   // 하단 네비게이션 바 아이콘 색상 (true: 검정색)
         }
 
+        // 상태바와 네비게이션 바의 배경 색상 설정
         window.apply {
-            statusBarColor = Color.TRANSPARENT
-            navigationBarColor = Color.WHITE
-            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            statusBarColor = Color.TRANSPARENT      // 상단 상태바 배경 투명
+            navigationBarColor = Color.WHITE        // 하단 네비게이션 바 배경 흰색
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR  // 네비게이션 바 아이콘을 어두운 색상으로 설정
         }
-
+        
         // 뷰 바인딩 초기화
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
+        // 시스템 UI(상태 바, 네비게이션 바)와 앱 콘텐츠가 겹치지 않도록 여백 자동 조정
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentContainerView) { view, windowInsets ->
+            // 현재 기기의 네비게이션 바와 상태 바의 크기 정보를 가져옴
+            val navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            val statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            
+            // 레이아웃 파라미터를 가져와서 마진 설정
+            val params = view.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+            // 하단 시스템 네비게이션 바 높이만큼 여백 설정
+            params.bottomMargin = navigationBars.bottom
+            // 상단 상태 바 높이만큼 여백 설정
+            params.topMargin = statusBars.top
+            // 변경된 레이아웃 파라미터 적용
+            view.layoutParams = params
+            
+            // 인셋이 처리되었음을 시스템에 알림
+            WindowInsetsCompat.CONSUMED
+        }
 
         // 드로어 레이아웃 초기화
         drawerLayout = binding.drawerLayout
