@@ -82,6 +82,7 @@ class SmManager(
     private var isSearchLoading: Boolean = false
     private var isSearchEnd: Boolean = false
     private var isSearchExpanded: Boolean = false
+    private var isSearchContainerExpanded: Boolean = false // 검색창이 확장되었는지 추적
 
     // 현재 날씨 데이터 콜백
     private var onWeatherDataUpdated: ((Map<String, Any>) -> Unit)? = null
@@ -512,6 +513,21 @@ class SmManager(
         Log.d("SmManager", "Drawer lock changed: expanded=${expanded}")
     }
 
+    /**
+     * 검색창이 확장되었는지 확인하여 DrawerLayout의 터치 이벤트를 제어합니다.
+     */
+    private fun setDrawerTouchEnabled(enabled: Boolean) {
+        val drawerLayout = binding.drawerLayout
+        if (enabled) {
+            // 검색창이 접혀있을 때만 사이드메뉴 터치 허용
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+        } else {
+            // 검색창이 확장되었을 때는 사이드메뉴 터치 차단
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN, GravityCompat.START)
+        }
+        Log.d("SmManager", "Drawer touch enabled: ${enabled}")
+    }
+
     // ==================== 애니메이션 기능 ====================
 
     /**
@@ -547,28 +563,30 @@ class SmManager(
                 }
             }
 
-            heightAnimator.addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    binding.sideMenuContent.llSearchResultsContainer.visibility = View.VISIBLE
-                    binding.sideMenuContent.llSearchResultsContainer.alpha = 0f
-                    binding.sideMenuContent.llSearchResultsContainer.animate()
-                        .alpha(1f)
-                        .setDuration(200)
-                        .start()
+                    heightAnimator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                binding.sideMenuContent.llSearchResultsContainer.visibility = View.VISIBLE
+                binding.sideMenuContent.llSearchResultsContainer.alpha = 0f
+                binding.sideMenuContent.llSearchResultsContainer.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
 
-                    binding.sideMenuContent.etSearchLocation.requestFocus()
+                binding.sideMenuContent.etSearchLocation.requestFocus()
 
-                    binding.sideMenuContent.etSearchLocation.postDelayed({
-                        val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
-                        imm.showSoftInput(binding.sideMenuContent.etSearchLocation, InputMethodManager.SHOW_IMPLICIT)
-                        Log.d(
-                            "SmManagerDrag",
-                            "animateUp end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
-                        )
-                        setDrawerLockForSearch(true)
-                    }, 100)
-                }
-            })
+                binding.sideMenuContent.etSearchLocation.postDelayed({
+                    val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
+                    imm.showSoftInput(binding.sideMenuContent.etSearchLocation, InputMethodManager.SHOW_IMPLICIT)
+                    Log.d(
+                        "SmManagerDrag",
+                        "animateUp end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
+                    )
+                    setDrawerLockForSearch(true)
+                    isSearchContainerExpanded = true
+                    setDrawerTouchEnabled(false) // 확장된 상태에서는 터치 차단
+                }, 100)
+            }
+        })
 
             heightAnimator.start()
         }
@@ -581,9 +599,7 @@ class SmManager(
         var startY = 0f
         var startHeight = 0
         var isDragging = false
-        var parentHeightAtStart = 0
-        var startTop = 0
-        var startBottom = 0
+        val originalHeight = searchContainer.height // 원본 높이 저장
 
         searchContainer.setOnTouchListener { _, event ->
             when (event.action) {
@@ -591,12 +607,9 @@ class SmManager(
                     startY = event.rawY
                     startHeight = searchContainer.height
                     isDragging = true
-                    parentHeightAtStart = (searchContainer.parent as? View)?.height ?: 0
-                    startTop = searchContainer.top
-                    startBottom = searchContainer.bottom
                     Log.d(
                         "SmManagerDrag",
-                        "drag DOWN: startY=${startY}, startH=${startHeight}, sc.top=${startTop}, sc.bottom=${startBottom}, parent.h=${parentHeightAtStart}, ref.top=${favoriteHeader.top}, ref.h=${favoriteHeader.height}"
+                        "drag DOWN: startY=${startY}, startH=${startHeight}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, parent.h=${(searchContainer.parent as? View)?.height ?: 0}, ref.top=${favoriteHeader.top}, ref.h=${favoriteHeader.height}"
                     )
                     true
                 }
@@ -608,9 +621,17 @@ class SmManager(
                         val parentHeight = (searchContainer.parent as? View)?.height ?: Int.MAX_VALUE
                         val maxHeight = parentHeight
                         val clampedHeight = newHeight.coerceIn(minHeight, maxHeight)
+                        
+                        // 검색창이 원본 높이보다 늘어났는지 확인
+                        val isExpanded = clampedHeight > originalHeight + 50 // 50px 여유값
+                        if (isExpanded != isSearchContainerExpanded) {
+                            isSearchContainerExpanded = isExpanded
+                            setDrawerTouchEnabled(!isExpanded) // 확장되었으면 터치 차단, 접혔으면 터치 허용
+                        }
+                        
                         Log.d(
                             "SmManagerDrag",
-                            "drag MOVE: deltaY=${deltaY}, newH=${newHeight}, clamp[${minHeight}..${maxHeight}]=${clampedHeight}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, parent.h=${parentHeight}"
+                            "drag MOVE: deltaY=${deltaY}, newH=${newHeight}, clamp[${minHeight}..${maxHeight}]=${clampedHeight}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, parent.h=${parentHeight}, isExpanded=${isExpanded}"
                         )
 
                         val params = searchContainer.layoutParams
@@ -693,6 +714,8 @@ class SmManager(
                         "animateToMax end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
                     )
                     setDrawerLockForSearch(true)
+                    isSearchContainerExpanded = true
+                    setDrawerTouchEnabled(false) // 확장된 상태에서는 터치 차단
                 }, 100)
             }
         })
@@ -733,6 +756,8 @@ class SmManager(
                     searchContainer.requestLayout()
                 }
                 setDrawerLockForSearch(false)
+                isSearchContainerExpanded = false
+                setDrawerTouchEnabled(true) // 접힌 상태에서는 터치 허용
             }
         })
 
@@ -755,6 +780,17 @@ class SmManager(
             }
         }
 
+        heightAnimator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // 원본 높이로 돌아갔을 때 상태 업데이트
+                val isExpanded = searchContainer.height > originalHeight + 50
+                if (isExpanded != isSearchContainerExpanded) {
+                    isSearchContainerExpanded = isExpanded
+                    setDrawerTouchEnabled(!isExpanded)
+                }
+            }
+        })
+
         heightAnimator.start()
     }
 
@@ -776,7 +812,7 @@ class SmManager(
         })
     }
 
-    private fun resetSearchContainer(searchContainer: View, favoriteHeader: View) {
+    private fun resetSearchContainer(searchContainer: View, @Suppress("UNUSED_PARAMETER") favoriteHeader: View) {
         val currentHeight = searchContainer.height
         val originalHeight = ViewGroup.LayoutParams.WRAP_CONTENT
 
@@ -809,6 +845,8 @@ class SmManager(
                 val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
                 imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
                 setDrawerLockForSearch(false)
+                isSearchContainerExpanded = false
+                setDrawerTouchEnabled(true) // 사이드메뉴가 닫힐 때 터치 허용
             }
         })
 
