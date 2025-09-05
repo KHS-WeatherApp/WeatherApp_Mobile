@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 검색 결과 아이템 클릭 시 리플 애니메이션 효과 -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#10000000">
+
+    <!-- 기본 배경 (흰색) -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+
+</ripple>

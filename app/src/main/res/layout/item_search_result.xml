@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="@dimen/dp_5"
-    android:background="?android:attr/selectableItemBackground"
+    android:padding="@dimen/dp_8"
+    android:background="@drawable/anim_com_item_effect_01"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical">
