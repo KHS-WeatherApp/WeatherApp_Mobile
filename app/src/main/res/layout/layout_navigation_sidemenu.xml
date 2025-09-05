@@ -93,12 +93,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="@dimen/dp_16"
+        android:padding="@dimen/dp_15"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
-        android:layout_marginHorizontal="@dimen/dp_8"
-        android:layout_marginTop="@dimen/dp_8">
+        android:layout_marginHorizontal="@dimen/dp_8">
 
         <!-- 위치 아이콘 -->
         <ImageView
@@ -109,8 +108,8 @@
             android:tint="@android:color/white"
             android:layout_marginEnd="@dimen/dp_12" />
 
-                 <!-- 지역 정보 -->
-         <LinearLayout
+        <!-- 지역 정보 -->
+        <LinearLayout
              android:layout_width="0dp"
              android:layout_height="wrap_content"
              android:layout_weight="1"
@@ -137,10 +136,10 @@
                  android:textSize="@dimen/sp_12"
                  android:alpha="0.8"
                  android:layout_marginTop="@dimen/dp_2" />
-         </LinearLayout>
+        </LinearLayout>
 
-         <!-- 날씨 정보 (오른쪽 끝) -->
-         <LinearLayout
+        <!-- 날씨 정보 (오른쪽 끝) -->
+        <LinearLayout
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:orientation="horizontal"
@@ -166,8 +165,7 @@
                  android:textColor="@android:color/white"
                  android:textSize="@dimen/sp_18"
                  android:textStyle="bold" />
-
-         </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- 구분선 -->
