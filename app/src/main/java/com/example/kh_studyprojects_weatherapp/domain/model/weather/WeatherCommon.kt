@@ -19,19 +19,19 @@ object WeatherCommon {
      * @return 아이콘 리소스 ID
      */
     fun getWeatherIcon(weatherCode: Int): Int = when (weatherCode) {
-        0 -> R.drawable.weather_icon_sun
-        1, 2, 3 -> R.drawable.weather_icon_partly_cloudy
-        45, 48 -> R.drawable.weather_icon_fog
-        51, 53, 55 -> R.drawable.weather_icon_drizzle
-        56, 57 -> R.drawable.weather_icon_freezing_drizzle
-        61, 63, 65 -> R.drawable.weather_icon_shower
-        66, 67 -> R.drawable.weather_icon_shower
-        71, 73, 75 -> R.drawable.weather_icon_snow
-        77 -> R.drawable.weather_icon_snow
-        80, 81, 82 -> R.drawable.weather_icon_thunder
-        85, 86 -> R.drawable.weather_icon_thunder
-        95 -> R.drawable.weather_icon_thunder
-        96, 99 -> R.drawable.weather_icon_thunder
+        0 -> R.drawable.weather_icon_sun                    // 맑은하늘
+        1, 2, 3 -> R.drawable.weather_icon_partly_cloudy    // 대체로 맑음, 야간 흐림, 흐림
+        45, 48 -> R.drawable.weather_icon_fog               // 안개와 쌓이는 서리안개
+        51, 53, 55 -> R.drawable.weather_icon_drizzle       // 이슬비: 가벼움, 보통, 짙은 강도
+        56, 57 -> R.drawable.weather_icon_freezing_drizzle  // 얼음 이슬비 : 가볍고 짙은 강도
+        61, 63, 65 -> R.drawable.weather_icon_shower        // 비 : 약간, 보통, 강함
+        66, 67 -> R.drawable.weather_icon_shower            // 빙우 : 가볍고 강한 강도
+        71, 73, 75 -> R.drawable.weather_icon_snow          // 눈 내림 : 약간, 보통, 강함
+        77 -> R.drawable.weather_icon_snow                  // 눈알
+        80, 81, 82 -> R.drawable.weather_icon_thunder       // 소나기 : 약간 보통, 강함
+        85, 86 -> R.drawable.weather_icon_thunder           // 눈소나기가 약간 내리고 많이 내림
+        95 -> R.drawable.weather_icon_thunder               // 뇌우 : 약간 또는 즈ㅜㅇ간
+        96, 99 -> R.drawable.weather_icon_thunder           // 가벼운 우박과 강한 우박을 동반한 외우
         else -> R.drawable.weather_icon_unknown
     }
 

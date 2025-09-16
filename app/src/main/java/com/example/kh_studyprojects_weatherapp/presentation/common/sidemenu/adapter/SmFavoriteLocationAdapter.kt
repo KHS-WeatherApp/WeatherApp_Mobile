@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.databinding.ItemFavoriteLocationBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,10 +83,9 @@ class SmFavoriteLocationAdapter(
                                 binding.tvTemperature.text = "N/A"
                             }
                             
-                            // 날씨 아이콘 설정 (기본값)
-                            binding.ivWeatherIcon.setImageResource(
-                                com.example.kh_studyprojects_weatherapp.R.drawable.weather_icon_sun
-                            )
+                            // 날씨 코드에 따른 아이콘 설정
+                            val weatherCode = (current?.get("weather_code") as? Number)?.toInt() ?: 0
+                            binding.ivWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
                         }
                     }.onFailure { exception ->
                         withContext(Dispatchers.Main) {
