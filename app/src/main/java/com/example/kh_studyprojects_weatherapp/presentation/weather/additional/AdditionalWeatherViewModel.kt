@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.presentation.weather.additional
+﻿package com.example.kh_studyprojects_weatherapp.presentation.weather.additional
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
