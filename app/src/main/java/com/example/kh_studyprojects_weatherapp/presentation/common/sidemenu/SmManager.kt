@@ -137,6 +137,8 @@ class SmManager(
      */
     private fun setupFavoriteLocationsRecyclerView() {
         val recyclerView = binding.sideMenuContent.rvFavoriteLocations
+        // 안정적인 드래그/재활용을 위해 StableIds를 어댑터 부착 전에 활성화
+        favoriteLocationAdapter.setHasStableIds(true)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = favoriteLocationAdapter
@@ -149,6 +151,71 @@ class SmManager(
 
         // 어댑터에 WeatherRepository 주입 (아이템 날씨 표시 캐시/지연 로딩 지원)
         favoriteLocationAdapter.setWeatherRepository(weatherRepository)
+
+        // 드래그 앤 드롭을 위한 ItemTouchHelper 설정 (편집 모드에서만 동작)
+        val touchHelper = androidx.recyclerview.widget.ItemTouchHelper(
+            object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(
+                androidx.recyclerview.widget.ItemTouchHelper.UP or androidx.recyclerview.widget.ItemTouchHelper.DOWN,
+                0
+            ) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    if (!favoriteLocationAdapter.isEditModeEnabled()) return false
+                    val from = viewHolder.bindingAdapterPosition
+                    val to = target.bindingAdapterPosition
+                    favoriteLocationAdapter.onItemMove(from, to)
+                    return true
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    // 스와이프 사용 안 함
+                }
+
+                override fun isLongPressDragEnabled(): Boolean {
+                    // 편집 모드에서만 롱프레스 드래그 허용
+                    return favoriteLocationAdapter.isEditModeEnabled()
+                }
+
+                override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                    super.clearView(recyclerView, viewHolder)
+                    // 드래그 종료 시 현재 순서를 서버에 반영
+                    if (!favoriteLocationAdapter.isEditModeEnabled()) return
+                    persistFavoriteSortOrder()
+                }
+            }
+        )
+        touchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    /**
+     * 현재 어댑터 순서를 DB SORT_ORDER로 저장합니다.
+     */
+    private fun persistFavoriteSortOrder() {
+        val current = favoriteLocationAdapter.getCurrentLocations()
+        if (current.isEmpty()) return
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val deviceId = getDeviceId()
+                current.forEachIndexed { index, location ->
+                    try {
+                        favoriteLocationRepository.updateSortOrder(
+                            latitude = location.latitude,
+                            longitude = location.longitude,
+                            deviceId = deviceId,
+                            sortOrder = index
+                        )
+                    } catch (e: Exception) {
+                        Log.e("SmManager", "정렬 순서 업데이트 실패: ${location.addressName}", e)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("SmManager", "정렬 순서 일괄 업데이트 실패", e)
+            }
+        }
     }
 
     /**

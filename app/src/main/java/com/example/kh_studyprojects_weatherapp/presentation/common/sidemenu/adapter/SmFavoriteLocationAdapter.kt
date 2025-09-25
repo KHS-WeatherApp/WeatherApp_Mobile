@@ -67,6 +67,11 @@ class SmFavoriteLocationAdapter(
     }
     
     /**
+     * 편집 모드 활성 상태를 반환합니다.
+     */
+    fun isEditModeEnabled(): Boolean = isEditMode
+    
+    /**
      * 편집 모드를 초기화합니다.
      * 편집 모드를 비활성화하고 일반 모드로 돌아갑니다.
      */
@@ -176,6 +181,19 @@ class SmFavoriteLocationAdapter(
     override fun getItemId(position: Int): Long {
         val item = locations[position]
         return (item.deviceId + ":" + item.latitude + ":" + item.longitude).hashCode().toLong()
+    }
+
+    /**
+     * 드래그 앤 드롭 중 아이템 위치를 변경합니다.
+     */
+    fun onItemMove(fromPosition: Int, toPosition: Int) {
+        if (fromPosition == toPosition) return
+        val mutable = locations.toMutableList()
+        val item = mutable.removeAt(fromPosition)
+        val target = toPosition.coerceIn(0, mutable.size)
+        mutable.add(target, item)
+        locations = mutable
+        notifyItemMoved(fromPosition, target)
     }
 
     /**
