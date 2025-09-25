@@ -3,6 +3,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.ada
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
 import com.example.kh_studyprojects_weatherapp.databinding.ItemFavoriteLocationBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
@@ -29,6 +30,7 @@ class SmFavoriteLocationAdapter(
 ) : RecyclerView.Adapter<SmFavoriteLocationAdapter.FavoriteLocationViewHolder>() {
 
     private var locations: List<FavoriteLocation> = emptyList()
+    private val locationIdToWeather: MutableMap<String, Pair<Int?, Int?>> = mutableMapOf()
     private var isEditMode = false
 
     /**
@@ -37,8 +39,22 @@ class SmFavoriteLocationAdapter(
      * @param newLocations 새로운 즐겨찾기 지역 목록
      */
     fun updateLocations(newLocations: List<FavoriteLocation>) {
+        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int = locations.size
+            override fun getNewListSize(): Int = newLocations.size
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val o = locations[oldItemPosition]
+                val n = newLocations[newItemPosition]
+                return o.latitude == n.latitude && o.longitude == n.longitude && o.deviceId == n.deviceId
+            }
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val o = locations[oldItemPosition]
+                val n = newLocations[newItemPosition]
+                return o == n
+            }
+        })
         locations = newLocations
-        notifyDataSetChanged()
+        diff.dispatchUpdatesTo(this)
     }
     
     /**
@@ -69,6 +85,15 @@ class SmFavoriteLocationAdapter(
      */
     private fun loadWeatherData(location: FavoriteLocation, binding: ItemFavoriteLocationBinding) {
         weatherRepository?.let { repo ->
+            val cacheKey = "${location.deviceId}:${location.latitude}:${location.longitude}"
+            val cached = locationIdToWeather[cacheKey]
+            if (cached != null) {
+                val (temp, code) = cached
+                binding.tvTemperature.text = temp?.let { "${it}°" } ?: "N/A"
+                code?.let { binding.ivWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(it)) }
+                return
+            }
+
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val result = repo.getWeatherInfo(location.latitude, location.longitude)
@@ -77,15 +102,14 @@ class SmFavoriteLocationAdapter(
                             // 온도 데이터 추출 및 표시
                             val current = weatherData["current"] as? Map<*, *>
                             val temperature = current?.get("temperature_2m") as? Double
-                            if (temperature != null) {
-                                binding.tvTemperature.text = "${temperature.toInt()}°"
-                            } else {
-                                binding.tvTemperature.text = "N/A"
-                            }
+                            val tempInt = temperature?.toInt()
+                            binding.tvTemperature.text = tempInt?.let { "${it}°" } ?: "N/A"
                             
                             // 날씨 코드에 따른 아이콘 설정
                             val weatherCode = (current?.get("weather_code") as? Number)?.toInt() ?: 0
                             binding.ivWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
+                            // 캐시 저장
+                            locationIdToWeather[cacheKey] = Pair(tempInt, weatherCode)
                         }
                     }.onFailure { exception ->
                         withContext(Dispatchers.Main) {
@@ -148,6 +172,11 @@ class SmFavoriteLocationAdapter(
     }
 
     override fun getItemCount(): Int = locations.size
+
+    override fun getItemId(position: Int): Long {
+        val item = locations[position]
+        return (item.deviceId + ":" + item.latitude + ":" + item.longitude).hashCode().toLong()
+    }
 
     /**
      * 즐겨찾기 지역 아이템을 표시하는 ViewHolder

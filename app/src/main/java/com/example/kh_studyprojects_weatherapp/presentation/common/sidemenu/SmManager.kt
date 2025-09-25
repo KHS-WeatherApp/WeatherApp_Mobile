@@ -117,9 +117,8 @@ class SmManager(
 
         Log.d("SmManager", "사이드메뉴 기본 설정 완료")
         
-        // 초기 즐겨찾기 목록 로드는 별도로 처리
+        // 초기 즐겨찾기 목록 즉시 로드 (불필요한 지연 제거)
         lifecycleScope.launch {
-            delay(500) // 기본 설정 완료 후 0.5초 대기
             Log.d("SmManager", "초기 즐겨찾기 목록 로드 시작")
             refreshFavoriteLocations()
         }
@@ -128,6 +127,7 @@ class SmManager(
 
         // GPS 현재 위치로 사이드메뉴 상단 헤더 갱신
         refreshGpsHeader()
+        refreshGpsWeatherInHeader()
     }
 
     // ==================== 즐겨찾기 관리 ====================
@@ -140,7 +140,15 @@ class SmManager(
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = favoriteLocationAdapter
+            // 스크롤 성능 최적화
+            setHasFixedSize(true)
+            setItemViewCacheSize(20)
+            // 변경 애니메이션으로 인한 깜빡임 방지 (목록 갱신 시 체인지 애니메이션 제거)
+            itemAnimator = null
         }
+
+        // 어댑터에 WeatherRepository 주입 (아이템 날씨 표시 캐시/지연 로딩 지원)
+        favoriteLocationAdapter.setWeatherRepository(weatherRepository)
     }
 
     /**
@@ -222,7 +230,9 @@ class SmManager(
                 Log.d("SmManager", "어댑터 참조 일치 여부: ${recyclerView.adapter === favoriteLocationAdapter}")
                 
                 Log.d("SmManager", "Repository 호출 시작")
-                val locations = favoriteLocationRepository.getFavoriteLocations(deviceId)
+                val locations = withContext(Dispatchers.IO) {
+                    favoriteLocationRepository.getFavoriteLocations(deviceId)
+                }
                 Log.d("SmManager", "Repository 호출 완료")
                 Log.d("SmManager", "즐겨찾기 목록 조회 결과: ${locations?.size ?: 0}개")
                 
@@ -902,27 +912,18 @@ class SmManager(
      * 현재 날씨 데이터 구독
      */
     private fun setupCurrentWeatherObserver() {
-        onWeatherDataUpdated = { weatherData ->
-            updateCurrentLocationInSideMenu(weatherData)
+        onWeatherDataUpdated = { _ ->
+            // 메인 화면 데이터와 무관하게, 헤더는 항상 GPS 기준으로 갱신
+            refreshGpsWeatherInHeader()
         }
     }
 
     /**
      * 사이드메뉴의 현재 위치 아이템 업데이트
      */
-    private fun updateCurrentLocationInSideMenu(weatherData: Map<String, Any>) {
-        try {
-            val current = weatherData["current"] as? Map<*, *>
-            current?.let {
-                val temperature = it["temperature_2m"] as? Double
-                binding.sideMenuContent.tvCurrentTemperature.text = "${temperature?.toInt()}°"
-
-                val weatherCode = (it["weather_code"] as? Number)?.toInt() ?: 0
-                binding.sideMenuContent.ivCurrentWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    private fun updateCurrentLocationInSideMenu(@Suppress("UNUSED_PARAMETER") weatherData: Map<String, Any>) {
+        // 헤더의 온도/아이콘은 GPS 기준으로만 갱신
+        refreshGpsWeatherInHeader()
     }
 
     /**
@@ -940,6 +941,38 @@ class SmManager(
                 }
             } catch (e: Exception) {
                 Log.e("SmManager", "GPS 헤더 갱신 실패", e)
+            }
+        }
+    }
+
+    /**
+     * 사이드메뉴 헤더의 날씨(온도/아이콘)를 GPS 위치 기준으로 갱신합니다.
+     */
+    private fun refreshGpsWeatherInHeader() {
+        lifecycleScope.launch {
+            try {
+                val loc = locationManager.getCurrentLocation()
+                if (loc != null) {
+                    val result = withContext(Dispatchers.IO) {
+                        weatherRepository.getWeatherInfo(loc.latitude, loc.longitude)
+                    }
+                    result.onSuccess { weatherData ->
+                        try {
+                            val current = weatherData["current"] as? Map<*, *>
+                            val temperature = (current?.get("temperature_2m") as? Double)?.toInt()
+                            binding.sideMenuContent.tvCurrentTemperature.text = temperature?.let { "${it}°" } ?: "N/A"
+
+                            val weatherCode = (current?.get("weather_code") as? Number)?.toInt() ?: 0
+                            binding.sideMenuContent.ivCurrentWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
+                        } catch (e: Exception) {
+                            Log.e("SmManager", "헤더 날씨 파싱 실패", e)
+                        }
+                    }.onFailure {
+                        binding.sideMenuContent.tvCurrentTemperature.text = "N/A"
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("SmManager", "GPS 헤더 날씨 갱신 실패", e)
             }
         }
     }
@@ -968,7 +1001,29 @@ class SmManager(
      * 현재 위치 클릭 처리
      */
     private fun handleCurrentLocationClick() {
-        refreshCurrentLocationWeather()
+        lifecycleScope.launch {
+            try {
+                val loc = locationManager.getCurrentLocation()
+                if (loc != null) {
+                    locationSelectionStore.setSelectedLocation(
+                        SelectedLocation(
+                            latitude = loc.latitude,
+                            longitude = loc.longitude,
+                            address = loc.address
+                        )
+                    )
+                    binding.drawerLayout.closeDrawers()
+                    Toast.makeText(context, "현재 위치의 날씨로 이동합니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "현재 위치를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("SmManager", "현재 위치 선택 실패", e)
+                Toast.makeText(context, "현재 위치 선택 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            } finally {
+                refreshCurrentLocationWeather()
+            }
+        }
     }
 
     /**
@@ -1032,5 +1087,6 @@ class SmManager(
         Log.d("SmManager", "사이드메뉴 열림 - 즐겨찾기 목록 새로고침")
         refreshFavoriteLocations()
         refreshGpsHeader()
+        refreshGpsWeatherInHeader()
     }
 }
