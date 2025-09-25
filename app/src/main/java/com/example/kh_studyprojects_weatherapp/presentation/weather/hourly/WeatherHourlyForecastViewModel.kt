@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
-import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherHourlyForecastViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val locationManager: LocationManager
+    private val effectiveLocationResolver: EffectiveLocationResolver
 ) : BaseLoadViewModel() {
 
     private val _hourlyForecastItems = MutableStateFlow<List<WeatherHourlyForecastDto>>(emptyList())
@@ -28,9 +28,7 @@ class WeatherHourlyForecastViewModel @Inject constructor(
     private val _locationInfo = MutableStateFlow<String?>(null)
     val locationInfo: StateFlow<String?> = _locationInfo.asStateFlow()
 
-    // 현재 위치의 위도와 경도를 저장하는 변수
-    private var currentLatitude: Double = -28.1662 // 기본값 좌표 설정
-    private var currentLongitude: Double = 29.1732
+    // 위치 정보 표시용(주소 및 좌표)
 
     init {
         loadInitial { fetch() }
@@ -39,21 +37,13 @@ class WeatherHourlyForecastViewModel @Inject constructor(
     private suspend fun fetch() {
         Log.d("WeatherHourlyForecast", "위치 정보 요청 시작")
         
-        // 현재 위치 가져오기
-        val locationInfo = locationManager.getCurrentLocation()
-        if (locationInfo != null) {
-            currentLatitude = locationInfo.latitude
-            currentLongitude = locationInfo.longitude
-            _locationInfo.value = "${locationInfo.address}\n위도: $currentLatitude, 경도: $currentLongitude"
-            Log.d("WeatherHourlyForecast", "GPS 위치 정보 획득 성공 - ${locationInfo.address}")
-        } else {
-            _locationInfo.value = "기본 위치(서울)\n위도: $currentLatitude, 경도: $currentLongitude"
-            Log.w("WeatherHourlyForecast", "GPS 위치 정보 획득 실패 - 기본값(서울) 사용")
-        }
+        // 공통 해석기 사용: 즐겨찾기 > GPS > 기본값
+        val loc = effectiveLocationResolver.resolve()
+        _locationInfo.value = "${loc.address}\n위도: ${loc.latitude}, 경도: ${loc.longitude}"
         
         // 가져온 위치 정보로 날씨 데이터 요청
-        Log.d("WeatherHourlyForecast", "날씨 정보 요청 시작 - 위도: $currentLatitude, 경도: $currentLongitude")
-        val result = weatherRepository.getWeatherInfo(currentLatitude, currentLongitude)
+        Log.d("WeatherHourlyForecast", "날씨 정보 요청 시작 - 위도: ${loc.latitude}, 경도: ${loc.longitude}")
+        val result = weatherRepository.getWeatherInfo(loc.latitude, loc.longitude)
         result.onSuccess { response ->
             val hourlyData = response["hourly"] as? Map<String, Any>
             if (hourlyData != null) {

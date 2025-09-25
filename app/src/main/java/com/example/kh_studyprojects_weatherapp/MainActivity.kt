@@ -27,6 +27,8 @@ import com.example.kh_studyprojects_weatherapp.domain.repository.weather.Weather
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import android.util.Log
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationSelectionStore
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -48,6 +50,12 @@ class MainActivity : AppCompatActivity() {
     
     @Inject
     lateinit var weatherRepository: WeatherRepository
+
+    @Inject
+    lateinit var locationSelectionStore: LocationSelectionStore
+
+    @Inject
+    lateinit var locationManager: LocationManager
 
     /**
      * 위치 권한 요청을 위한 런처
@@ -217,7 +225,9 @@ class MainActivity : AppCompatActivity() {
             navController = navController,
             activity = this,
             favoriteLocationRepository = favoriteLocationRepository,
-            weatherRepository = weatherRepository
+            weatherRepository = weatherRepository,
+            locationSelectionStore = locationSelectionStore,
+            locationManager = locationManager
         )
 
         // 사이드 메뉴 설정

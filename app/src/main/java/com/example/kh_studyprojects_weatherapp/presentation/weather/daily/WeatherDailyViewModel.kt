@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherDailyDto
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
-import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 @HiltViewModel
 class WeatherDailyViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val locationManager: LocationManager
+    private val effectiveLocationResolver: EffectiveLocationResolver
 ) : BaseLoadViewModel() {
 
     private val _weatherItems = MutableStateFlow<List<WeatherDailyDto>>(emptyList())
@@ -44,13 +44,9 @@ class WeatherDailyViewModel @Inject constructor(
     }
 
     private suspend fun fetchByCurrentLocation() {
-        val locationInfo = locationManager.getCurrentLocation()
-        val (lat, lon) = if (locationInfo != null) {
-            locationInfo.latitude to locationInfo.longitude
-        } else {
-            37.5606 to 126.986
-        }
-        fetchWeatherData(lat, lon)
+        val loc = effectiveLocationResolver.resolve()
+        _locationInfo.value = "${loc.address}\n위도: ${loc.latitude}, 경도: ${loc.longitude}"
+        fetchWeatherData(loc.latitude, loc.longitude)
     }
 
     private suspend fun fetchWeatherData(latitude: Double, longitude: Double) {
@@ -175,7 +171,7 @@ class WeatherDailyViewModel @Inject constructor(
                 week = if (index == 0) "어제" else if (index == 1) "오늘" else getDayOfWeek(date),
                 date = if (index == 0 || index == 1) date else formatDate(date),
                 precipitation = "${precipitations.getOrNull(index) ?: 0.0}mm",
-                humidity = "${(humidities?.get(index) as? Number)?.toInt() ?: 0}%",
+                humidity = "${(humidities.getOrNull(index) as? Number)?.toInt() ?: 0}%",
                 minTemp = "${minTemps.getOrNull(index) ?: 0.0}°",
                 maxTemp = "${maxTemps.getOrNull(index) ?: 0.0}°",
                 weatherCode = (weatherCodes.getOrNull(index) as? Number)?.toInt() ?: 0,

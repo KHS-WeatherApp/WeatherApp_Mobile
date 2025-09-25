@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
@@ -46,6 +45,9 @@ import retrofit2.HttpException
 import java.io.IOException
 import android.app.AlertDialog
 import android.util.Log
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationSelectionStore
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.SelectedLocation
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
 
 /**
  * 사이드메뉴 전체를 관리하는 통합 Manager 클래스
@@ -73,7 +75,9 @@ class SmManager(
     private val navController: NavController,
     private val activity: FragmentActivity,
     private val favoriteLocationRepository: SmFavoriteLocationRepository,
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: WeatherRepository,
+    private val locationSelectionStore: LocationSelectionStore,
+    private val locationManager: LocationManager
 ) {
     // 검색 관련 변수
     private var searchJob: Job? = null
@@ -121,6 +125,9 @@ class SmManager(
         }
         
         Log.d("SmManager", "사이드메뉴 설정 완료")
+
+        // GPS 현재 위치로 사이드메뉴 상단 헤더 갱신
+        refreshGpsHeader()
     }
 
     // ==================== 즐겨찾기 관리 ====================
@@ -140,8 +147,21 @@ class SmManager(
      * 즐겨찾기 지역 클릭을 처리합니다.
      */
     fun handleFavoriteLocationClick(location: FavoriteLocation) {
-        Toast.makeText(context, "${location.addressName}의 날씨 정보를 가져옵니다.", Toast.LENGTH_SHORT).show()
-        // TODO: 해당 지역의 날씨 정보를 가져와서 표시
+        // 선택 위치를 전역 Store에 반영 -> ViewModel의 EffectiveLocationResolver가 이를 사용
+        locationSelectionStore.setSelectedLocation(
+            SelectedLocation(
+                latitude = location.latitude,
+                longitude = location.longitude,
+                address = location.addressName
+            )
+        )
+
+        // 메인 화면(날씨 화면) 새로고침
+        refreshCurrentLocationWeather()
+
+        // 사이드메뉴 닫기 및 안내
+        binding.drawerLayout.closeDrawers()
+        Toast.makeText(context, "${location.addressName}의 날씨로 이동합니다.", Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -508,7 +528,7 @@ class SmManager(
     private fun setDrawerLockForSearch(expanded: Boolean) {
         val drawerLayout = binding.drawerLayout
         val mode = if (expanded) DrawerLayout.LOCK_MODE_LOCKED_OPEN else DrawerLayout.LOCK_MODE_UNLOCKED
-        drawerLayout.setDrawerLockMode(mode, GravityCompat.START)
+        drawerLayout.setDrawerLockMode(mode)
         isSearchExpanded = expanded
         Log.d("SmManager", "Drawer lock changed: expanded=${expanded}")
     }
@@ -520,10 +540,10 @@ class SmManager(
         val drawerLayout = binding.drawerLayout
         if (enabled) {
             // 검색창이 접혀있을 때만 사이드메뉴 터치 허용
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         } else {
             // 검색창이 확장되었을 때는 사이드메뉴 터치 차단
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN, GravityCompat.START)
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN)
         }
         Log.d("SmManager", "Drawer touch enabled: ${enabled}")
     }
@@ -892,13 +912,6 @@ class SmManager(
      */
     private fun updateCurrentLocationInSideMenu(weatherData: Map<String, Any>) {
         try {
-            weatherData["location"]?.let { location ->
-                val address = location.toString()
-                val thoroughfare = address.split(" ").lastOrNull() ?: address
-                binding.sideMenuContent.tvCurrentLocationName.text = thoroughfare
-                binding.sideMenuContent.tvCurrentLocationAddress.text = address
-            }
-
             val current = weatherData["current"] as? Map<*, *>
             current?.let {
                 val temperature = it["temperature_2m"] as? Double
@@ -909,6 +922,25 @@ class SmManager(
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    /**
+     * GPS 현재 위치로 사이드메뉴 상단 헤더(주소)를 갱신합니다.
+     */
+    private fun refreshGpsHeader() {
+        lifecycleScope.launch {
+            try {
+                val loc = locationManager.getCurrentLocation()
+                if (loc != null) {
+                    val address = loc.address
+                    val thoroughfare = address.split(" ").lastOrNull() ?: address
+                    binding.sideMenuContent.tvCurrentLocationName.text = thoroughfare
+                    binding.sideMenuContent.tvCurrentLocationAddress.text = address
+                }
+            } catch (e: Exception) {
+                Log.e("SmManager", "GPS 헤더 갱신 실패", e)
+            }
         }
     }
 
@@ -999,5 +1031,6 @@ class SmManager(
     fun onSideMenuOpened() {
         Log.d("SmManager", "사이드메뉴 열림 - 즐겨찾기 목록 새로고침")
         refreshFavoriteLocations()
+        refreshGpsHeader()
     }
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AdditionalWeatherViewModel @Inject constructor(
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: WeatherRepository,
+    private val effectiveLocationResolver: EffectiveLocationResolver
 ) : BaseLoadViewModel() {
 
     private val _weatherState = MutableStateFlow<Map<String, Any>>(emptyMap())
@@ -22,16 +24,18 @@ class AdditionalWeatherViewModel @Inject constructor(
     }
 
     private suspend fun fetch() {
+        // 위치 결정(즐겨찾기 > GPS > 기본값)
+        val loc = effectiveLocationResolver.resolve()
         // 1. 기본 날씨 데이터 가져오기
         val weatherResult = weatherRepository.getWeatherInfo(
-            latitude = 37.5665, // 서울 위도
-            longitude = 126.9780 // 서울 경도
+            latitude = loc.latitude,
+            longitude = loc.longitude
         )
 
         // 2. 대기질 데이터 가져오기
         val airPollutionResult = weatherRepository.getAdditionalWeatherInfo(
-            latitude = 37.5665,
-            longitude = 126.9780
+            latitude = loc.latitude,
+            longitude = loc.longitude
         )
 
         // 3. 두 결과를 합치기

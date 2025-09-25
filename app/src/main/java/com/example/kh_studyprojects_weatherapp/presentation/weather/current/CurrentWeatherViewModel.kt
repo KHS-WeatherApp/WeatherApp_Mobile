@@ -2,7 +2,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.weather.current
 
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
-import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CurrentWeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val locationManager: LocationManager
+    private val effectiveLocationResolver: EffectiveLocationResolver
 ) : BaseLoadViewModel() {
 
     // 1. StateFlow를 사용한 데이터 상태 관리(초기값은 빈 Map)
@@ -27,12 +27,10 @@ class CurrentWeatherViewModel @Inject constructor(
 
     // 3. 데이터 가져오기 함수 (suspend로 분리)
     private suspend fun fetch() {
-        val locationInfo = locationManager.getCurrentLocation()
-        val (lat, lon, addr) = if (locationInfo != null) {
-            Triple(locationInfo.latitude, locationInfo.longitude, locationInfo.address)
-        } else {
-            Triple(37.5606, 126.986, "기본 위치")
-        }
+        val loc = effectiveLocationResolver.resolve()
+        val lat = loc.latitude
+        val lon = loc.longitude
+        val addr = loc.address
         
         weatherRepository.getWeatherInfo(lat, lon).onSuccess { response ->
             val weatherData = response.toMutableMap()
