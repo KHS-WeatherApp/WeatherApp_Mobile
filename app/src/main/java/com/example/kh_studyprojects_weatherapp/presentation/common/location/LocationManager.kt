@@ -1,4 +1,4 @@
-﻿package com.example.kh_studyprojects_weatherapp.presentation.common.location
+package com.example.kh_studyprojects_weatherapp.presentation.common.location
 
 /**
  *################################################################################
@@ -186,6 +186,7 @@ class LocationManager @Inject constructor(
             } ?: "알 수 없는 위치"
         } catch (e: Exception) {
             Log.e("LocationManager", "카카오 API 주소 변환 중 오류 발생", e)
+            Log.e("LocationManager", "위도"+ latitude + "/경도"+ longitude)
             "알 수 없는 위치"
         }
     }

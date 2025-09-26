@@ -26,14 +26,11 @@ object ExternalRetrofitConfig {
             }
             .addInterceptor { chain ->
                 val original = chain.request()
+                val apiKey = BuildConfig.KAKAO_API_KEY.trim()
                 val request = original.newBuilder()
-                    .header("Authorization", "KakaoAK ${'$'}{BuildConfig.KAKAO_API_KEY}")
+                    .header("Authorization", "KakaoAK " + apiKey)
                     .method(original.method, original.body)
                     .build()
-
-                if (BuildConfig.ENABLE_EXTERNAL_HTTP_LOGGING) {
-                    Log.d(TAG, "Kakao API request URL: ${'$'}{request.url}")
-                }
                 chain.proceed(request)
             }
             .retryOnConnectionFailure(true)
