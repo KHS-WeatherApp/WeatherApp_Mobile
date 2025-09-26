@@ -20,19 +20,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    // Retrofit API 서비스 제공
+    // Kakao API 서비스 제공
     @Provides
     @Singleton
     fun provideKakaoApiService(): KakaoApiService =
         ExternalRetrofitConfig.kakaoRetrofit.create(KakaoApiService::class.java)
     
-    // Retrofit API 서비스 제공
+    // Weather API 서비스 제공
     @Provides
     @Singleton
     fun provideWeatherApiService(): WeatherApiService =
         BackendRetrofitConfig.retrofit.create(WeatherApiService::class.java)
 
-    // Retrofit API 서비스 제공
+    // SmFavoriteLocation API 서비스 제공
     @Provides
     @Singleton
     fun provideSmFavoriteLocationApiService(): SmFavoriteLocationApiService =
