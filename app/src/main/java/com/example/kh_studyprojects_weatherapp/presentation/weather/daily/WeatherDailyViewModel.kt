@@ -24,19 +24,24 @@ class WeatherDailyViewModel @Inject constructor(
     private val effectiveLocationResolver: EffectiveLocationResolver
 ) : BaseLoadViewModel() {
 
+    // UI에 노출할 일별 예보 목록 상태
     private val _weatherItems = MutableStateFlow<List<WeatherDailyDto>>(emptyList())
     val weatherItems: StateFlow<List<WeatherDailyDto>> = _weatherItems.asStateFlow()
 
+    // 현재 API 시간 (헤더 등에서 사용)
     private val _currentApiTime = MutableStateFlow<String?>(null)
     val currentApiTime: StateFlow<String?> = _currentApiTime.asStateFlow()
 
     // 펼침 상태 (date 또는 고유 키)
     private val expandedKeys = MutableStateFlow<Set<String>>(emptySet())
-
+    // 전체 날씨 데이터 (어제 포함/15일 여부에 따라 슬라이스됨)
     private var fullWeatherData: List<WeatherDailyDto> = emptyList()
+    // 어제 포함/15일 여부 토글 상태
     private var isYesterdayShown = false
+    // 15일 여부 토글 상태
     private var is15DaysShown = false
 
+    // 주소 + 위경도 표시용 상태(헤더 등에서 사용)
     private val _locationInfo = MutableStateFlow<String?>(null)
     val locationInfo: StateFlow<String?> = _locationInfo.asStateFlow()
 
@@ -44,12 +49,14 @@ class WeatherDailyViewModel @Inject constructor(
         loadInitial { fetchByCurrentLocation() }
     }
 
+    // 위치 기반 새로고침
     private suspend fun fetchByCurrentLocation() {
         val loc = effectiveLocationResolver.resolve()
         _locationInfo.value = "${loc.address}\n위도: ${loc.latitude}, 경도: ${loc.longitude}"
         fetchWeatherData(loc.latitude, loc.longitude)
     }
 
+    // 위도/경도 기반 새로고침
     private suspend fun fetchWeatherData(latitude: Double, longitude: Double) {
         Log.i("WeatherVM", "Start fetching weather data: lat=$latitude, lon=$longitude")
         weatherRepository.getWeatherInfo(latitude, longitude)
@@ -82,17 +89,20 @@ class WeatherDailyViewModel @Inject constructor(
     }
 
 
+    // 어제 포함/15일 토글 반영
     private fun baseSlice(source: List<WeatherDailyDto>): List<WeatherDailyDto> {
         // 어제 포함/15일 토글 반영, subList 대신 drop/take로 '완전히 새 리스트'
         val body = if (is15DaysShown) source.drop(1).take(15) else source.drop(1).take(10)
         return if (isYesterdayShown && source.isNotEmpty()) listOf(source.first()) + body else body
     }
 
+    // 프래그먼트/어댑터에서 펼침 토글할 때 호출
     fun toggleYesterdayWeather() {
         isYesterdayShown = !isYesterdayShown
         _weatherItems.value = baseSlice(fullWeatherData)
     }
 
+    //  프래그먼트/어댑터에서 펼침 토글할 때 호출
     fun toggle15DaysWeather() {
         is15DaysShown = !is15DaysShown
         _weatherItems.value = baseSlice(fullWeatherData)
