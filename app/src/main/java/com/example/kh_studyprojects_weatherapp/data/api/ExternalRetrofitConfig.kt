@@ -8,48 +8,43 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-/**
- * 외부 API Retrofit 설정 클래스
- * 
- * 카카오, 네이버 등 외부 공개 API와의 연결 설정을 담당합니다.
- * 각 API별로 인증 헤더와 설정을 관리합니다.
- *
- * @author 김효동
- * @since 2025.08.06
- * @version 1.0
- */
 object ExternalRetrofitConfig {
-    
-    /** 카카오 로컬 API 기본 URL */
+    private const val TAG = "ExternalRetrofitConfig"
     private const val KAKAO_BASE_URL = "https://dapi.kakao.com/"
 
-    /** 카카오 API용 OkHttpClient (인증 헤더 포함) */
-    private val kakaoOkHttpClient = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        })
-        .addInterceptor { chain ->
-            val original = chain.request()
-            val request = original.newBuilder()
-                .header("Authorization", "KakaoAK ${BuildConfig.KAKAO_API_KEY}") // BuildConfig에서 API 키 가져오기
-                .method(original.method, original.body)
-                .build()
-            Log.d("ExternalRetrofitConfig", "카카오 API 요청 URL: ${request.url}")
-            chain.proceed(request)
-        }
-        .retryOnConnectionFailure(true)
-        .build()
+    private val kakaoOkHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .apply {
+                if (BuildConfig.ENABLE_EXTERNAL_HTTP_LOGGING) {
+                    addInterceptor(HttpLoggingInterceptor().apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    })
+                }
+            }
+            .addInterceptor { chain ->
+                val original = chain.request()
+                val request = original.newBuilder()
+                    .header("Authorization", "KakaoAK ${'$'}{BuildConfig.KAKAO_API_KEY}")
+                    .method(original.method, original.body)
+                    .build()
 
-    /** 카카오 API용 Retrofit 인스턴스 */
-    val kakaoRetrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(KAKAO_BASE_URL)
-        .client(kakaoOkHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    
-    // 향후 다른 외부 API 추가 시 여기에 추가
-    // 예: 네이버 지도 API, 구글 플레이스 API 등
+                if (BuildConfig.ENABLE_EXTERNAL_HTTP_LOGGING) {
+                    Log.d(TAG, "Kakao API request URL: ${'$'}{request.url}")
+                }
+                chain.proceed(request)
+            }
+            .retryOnConnectionFailure(true)
+            .build()
+    }
+
+    val kakaoRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(KAKAO_BASE_URL)
+            .client(kakaoOkHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 }
