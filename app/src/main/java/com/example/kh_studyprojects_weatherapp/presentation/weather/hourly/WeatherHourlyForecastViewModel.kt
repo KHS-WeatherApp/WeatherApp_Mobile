@@ -1,114 +1,66 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
+import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherMappers
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
-import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
+import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
+/**
+ * 시간별 예보 화면의 ViewModel
+ * - 위치 해석(즐겨찾기 > GPS > 기본값) 후 레포지토리에서 응답을 받아
+ *   WeatherMappers로 안전하게 파싱하여 UI 상태(StateFlow)로 제공합니다.
+ * - BaseLoadViewModel의 loadInitial/load를 사용해 로딩/에러 상태를 관리합니다.
+ */
 class WeatherHourlyForecastViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val effectiveLocationResolver: EffectiveLocationResolver
 ) : BaseLoadViewModel() {
 
+    // UI에 노출할 시간별 예보 목록 상태
     private val _hourlyForecastItems = MutableStateFlow<List<WeatherHourlyForecastDto>>(emptyList())
     val hourlyForecastItems: StateFlow<List<WeatherHourlyForecastDto>> = _hourlyForecastItems.asStateFlow()
 
-
-
-
+    // 주소 + 위경도 표시용 상태(헤더 등에서 사용)
     private val _locationInfo = MutableStateFlow<String?>(null)
     val locationInfo: StateFlow<String?> = _locationInfo.asStateFlow()
 
-    // 위치 정보 표시용(주소 및 좌표)
-
     init {
+        // 최초 진입 시 1회 로딩
         loadInitial { fetch() }
     }
 
-    private suspend fun fetch() {
-        Log.d("WeatherHourlyForecast", "위치 정보 요청 시작")
-        
-        // 공통 해석기 사용: 즐겨찾기 > GPS > 기본값
-        val loc = effectiveLocationResolver.resolve()
-        _locationInfo.value = "${loc.address}\n위도: ${loc.latitude}, 경도: ${loc.longitude}"
-        
-        // 가져온 위치 정보로 날씨 데이터 요청
-        Log.d("WeatherHourlyForecast", "날씨 정보 요청 시작 - 위도: ${loc.latitude}, 경도: ${loc.longitude}")
-        val result = weatherRepository.getWeatherInfo(loc.latitude, loc.longitude)
-        result.onSuccess { response ->
-            val hourlyData = response["hourly"] as? Map<String, Any>
-            if (hourlyData != null) {
-                val items = convertToHourlyForecast(hourlyData)
-                _hourlyForecastItems.value = items
-                Log.d("WeatherHourlyForecast", "날씨 정보 획득 성공 - ${items.size}개의 시간대 데이터")
-            } else {
-                throw Exception("날씨 데이터 형식이 올바르지 않습니다.")
-            }
-        }.onFailure { e ->
-            throw e
-        }
-    }
-
-    /**
-     * 날씨 데이터 새로고침 (외부에서 호출 가능)
-     */
+    /** 외부에서 호출하는 새로고침 진입점 */
     fun refreshWeatherData() = load { fetch() }
 
-    private fun convertToHourlyForecast(hourlyData: Map<String, Any>): List<WeatherHourlyForecastDto> {
-        val times = hourlyData["time"] as? List<String> ?: return emptyList() // 시간 데이터
-        val temperatures = hourlyData["temperature_2m"] as? List<Double> ?: return emptyList() // 온도 데이터
-        val precipitationProbs = hourlyData["precipitation_probability"] as? List<Int> ?: return emptyList() // 강수 확률 데이터
-        val precipitations = hourlyData["precipitation"] as? List<Double> ?: return emptyList() // 강수량 데이터
-        val weatherCodes = hourlyData["weather_code"] as? List<Int> ?: return emptyList() // 날씨 코드 데이터
-        val apparentTemps = hourlyData["apparent_temperature"] as? List<Double> ?: return emptyList() // 체감온도 데이터
-        
-        // 현재 시간 구하기
-        val now = LocalDateTime.now()
-        val currentHourStart = now.withMinute(0).withSecond(0).withNano(0)
-
-        // 현재 시간부터의 데이터 인덱스 찾기
-        val currentIndex = times.indexOfFirst { time ->
-            val dateTime = LocalDateTime.parse(time.replace("Z", ""))
-            // 현재 시간대의 데이터부터 포함
-            !dateTime.isBefore(currentHourStart)
-        }.takeIf { it >= 0 } ?: 0
-
-        // 24시간 데이터를 저장할 리스트
-        val result = mutableListOf<WeatherHourlyForecastDto>()
-        var hoursCount = 0
-
-        // 현재 시간부터 24시간 동안의 데이터 수집
-        while (hoursCount < 24 && (currentIndex + hoursCount) < times.size) {
-            val index = currentIndex + hoursCount
-            val time = times[index]
-            val dateTime = LocalDateTime.parse(time.replace("Z", ""))
-            val hourInt = dateTime.hour
-            
-            val amPm = when (hourInt) {
-                in 0..11 -> "오전"
-                else -> "오후"
+    /**
+     * 데이터 로딩 순서
+     * 1) 유효 위치 계산(즐겨찾기 > GPS > 기본값)
+     * 2) 레포지토리에서 날씨 응답 수신
+     * 3) 매퍼로 파싱해 상태 업데이트(빈 결과는 경고 로그 후 빈 리스트)
+     */
+    private suspend fun fetch() {
+        Log.d("WeatherHourlyForecast", "start fetch")
+        val loc = effectiveLocationResolver.resolve()
+        _locationInfo.value = "${loc.address}\n위도: ${loc.latitude}, 경도: ${loc.longitude}"
+        val result = weatherRepository.getWeatherInfo(loc.latitude, loc.longitude)
+        result.onSuccess { response ->
+            val items = WeatherMappers.toHourlyForecastDtos(response)
+            if (items.isEmpty()) {
+                Log.w("WeatherHourlyForecast", "시간별 예보가 비어있습니다. 응답 포맷 또는 데이터 부족 가능")
+                _hourlyForecastItems.value = emptyList()
+            } else {
+                _hourlyForecastItems.value = items
+                Log.d("WeatherHourlyForecast", "parsed ${items.size} hourly items")
             }
-
-            val formattedHour = "${hourInt}시" // 시간 형식 변환    
-            val prob = if (precipitationProbs[index] > 0) "${precipitationProbs[index]}%" else "" // 강수 확률 형식 변환
-            val precip = if (precipitations[index] > 0) "${precipitations[index]}mm" else "" // 강수량 형식 변환
-            val temp = "${temperatures[index]}" // 온도 형식 변환
-            val weatherCode = weatherCodes[index].toInt() // 날씨 코드 형식 변환
-            val apparentTemp =  "${apparentTemps[index]}" // 체감온도 형식 변환
-
-            result.add(WeatherHourlyForecastDto(amPm, formattedHour, prob, precip, temp, weatherCode , apparentTemp))
-            hoursCount++
-        }
-
-        return result
+        }.onFailure { throw it }
     }
-} 
+}
+
