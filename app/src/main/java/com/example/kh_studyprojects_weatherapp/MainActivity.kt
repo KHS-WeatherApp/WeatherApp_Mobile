@@ -93,11 +93,14 @@ class MainActivity : AppCompatActivity() {
             WindowInsetsCompat.CONSUMED
         }
 
+        // 드로어 레이아웃 참조
         drawerLayout = binding.drawerLayout
 
+        // NavController 초기화
         val navHost = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHost.navController
 
+        // 사이드메뉴 구성
         setupSideMenu()
     }
 
@@ -153,6 +156,7 @@ class MainActivity : AppCompatActivity() {
         // 어댑터에 WeatherRepository 주입
         favoriteLocationAdapter.setWeatherRepository(weatherRepository)
 
+        // 검색 결과 어댑터 생성
         val searchResultAdapter = SmSearchResultAdapter()
 
         // SmManager 초기화
@@ -183,6 +187,7 @@ class MainActivity : AppCompatActivity() {
         favoriteLocationAdapter.updateOnDeleteClick { loc ->
             sideMenuManager.handleFavoriteLocationDelete(loc)
         }
+        // 위치 권한 확인 및 요청
         checkLocationPermission()
     }
 }
