@@ -3,6 +3,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.weather.daily
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherDailyDto
+import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherMappers
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
@@ -56,7 +57,7 @@ class WeatherDailyViewModel @Inject constructor(
                 Log.i("WeatherVM", "Weather data fetch success")
                 val data = response as? Map<String, Any>
                 if (data != null) {
-                    fullWeatherData = convertToWeatherDailyItems(data)
+                    fullWeatherData = WeatherMappers.toDailyWeatherDtos(data)
                     
                     // 어댑터가 동일 아이템으로 인식하지 않도록 '펼친 행'은 반드시 copy + 깊은 copy
                     val target = baseSlice(fullWeatherData).map { item ->
@@ -97,6 +98,9 @@ class WeatherDailyViewModel @Inject constructor(
         _weatherItems.value = baseSlice(fullWeatherData)
     }
 
+    /**
+     * 미사용: WeatherMappers.toDailyWeatherDtos로 대체됨. 정리 시 삭제 예정.
+     */
     private fun convertToWeatherDailyItems(data: Map<String, Any>): List<WeatherDailyDto> {
         val daily = data["daily"] as? Map<*, *> ?: return emptyList()
         val hourly = data["hourly"] as? Map<*, *> ?: return emptyList()
@@ -185,6 +189,9 @@ class WeatherDailyViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 미사용: WeatherMappers.dayOfWeekKorean 사용으로 대체됨. 정리 시 삭제 예정.
+     */
     private fun getDayOfWeek(dateString: String): String {
         return try {
             val date = LocalDate.parse(dateString)
@@ -202,6 +209,9 @@ class WeatherDailyViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 미사용: WeatherMappers.formatDateKorean 사용으로 대체됨. 정리 시 삭제 예정.
+     */
     private fun formatDate(dateString: String): String {
         return try {
             val date = LocalDate.parse(dateString)

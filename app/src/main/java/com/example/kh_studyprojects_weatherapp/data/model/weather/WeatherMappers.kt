@@ -154,4 +154,127 @@ object WeatherMappers {
 
         return result
     }
+
+    /**
+     * Current 화면용: 응답 맵에 안전하게 위치 문자열을 합성합니다.
+     * 프레젠테이션 계층이 임의 캐스팅 없이 그대로 사용할 수 있도록 도와줍니다.
+     */
+    fun enrichCurrentWeather(response: Map<String, Any>, locationAddress: String): Map<String, Any> {
+        return try {
+            val copy = response.toMutableMap()
+            copy["location"] = locationAddress
+            copy
+        } catch (_: Exception) {
+            mapOf("location" to locationAddress)
+        }
+    }
+
+    /**
+     * Additional 화면용: 날씨/대기질 응답을 하나의 맵으로 병합합니다.
+     * 동일 키 충돌 시 airData가 우선(최근 호출 기준)하도록 합칩니다.
+     */
+    fun mergeWeatherAndAir(weatherData: Map<String, Any>?, airData: Map<String, Any>?): Map<String, Any> {
+        val result = mutableMapOf<String, Any>()
+        if (weatherData != null) result.putAll(weatherData)
+        if (airData != null) result.putAll(airData)
+        return result
+    }
+
+    /**
+     * Daily 화면용: 일별/시간별 데이터를 결합해 WeatherDailyDto 목록으로 변환합니다.
+     * - 일자별 최소/최대, 강수량, 강수확률(또는 유사 지표), 일자별 시간예보 리스트를 포함합니다.
+     * - 날짜 표기는 index 기준으로 0: 어제, 1: 오늘, 나머지: 요일명과 M.d 형식 병행.
+     */
+    fun toDailyWeatherDtos(response: Map<String, Any>): List<WeatherDailyDto> {
+        val daily = response["daily"] as? Map<*, *> ?: return emptyList()
+        val hourly = response["hourly"] as? Map<*, *> ?: return emptyList()
+
+        val dailyTime = asStringList(daily["time"] as? List<*>)
+        if (dailyTime.isEmpty()) return emptyList()
+
+        val maxTemps = asDoubleList(daily["temperature_2m_max"] as? List<*>, fallbackSize = dailyTime.size)
+        val minTemps = asDoubleList(daily["temperature_2m_min"] as? List<*>, fallbackSize = dailyTime.size)
+        val weatherCodes = asIntList(daily["weather_code"] as? List<*>, fallbackSize = dailyTime.size)
+        val precipitations = asDoubleList(daily["precipitation_sum"] as? List<*>, fallbackSize = dailyTime.size)
+        val humidities = asIntList(daily["precipitation_probability_max"] as? List<*>, fallbackSize = dailyTime.size)
+        // 주의: API 필드 네이밍에 따라 max/min이 반대로 들어올 수 있어 원본 로직을 존중해 매핑
+        val apparentTempMaxs = asDoubleList(daily["apparent_temperature_min"] as? List<*>, fallbackSize = dailyTime.size)
+        val apparentTempMins = asDoubleList(daily["apparent_temperature_max"] as? List<*>, fallbackSize = dailyTime.size)
+
+        val hourlyTimes = asStringList(hourly["time"] as? List<*>)
+        val hourlyTemps = asDoubleList(hourly["temperature_2m"] as? List<*>, fallbackSize = hourlyTimes.size)
+        val hourlyPrecip = asDoubleList(hourly["precipitation"] as? List<*>, fallbackSize = hourlyTimes.size)
+        val hourlyProb = asIntList(hourly["precipitation_probability"] as? List<*>, fallbackSize = hourlyTimes.size)
+        val hourlyCodes = asIntList(hourly["weather_code"] as? List<*>, fallbackSize = hourlyTimes.size)
+        val hourlyApparentTemps = asDoubleList(hourly["apparent_temperature"] as? List<*>, fallbackSize = hourlyTimes.size)
+
+        val hourlyPerDay: Map<String, List<String>> = hourlyTimes.groupBy { it.take(10) }
+        val lowestTemp = (minTemps.minOrNull() ?: -18.0)
+        val highestTemp = (maxTemps.maxOrNull() ?: 38.0)
+
+        return dailyTime.mapIndexed { index, date ->
+            val hourlyDataList = hourlyPerDay[date]
+
+            val hourlyForecast: List<WeatherHourlyForecastDto> = hourlyDataList?.mapNotNull { timeStr ->
+                try {
+                    val idx = hourlyTimes.indexOf(timeStr)
+                    val hour = parseToLocalDateTime(timeStr)?.hour ?: return@mapNotNull null
+                    WeatherHourlyForecastDto(
+                        tvAmPm = if (hour < 12) "오전" else "오후",
+                        tvHour = if (hour == 0 || hour == 12) "12" else (hour % 12).toString(),
+                        probability = "${hourlyProb.getOrNull(idx) ?: 0}%",
+                        precipitation = "${hourlyPrecip.getOrNull(idx) ?: 0.0}mm",
+                        temperature = "${hourlyTemps.getOrNull(idx) ?: 0.0}°",
+                        weatherCode = hourlyCodes.getOrNull(idx) ?: 0,
+                        apparent_temperature = "${hourlyApparentTemps.getOrNull(idx) ?: 0.0}°",
+                    )
+                } catch (_: Exception) {
+                    null
+                }
+            } ?: emptyList()
+
+            WeatherDailyDto(
+                type = when (index) {
+                    0 -> WeatherDailyDto.Type.YESTERDAY
+                    1 -> WeatherDailyDto.Type.TODAY
+                    else -> WeatherDailyDto.Type.OTHER
+                },
+                week = when (index) {
+                    0 -> "어제"
+                    1 -> "오늘"
+                    else -> dayOfWeekKorean(date)
+                },
+                date = if (index == 0 || index == 1) date else formatDateKorean(date),
+                precipitation = "${precipitations.getOrNull(index) ?: 0.0}mm",
+                humidity = "${humidities.getOrNull(index) ?: 0}%",
+                minTemp = "${minTemps.getOrNull(index) ?: 0.0}°",
+                maxTemp = "${maxTemps.getOrNull(index) ?: 0.0}°",
+                weatherCode = weatherCodes.getOrNull(index) ?: 0,
+                isVisible = true,
+                globalMinTemp = lowestTemp,
+                globalMaxTemp = highestTemp,
+                hourlyForecast = hourlyForecast,
+                apparent_temperature_max = "${apparentTempMaxs.getOrNull(index) ?: 0.0}°",
+                apparent_temperature_min = "${apparentTempMins.getOrNull(index) ?: 0.0}°",
+            )
+        }
+    }
+
+    private fun dayOfWeekKorean(dateString: String): String = try {
+        val date = java.time.LocalDate.parse(dateString)
+        when (date.dayOfWeek) {
+            java.time.DayOfWeek.MONDAY -> "월"
+            java.time.DayOfWeek.TUESDAY -> "화"
+            java.time.DayOfWeek.WEDNESDAY -> "수"
+            java.time.DayOfWeek.THURSDAY -> "목"
+            java.time.DayOfWeek.FRIDAY -> "금"
+            java.time.DayOfWeek.SATURDAY -> "토"
+            java.time.DayOfWeek.SUNDAY -> "일"
+        }
+    } catch (_: Exception) { "?" }
+
+    private fun formatDateKorean(dateString: String): String = try {
+        val d = java.time.LocalDate.parse(dateString)
+        "${d.monthValue}.${d.dayOfMonth}"
+    } catch (_: Exception) { dateString }
 }

@@ -1,6 +1,7 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.current
 
 import androidx.lifecycle.viewModelScope
+import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherMappers
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
@@ -33,9 +34,7 @@ class CurrentWeatherViewModel @Inject constructor(
         val addr = loc.address
         
         weatherRepository.getWeatherInfo(lat, lon).onSuccess { response ->
-            val weatherData = response.toMutableMap()
-            weatherData["location"] = addr
-            _weatherState.value = weatherData
+            _weatherState.value = WeatherMappers.enrichCurrentWeather(response, addr)
         }.onFailure { throw it }
     }
     
@@ -43,4 +42,4 @@ class CurrentWeatherViewModel @Inject constructor(
      * 날씨 데이터 새로고침 (외부에서 호출 가능)
      */
     fun refreshWeatherData() = load { fetch() }
-} 
+}
