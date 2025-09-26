@@ -62,8 +62,8 @@ class WeatherFragment : Fragment() {
         // 로딩 오버레이 뷰 참조
         loadingOverlay = binding.root.findViewById(R.id.loadingOverlay)
 
-        setupNavigation()
-        setupChildFragments(savedInstanceState)
+        setupNavigation() // 하단 네비게이션 설정
+        setupChildFragments(savedInstanceState) // 자식 프래그먼트 설정
 
         return binding.root
     }
@@ -126,6 +126,7 @@ class WeatherFragment : Fragment() {
             return
         }
 
+        // 모든 자식 뷰모델 참조
         viewLifecycleOwner.lifecycleScope.launch {
             // 각 뷰모델의 데이터 준비 여부를 Boolean Flow로 변환
             val currentReady = current.viewModelInstance.weatherState.map { it.isNotEmpty() }
@@ -207,6 +208,7 @@ class WeatherFragment : Fragment() {
         }
     }
 
+    // ViewBinding 해제
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

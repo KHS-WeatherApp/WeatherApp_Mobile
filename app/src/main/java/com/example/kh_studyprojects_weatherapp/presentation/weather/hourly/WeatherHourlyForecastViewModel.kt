@@ -48,9 +48,14 @@ class WeatherHourlyForecastViewModel @Inject constructor(
      */
     private suspend fun fetch() {
         Log.d("WeatherHourlyForecast", "start fetch")
+        
+        // 1) 유효 위치 계산
         val loc = effectiveLocationResolver.resolve()
+        // 2) 위치 정보 상태 업데이트(주소 + 위경도)
         _locationInfo.value = "${loc.address}\n위도: ${loc.latitude}, 경도: ${loc.longitude}"
+        // 3) 레포지토리에서 날씨 응답 수신
         val result = weatherRepository.getWeatherInfo(loc.latitude, loc.longitude)
+        // 4) 매퍼로 파싱해 상태 업데이트
         result.onSuccess { response ->
             val items = WeatherMappers.toHourlyForecastDtos(response)
             if (items.isEmpty()) {
