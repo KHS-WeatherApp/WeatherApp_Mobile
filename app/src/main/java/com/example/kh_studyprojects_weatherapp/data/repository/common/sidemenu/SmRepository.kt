@@ -1,8 +1,7 @@
 package com.example.kh_studyprojects_weatherapp.data.repository.common.sidemenu
 
 import android.util.Log
-import com.example.kh_studyprojects_weatherapp.data.api.ApiServiceProvider
-import com.example.kh_studyprojects_weatherapp.data.api.common.ApiResponse
+import com.example.kh_studyprojects_weatherapp.data.api.sidemenu.SmFavoriteLocationApiService
 import com.example.kh_studyprojects_weatherapp.data.api.sidemenu.SmFavoriteLocationRequest
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.sidemenu.SmFavoriteLocationRepository
@@ -24,12 +23,14 @@ import javax.inject.Singleton
  * @version 2.0 (통합 버전)
  */
 @Singleton
-class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
-
-    private val apiService = ApiServiceProvider.smFavoriteLocationApiService
-
+class SmRepository @Inject constructor(
+    private val apiService: SmFavoriteLocationApiService
+) : SmFavoriteLocationRepository {
+    
+    // 즐겨찾기 지역 목록 조회
     override suspend fun getFavoriteLocations(deviceId: String): List<FavoriteLocation>? {
         return try {
+            // API 호출
             val response = apiService.getFavoriteLocations(deviceId)
 
             if (!response.isSuccessful) {
@@ -41,7 +42,7 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
             if (responseBody == null) {
                 return null
             }
-            
+            // DTO를 도메인 모델로 변환
             val locations = responseBody.data?.map { dto ->
                 FavoriteLocation(
                     deviceId = dto.deviceId,
@@ -72,7 +73,8 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
             null
         }
     }
-
+    
+    // 즐겨찾기 지역 추가
     override suspend fun addFavoriteLocation(location: FavoriteLocation): Pair<Boolean, String> {
         return try {
                     val request = SmFavoriteLocationRequest(
@@ -115,6 +117,7 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
         }
     }
 
+    // 서버 에러 메시지 추출 헬퍼 함수
     private fun extractServerMessage(errorBody: String): String {
         if (errorBody.isBlank()) return ""
         try {
@@ -138,6 +141,7 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
         return errorBody.trim()
     }
 
+    // 즐겨찾기 지역 삭제
     override suspend fun deleteFavoriteLocation(
         latitude: Double,
         longitude: Double,
@@ -172,6 +176,7 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
         }
     }
 
+    // 즐겨찾기 지역 정렬 순서 변경
     override suspend fun updateSortOrder(
         latitude: Double,
         longitude: Double,
@@ -181,11 +186,12 @@ class SmRepository @Inject constructor() : SmFavoriteLocationRepository {
         return try {
             val response = apiService.updateFavoriteLocationSortOrder(latitude, longitude, deviceId, sortOrder)
             
+            // API 호출 결과 처리
             if (response.isSuccessful) {
                 val body = response.body()
                 val message = body?.message ?: "정렬 순서가 변경되었습니다"
                 Pair(true, message)
-            } else {
+            } else { // 실패 시 서버 메시지 추출
                 val errorBody = response.errorBody()?.string().orEmpty()
                 val msg = extractServerMessage(errorBody).ifBlank { response.message().orEmpty() }
                 Pair(false, if (msg.isNotBlank()) msg else "정렬 순서 변경에 실패했습니다.")

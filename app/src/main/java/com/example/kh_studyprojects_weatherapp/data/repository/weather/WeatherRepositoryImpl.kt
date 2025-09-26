@@ -1,13 +1,18 @@
-package com.example.kh_studyprojects_weatherapp.data.repository.weather
+﻿package com.example.kh_studyprojects_weatherapp.data.repository.weather
 
 import android.util.Log
-import com.example.kh_studyprojects_weatherapp.data.api.ApiServiceProvider
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.data.api.weather.WeatherRequest
+import com.example.kh_studyprojects_weatherapp.data.api.weather.WeatherApiService
 import javax.inject.Inject
 
-class WeatherRepositoryImpl @Inject constructor() : WeatherRepository {
-    private val weatherApiService = ApiServiceProvider.weatherApiService
+/**
+ * WeatherRepository 구현체
+ * - Hilt로 주입 받은 WeatherApiService를 사용하며, 수동 싱글턴 없이 DI로 수명 관리합니다.
+ */
+class WeatherRepositoryImpl @Inject constructor(
+    private val weatherApiService: WeatherApiService
+) : WeatherRepository {
     private val TAG = "WeatherRepository"
 
     override suspend fun getWeatherInfo(
@@ -94,16 +99,5 @@ class WeatherRepositoryImpl @Inject constructor() : WeatherRepository {
             Result.failure(e)
         }
     }
-
-    companion object {
-        // Singleton 인스턴스 생성
-        @Volatile
-        private var instance: WeatherRepositoryImpl? = null
-
-        fun getInstance(): WeatherRepositoryImpl {
-            return instance ?: synchronized(this) {
-                instance ?: WeatherRepositoryImpl().also { instance = it }
-            }
-        }
-    }
 }
+

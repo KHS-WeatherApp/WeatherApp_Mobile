@@ -31,7 +31,7 @@ import com.example.kh_studyprojects_weatherapp.presentation.weather.current.Curr
 import com.example.kh_studyprojects_weatherapp.presentation.weather.daily.WeatherDailyFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.hourly.WeatherHourlyForecastFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.AdditionalWeatherFragment
-import com.example.kh_studyprojects_weatherapp.data.api.ApiServiceProvider
+import com.example.kh_studyprojects_weatherapp.domain.repository.common.geocoding.GeocodingRepository
 import com.example.kh_studyprojects_weatherapp.data.api.kakao.SearchDocument
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.sidemenu.SmFavoriteLocationRepository
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
@@ -77,6 +77,7 @@ class SmManager(
     private val activity: FragmentActivity,
     private val favoriteLocationRepository: SmFavoriteLocationRepository,
     private val weatherRepository: WeatherRepository,
+    private val geocodingRepository: GeocodingRepository,
     private val locationSelectionStore: LocationSelectionStore,
     private val locationManager: LocationManager
 ) {
@@ -494,7 +495,7 @@ class SmManager(
         searchJob = lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ApiServiceProvider.kakaoApiService.searchByAddress(
+                    geocodingRepository.searchByAddress(
                         query = trimmedQuery,
                         page = 1,
                         size = 30
@@ -557,7 +558,7 @@ class SmManager(
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ApiServiceProvider.kakaoApiService.searchByAddress(
+                    geocodingRepository.searchByAddress(
                         query = currentSearchQuery,
                         page = currentSearchPage,
                         size = 30
@@ -599,14 +600,27 @@ class SmManager(
         }
     }
 
+    // ==================== 윈도우 인셋 처리 ====================
+    // (상단 상태바, 하단 내비게이션바 등 시스템 UI와의 간섭 방지)
+    // ViewCompat.setOnApplyWindowInsetsListener를 사용하여
+    // 뷰의 패딩을 동적으로 조정합니다.
+    // ==================================================
+    // isPaddingLeft, isPaddingTop, isPaddingRight, isPaddingBottom 중
+    // true로 설정된 방향에 대해서만 패딩을 적용합니다.
+    // ==================================================
+    // isMarginLeft, isMarginTop, isMarginRight, isMarginBottom 중
+    // true로 설정된 방향에 대해서만 마진을 적용합니다.
+    // ==================================================
     private fun showLoadingIndicator(show: Boolean) {
         searchResultAdapter.setLoading(show)
     }
 
+    // 윈도우 인셋 처리 설정
     private fun showErrorMessage(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
+    // 디바이스 ID 가져오기
     private fun setDrawerLockForSearch(expanded: Boolean) {
         val drawerLayout = binding.drawerLayout
         val mode = if (expanded) DrawerLayout.LOCK_MODE_LOCKED_OPEN else DrawerLayout.LOCK_MODE_UNLOCKED
@@ -770,6 +784,7 @@ class SmManager(
         }
     }
 
+    // 검색창을 최대 높이로 확장하는 애니메이션
     private fun animateToMaxHeight(searchContainer: View, favoriteHeader: View) {
         val currentHeight = searchContainer.height
         val searchContainerTop = searchContainer.top
@@ -825,6 +840,7 @@ class SmManager(
         heightAnimator.start()
     }
 
+    // 검색창을 최소 높이로 축소하는 애니메이션
     private fun animateToMinHeight(searchContainer: View) {
         val currentHeight = searchContainer.height
         val minHeight = 100
@@ -866,6 +882,7 @@ class SmManager(
         heightAnimator.start()
     }
 
+    // 검색창을 원본 높이로 복원하는 애니메이션
     private fun animateToOriginalHeight(searchContainer: View, originalHeight: Int) {
         val currentHeight = searchContainer.height
 
@@ -914,6 +931,7 @@ class SmManager(
         })
     }
 
+    // 검색창 초기화 애니메이션
     private fun resetSearchContainer(searchContainer: View, @Suppress("UNUSED_PARAMETER") favoriteHeader: View) {
         val currentHeight = searchContainer.height
         val originalHeight = ViewGroup.LayoutParams.WRAP_CONTENT
