@@ -50,6 +50,8 @@ import com.example.kh_studyprojects_weatherapp.presentation.common.location.Loca
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.SelectedLocation
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
 
+import kotlin.math.roundToInt
+
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherData
 /**
  * 사이드메뉴 전체를 관리하는 통합 Manager 클래스
@@ -1049,7 +1051,7 @@ class SmManager(
                     }
                     result.onSuccess { weatherData ->
                         try {
-                            val temperature = weatherData.current.temperature2m?.toInt()
+                            val temperature = weatherData.current.temperature2m?.roundToInt()
                             binding.sideMenuContent.tvCurrentTemperature.text = temperature?.let { "${it}°" } ?: "N/A"
 
                             val weatherCode = weatherData.current.weatherCode ?: 0

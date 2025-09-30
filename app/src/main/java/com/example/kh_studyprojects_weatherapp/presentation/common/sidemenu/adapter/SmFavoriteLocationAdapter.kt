@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.roundToInt
 
 /**
  * 사이드메뉴 즐겨찾기 지역 어댑터
@@ -104,7 +105,7 @@ class SmFavoriteLocationAdapter(
                     val result = repo.getWeatherInfo(location.latitude, location.longitude)
                     result.onSuccess { weatherData ->
                         withContext(Dispatchers.Main) {
-                            val tempInt = weatherData.current.temperature2m?.toInt()
+                            val tempInt = weatherData.current.temperature2m?.roundToInt()
                             binding.tvTemperature.text = tempInt?.let { "${it}°" } ?: "N/A"
 
                             val weatherCode = weatherData.current.weatherCode ?: 0
