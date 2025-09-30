@@ -10,7 +10,7 @@ data class WeatherDailyDto(
     val maxTemp: String,
     val weatherCode: Int,
     var isVisible: Boolean = true,
-    // 기존 필드들...
+
     val globalMinTemp: Double, // 전체 기간 최저 온도
     val globalMaxTemp: Double,  // 전체 기간 최고 온도
     val hourlyForecast: List<WeatherHourlyForecastDto> = emptyList(), // 시간별 날씨

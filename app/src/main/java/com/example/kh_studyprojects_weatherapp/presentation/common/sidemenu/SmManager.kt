@@ -504,7 +504,7 @@ class SmManager(
                         size = 30
                     )
                 }
-                
+
                 if (response.documents.isEmpty()) {
                     searchResultAdapter.clearSearchResults()
                     binding.sideMenuContent.llSearchResultsContainer.visibility = View.GONE
@@ -514,25 +514,11 @@ class SmManager(
                     currentSearchPage = 2
                     isSearchEnd = response.meta.isEnd
                 }
-            } catch (e: HttpException) {
-                val code = e.code()
-                val msg = e.response()?.errorBody()?.string().orEmpty()
-                Log.e("KakaoAddressSearch", "HTTP $code: $msg", e)
-                showLoadingIndicator(false)
-                val errorMessage = e.message ?: "검색 오류 (HTTP $code)"
-                showErrorMessage(errorMessage)
-            } catch (e: IOException) {
-                Log.e("KakaoAddressSearch", "네트워크 오류", e)
-                showLoadingIndicator(false)
-                val errorMessage = e.message ?: "네트워크 오류가 발생했습니다"
-                showErrorMessage(errorMessage)
-            } catch (e: CancellationException) {
-                // 검색 디바운스/취소는 정상 플로우이므로 사용자에게 알리지 않음
             } catch (e: Exception) {
-                Log.e("KakaoAddressSearch", "기타 오류", e)
                 showLoadingIndicator(false)
                 val errorMessage = e.message ?: "검색 중 오류가 발생했습니다"
                 showErrorMessage(errorMessage)
+                Log.e("KakaoAddressSearch", "Search error", e)
             }
         }
     }
@@ -577,26 +563,11 @@ class SmManager(
                     isSearchEnd = true
                     showLoadingIndicator(false)
                 }
-
-            } catch (e: HttpException) {
-                val code = e.code()
-                val msg = e.response()?.errorBody()?.string().orEmpty()
-                Log.e("KakaoAddressSearch", "HTTP $code: $msg", e)
-                showLoadingIndicator(false)
-                val errorMessage = e.message ?: "검색 오류 (HTTP $code)"
-                showErrorMessage(errorMessage)
-            } catch (e: IOException) {
-                Log.e("KakaoAddressSearch", "네트워크 오류", e)
-                showLoadingIndicator(false)
-                val errorMessage = e.message ?: "네트워크 오류가 발생했습니다"
-                showErrorMessage(errorMessage)
-            } catch (e: CancellationException) {
-                // 다음 페이지 로드 중 취소도 정상 처리. 사용자에게 토스트를 띄우지 않음
             } catch (e: Exception) {
-                Log.e("KakaoAddressSearch", "기타 오류", e)
                 showLoadingIndicator(false)
                 val errorMessage = e.message ?: "검색 중 오류가 발생했습니다"
                 showErrorMessage(errorMessage)
+                Log.e("KakaoAddressSearch", "loadNextSearchPage error", e)
             } finally {
                 isSearchLoading = false
             }
