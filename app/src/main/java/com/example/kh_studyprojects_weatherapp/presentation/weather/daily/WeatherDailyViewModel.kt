@@ -7,7 +7,7 @@ import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherMappers
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.EffectiveLocationResolver
-import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLoadViewModel
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLegacyViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +22,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 class WeatherDailyViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val effectiveLocationResolver: EffectiveLocationResolver
-) : BaseLoadViewModel() {
+) : BaseLegacyViewModel() {
 
     // UI에 노출할 일별 예보 목록 상태
     private val _weatherItems = MutableStateFlow<List<WeatherDailyDto>>(emptyList())
@@ -60,30 +60,21 @@ class WeatherDailyViewModel @Inject constructor(
     private suspend fun fetchWeatherData(latitude: Double, longitude: Double) {
         Log.i("WeatherVM", "Start fetching weather data: lat=$latitude, lon=$longitude")
         weatherRepository.getWeatherInfo(latitude, longitude)
-            .onSuccess { response ->
+            .onSuccess { weatherData ->
                 Log.i("WeatherVM", "Weather data fetch success")
-                val data = response as? Map<String, Any>
-                if (data != null) {
-                    fullWeatherData = WeatherMappers.toDailyWeatherDtos(data)
-                    
-                    // 어댑터가 동일 아이템으로 인식하지 않도록 '펼친 행'은 반드시 copy + 깊은 copy
-                    val target = baseSlice(fullWeatherData).map { item ->
-                        val key = item.date  // 또는 (date + week) 등 고유 키
-                        if (key in expandedKeys.value) {
-                            item.copy(
-                                hourlyForecast = item.hourlyForecast.map { it.copy() } // 깊은 복사
-                            )
-                        } else item
-                    }
-                    _weatherItems.value = target
+                fullWeatherData = WeatherMappers.toDailyWeatherDtos(weatherData)
 
-                    val current = (data["current"] as? Map<*, *>) ?: emptyMap<String, Any>()
-                    _currentApiTime.value = current["time"] as? String
-                    Log.i("WeatherVM", "Current API Time: ${_currentApiTime.value}")
-                    Log.i("WeatherVM", "Parsed daily items: ${fullWeatherData.size}")
-                } else {
-                    throw Exception("날씨 데이터 형식이 올바르지 않습니다")
+                val target = baseSlice(fullWeatherData).map { item ->
+                    val key = item.date
+                    if (key in expandedKeys.value) {
+                        item.copy(hourlyForecast = item.hourlyForecast.map { it.copy() })
+                    } else item
                 }
+                _weatherItems.value = target
+
+                _currentApiTime.value = weatherData.current.time
+                Log.i("WeatherVM", "Current API Time: ${_currentApiTime.value}")
+                Log.i("WeatherVM", "Parsed daily items: ${fullWeatherData.size}")
             }
             .onFailure { throw it }
     }

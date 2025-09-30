@@ -1,4 +1,4 @@
-﻿package com.example.kh_studyprojects_weatherapp
+package com.example.kh_studyprojects_weatherapp
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -31,6 +31,7 @@ import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adap
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherData
 @AndroidEntryPoint
 /**
  * MainActivity
@@ -141,7 +142,7 @@ class MainActivity : AppCompatActivity() {
      * 현재 날씨 데이터가 갱신되었을 때(프래그먼트에서 콜백)
      * 사이드메뉴 헤더 등의 표시를 업데이트하기 위해 SmManager로 전달
      */
-    fun updateCurrentWeatherData(weatherData: Map<String, Any>) {
+    fun updateCurrentWeatherData(weatherData: WeatherData) {
         sideMenuManager.updateCurrentWeatherData(weatherData)
     }
 
@@ -191,3 +192,4 @@ class MainActivity : AppCompatActivity() {
         checkLocationPermission()
     }
 }
+

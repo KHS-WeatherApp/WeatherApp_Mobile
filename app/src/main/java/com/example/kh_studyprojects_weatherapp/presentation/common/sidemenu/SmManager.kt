@@ -27,10 +27,10 @@ import com.example.kh_studyprojects_weatherapp.presentation.common.sidemenu.adap
 import com.example.kh_studyprojects_weatherapp.domain.model.location.FavoriteLocation
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import com.example.kh_studyprojects_weatherapp.presentation.weather.WeatherFragment
-import com.example.kh_studyprojects_weatherapp.presentation.weather.current.CurrentWeatherFragment
+import com.example.kh_studyprojects_weatherapp.presentation.weather.current.WeatherCurrentFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.daily.WeatherDailyFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.hourly.WeatherHourlyForecastFragment
-import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.AdditionalWeatherFragment
+import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.WeatherAdditionalFragment
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.geocoding.GeocodingRepository
 import com.example.kh_studyprojects_weatherapp.data.api.kakao.SearchDocument
 import com.example.kh_studyprojects_weatherapp.domain.repository.common.sidemenu.SmFavoriteLocationRepository
@@ -50,6 +50,7 @@ import com.example.kh_studyprojects_weatherapp.presentation.common.location.Loca
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.SelectedLocation
 import com.example.kh_studyprojects_weatherapp.presentation.common.location.LocationManager
 
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherData
 /**
  * 사이드메뉴 전체를 관리하는 통합 Manager 클래스
  * 
@@ -91,7 +92,7 @@ class SmManager(
     private var isSearchContainerExpanded: Boolean = false // 검색창이 확장되었는지 추적
 
     // 현재 날씨 데이터 콜백
-    private var onWeatherDataUpdated: ((Map<String, Any>) -> Unit)? = null
+    private var onWeatherDataUpdated: ((WeatherData) -> Unit)? = null
 
     fun setupSideMenu() {
         // 즐겨찾기 지역 RecyclerView 설정
@@ -1011,7 +1012,7 @@ class SmManager(
     /**
      * 사이드메뉴의 현재 위치 아이템 업데이트
      */
-    private fun updateCurrentLocationInSideMenu(@Suppress("UNUSED_PARAMETER") weatherData: Map<String, Any>) {
+    private fun updateCurrentLocationInSideMenu(@Suppress("UNUSED_PARAMETER") weatherData: WeatherData) {
         // 헤더의 온도/아이콘은 GPS 기준으로만 갱신
         refreshGpsWeatherInHeader()
     }
@@ -1048,14 +1049,13 @@ class SmManager(
                     }
                     result.onSuccess { weatherData ->
                         try {
-                            val current = weatherData["current"] as? Map<*, *>
-                            val temperature = (current?.get("temperature_2m") as? Double)?.toInt()
+                            val temperature = weatherData.current.temperature2m?.toInt()
                             binding.sideMenuContent.tvCurrentTemperature.text = temperature?.let { "${it}°" } ?: "N/A"
 
-                            val weatherCode = (current?.get("weather_code") as? Number)?.toInt() ?: 0
+                            val weatherCode = weatherData.current.weatherCode ?: 0
                             binding.sideMenuContent.ivCurrentWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
                         } catch (e: Exception) {
-                            Log.e("SmManager", "헤더 날씨 파싱 실패", e)
+                            Log.e("SmManager", "기본 날씨 파싱 실패", e)
                         }
                     }.onFailure {
                         binding.sideMenuContent.tvCurrentTemperature.text = "N/A"
@@ -1066,6 +1066,7 @@ class SmManager(
             }
         }
     }
+
 
     /**
      * 메뉴 아이템 클릭 리스너 설정
@@ -1131,10 +1132,10 @@ class SmManager(
 
             weatherFragment?.childFragmentManager?.fragments?.forEach { fragment ->
                 when (fragment) {
-                    is CurrentWeatherFragment -> fragment.refreshWeatherData()
+                    is WeatherCurrentFragment -> fragment.refreshWeatherData()
                     is WeatherHourlyForecastFragment -> fragment.refreshWeatherData()
                     is WeatherDailyFragment -> fragment.refreshWeatherData()
-                    is AdditionalWeatherFragment -> fragment.refreshWeatherData()
+                    is WeatherAdditionalFragment -> fragment.refreshWeatherData()
                 }
             }
 
@@ -1159,7 +1160,7 @@ class SmManager(
     /**
      * 현재 날씨 데이터 업데이트 (Fragment에서 호출)
      */
-    fun updateCurrentWeatherData(weatherData: Map<String, Any>) {
+    fun updateCurrentWeatherData(weatherData: WeatherData) {
         onWeatherDataUpdated?.invoke(weatherData)
     }
 
@@ -1180,3 +1181,5 @@ class SmManager(
         refreshGpsWeatherInHeader()
     }
 }
+
+

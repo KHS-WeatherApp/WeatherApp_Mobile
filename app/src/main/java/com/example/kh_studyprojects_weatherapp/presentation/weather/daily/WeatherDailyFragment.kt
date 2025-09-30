@@ -18,7 +18,8 @@ import kotlinx.coroutines.flow.collectLatest
 @AndroidEntryPoint
 class WeatherDailyFragment : Fragment() {
     private var _binding: WeatherDailyIncludeBinding? = null
-    private val binding get() = _binding!!
+    private val binding: WeatherDailyIncludeBinding
+        get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
 
     private val viewModel: WeatherDailyViewModel by viewModels()
     
@@ -53,28 +54,18 @@ class WeatherDailyFragment : Fragment() {
             adapter = weatherDailyAdapter
         }
 
-        // ViewModel의 데이터 관찰
+        // ViewModel의 데이터 관찰 - combine으로 두 Flow를 효율적으로 수집
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                try {
-                    // 🚀 1. weatherItems와 currentApiTime을 모두 관찰
-                    // 두 Flow를 zip() 등으로 묶어서 한 번에 처리하는 것이 효율적입니다.
-                    viewModel.weatherItems.collectLatest { dailyItems ->
-                        // 🚀 2. `currentApiTime`이 업데이트될 때까지 대기
-                        viewModel.currentApiTime.collectLatest { currentApiTime ->
-                            if (currentApiTime != null) {
-                                // 🚀 3. 어댑터에 데이터와 함께 API 시간을 전달
-                                weatherDailyAdapter.submitListWithTime(dailyItems, currentApiTime)
-                            }
-                        }
+                kotlinx.coroutines.flow.combine(
+                    viewModel.weatherItems,
+                    viewModel.currentApiTime
+                ) { items, apiTime ->
+                    items to apiTime
+                }.collect { (items, apiTime) ->
+                    apiTime?.let { time ->
+                        weatherDailyAdapter.submitListWithTime(items, time)
                     }
-//                    viewModel.weatherItems.collect { items ->
-//                        println("Submitting items to adapter: $items")
-//                        adapter.submitList(items)
-//                    }
-                } catch (e: Exception) {
-                    println("Error collecting weather items: ${e.message}")
-                    e.printStackTrace()
                 }
             }
         }

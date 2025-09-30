@@ -104,16 +104,11 @@ class SmFavoriteLocationAdapter(
                     val result = repo.getWeatherInfo(location.latitude, location.longitude)
                     result.onSuccess { weatherData ->
                         withContext(Dispatchers.Main) {
-                            // 온도 데이터 추출 및 표시
-                            val current = weatherData["current"] as? Map<*, *>
-                            val temperature = current?.get("temperature_2m") as? Double
-                            val tempInt = temperature?.toInt()
+                            val tempInt = weatherData.current.temperature2m?.toInt()
                             binding.tvTemperature.text = tempInt?.let { "${it}°" } ?: "N/A"
-                            
-                            // 날씨 코드에 따른 아이콘 설정
-                            val weatherCode = (current?.get("weather_code") as? Number)?.toInt() ?: 0
+
+                            val weatherCode = weatherData.current.weatherCode ?: 0
                             binding.ivWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
-                            // 캐시 저장
                             locationIdToWeather[cacheKey] = Pair(tempInt, weatherCode)
                         }
                     }.onFailure { exception ->

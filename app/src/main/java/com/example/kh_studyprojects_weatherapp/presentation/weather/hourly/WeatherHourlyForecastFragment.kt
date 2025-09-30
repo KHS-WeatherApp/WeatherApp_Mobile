@@ -1,8 +1,8 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import com.example.kh_studyprojects_weatherapp.presentation.common.util.DebugLogger
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,9 +19,10 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class WeatherHourlyForecastFragment : Fragment() {
 
-    private var _binding: WeatherHourlyForecastFragmentBinding? = null // 뷰 바인딩 객체를 위한 변수를 선언 (null 허용)
-    private val binding get() = _binding!! // 안전하게 접근할 수 있도록 get()을 통해 _binding의 값을 사용
-    private lateinit var adapter: WeatherHourlyForecastAdapter // 리사이클러뷰의 어댑터를 늦은 초기화(Lateinit) 방식으로 선언
+    private var _binding: WeatherHourlyForecastFragmentBinding? = null
+    private val binding: WeatherHourlyForecastFragmentBinding
+        get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
+    private lateinit var adapter: WeatherHourlyForecastAdapter
     private val viewModel: WeatherHourlyForecastViewModel by viewModels()
     
     // 외부에서 접근 가능하도록 viewModel 속성 추가
@@ -52,7 +53,7 @@ class WeatherHourlyForecastFragment : Fragment() {
 
         // 스위치(토글 버튼) 리스너 설정
         binding.switchOrientation.setOnCheckedChangeListener { _, isChecked ->
-            Log.d("SwitchTest", "Switch is now: ${if (isChecked) "Checked" else "Unchecked"}")
+            DebugLogger.d("SwitchTest", "Switch is now: ${if (isChecked) "Checked" else "Unchecked"}")
 
             // Switch 텍스트 변경
             binding.switchOrientation.text = if (isChecked) "가로로 보기" else "세로로 보기"
@@ -85,12 +86,7 @@ class WeatherHourlyForecastFragment : Fragment() {
                 // 시간별 예보 데이터 수신
                 launch {
                     viewModel.hourlyForecastItems.collect { items ->
-                        adapter?.submitList(items)
-                    }
-                }
-                // 로딩 상태 처리
-                launch {
-                    viewModel.isLoading.collect { isLoading ->
+                        adapter.submitList(items)
                     }
                 }
                 // 에러 처리
@@ -98,14 +94,6 @@ class WeatherHourlyForecastFragment : Fragment() {
                     viewModel.error.collect { error ->
                         error?.let {
                             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
-                /*디버깅용 위도 경도 구 동  Toast 메시지 출력*/
-                launch {
-                    viewModel.locationInfo.collect { locationInfo ->
-                        locationInfo?.let {
-//                            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                         }
                     }
                 }

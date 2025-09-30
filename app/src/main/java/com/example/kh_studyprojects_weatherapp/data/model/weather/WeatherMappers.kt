@@ -1,7 +1,14 @@
 package com.example.kh_studyprojects_weatherapp.data.model.weather
 
 import android.util.Log
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherAdditional
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCurrent
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCurrentRaw
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherData
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherDaily
+import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherHourly
 import java.time.LocalDateTime
+import kotlin.math.roundToInt
 
 /**
  * WeatherMappers
@@ -50,6 +57,90 @@ object WeatherMappers {
             }
         } ?: List(fallbackSize) { fallback }
 
+    private fun asDouble(value: Any?): Double? = when (value) {
+        is Number -> value.toDouble()
+        is String -> value.toDoubleOrNull()
+        else -> null
+    }
+
+    private fun asInt(value: Any?): Int? = when (value) {
+        is Number -> value.toInt()
+        is String -> value.toIntOrNull()
+        else -> null
+    }
+
+        fun toHourlyForecastDtos(data: WeatherData): List<WeatherHourlyForecastDto> =
+        toHourlyForecastDtos(data.raw)
+
+    fun toDailyWeatherDtos(data: WeatherData): List<WeatherDailyDto> =
+        toDailyWeatherDtos(data.raw)
+
+    fun toWeatherData(response: Map<String, Any>): WeatherData? {
+        val currentMap = (response["current"] as? Map<*, *>)?.mapKeys { it.key.toString() } ?: return null
+        val hourlyMap = (response["hourly"] as? Map<*, *>)?.mapKeys { it.key.toString() } ?: return null
+        val dailyMap = (response["daily"] as? Map<*, *>)?.mapKeys { it.key.toString() } ?: return null
+
+        val hourlyTimes = asStringList(hourlyMap["time"] as? List<*>)
+        val dailyTimes = asStringList(dailyMap["time"] as? List<*>)
+
+        val current = WeatherCurrentRaw(
+            time = currentMap["time"]?.toString(),
+            temperature2m = asDouble(currentMap["temperature_2m"]),
+            apparentTemperature = asDouble(currentMap["apparent_temperature"]),
+            relativeHumidity2m = asDouble(currentMap["relative_humidity_2m"]),
+            precipitation = asDouble(currentMap["precipitation"]),
+            weatherCode = asInt(currentMap["weather_code"]),
+            windSpeed10m = asDouble(currentMap["wind_speed_10m"]),
+            raw = currentMap
+        )
+
+        val hourly = WeatherHourly(
+            time = hourlyTimes,
+            temperature2m = asDoubleList(hourlyMap["temperature_2m"] as? List<*>, fallbackSize = hourlyTimes.size),
+            apparentTemperature = asDoubleList(hourlyMap["apparent_temperature"] as? List<*>, fallbackSize = hourlyTimes.size),
+            precipitation = asDoubleList(hourlyMap["precipitation"] as? List<*>, fallbackSize = hourlyTimes.size),
+            precipitationProbability = asIntList(hourlyMap["precipitation_probability"] as? List<*>, fallbackSize = hourlyTimes.size),
+            weatherCode = asIntList(hourlyMap["weather_code"] as? List<*>, fallbackSize = hourlyTimes.size)
+        )
+
+        val daily = WeatherDaily(
+            time = dailyTimes,
+            temperatureMax = asDoubleList(dailyMap["temperature_2m_max"] as? List<*>, fallbackSize = dailyTimes.size),
+            temperatureMin = asDoubleList(dailyMap["temperature_2m_min"] as? List<*>, fallbackSize = dailyTimes.size),
+            weatherCode = asIntList(dailyMap["weather_code"] as? List<*>, fallbackSize = dailyTimes.size),
+            precipitationSum = asDoubleList(dailyMap["precipitation_sum"] as? List<*>, fallbackSize = dailyTimes.size),
+            precipitationProbabilityMax = asIntList(dailyMap["precipitation_probability_max"] as? List<*>, fallbackSize = dailyTimes.size),
+            apparentTemperatureMax = asDoubleList(dailyMap["apparent_temperature_max"] as? List<*>, fallbackSize = dailyTimes.size),
+            apparentTemperatureMin = asDoubleList(dailyMap["apparent_temperature_min"] as? List<*>, fallbackSize = dailyTimes.size),
+            sunrise = asStringList(dailyMap["sunrise"] as? List<*>),
+            sunset = asStringList(dailyMap["sunset"] as? List<*>)
+        )
+
+        return WeatherData(
+            raw = response,
+            current = current,
+            hourly = hourly,
+            daily = daily
+        )
+    }
+
+    fun toAdditionalWeather(weather: WeatherData, airResponse: Map<String, Any>): WeatherAdditional {
+        val currentAir = (airResponse["current"] as? Map<*, *>)?.mapKeys { it.key.toString() } ?: emptyMap()
+        val todayIndex = weather.daily.time.indexOfFirst { it == java.time.LocalDate.now().toString() }
+
+        val sunrise = weather.daily.sunrise.getOrNull(todayIndex)
+        val sunset = weather.daily.sunset.getOrNull(todayIndex)
+
+        return WeatherAdditional(
+            sunrise = sunrise,
+            sunset = sunset,
+            precipitation = weather.current.precipitation,
+            windSpeed = weather.current.windSpeed10m,
+            pm10 = asDouble(currentAir["pm10"]),
+            pm2_5 = asDouble(currentAir["pm2_5"]),
+            uvIndex = asDouble(currentAir["uv_index"])
+        )
+    }
     private fun parseToLocalDateTime(raw: String): LocalDateTime? {
         // Try common patterns: with 'Z', with offset, without seconds, with seconds
         val s = raw.trim()
@@ -159,6 +250,32 @@ object WeatherMappers {
      * Current 화면용: 응답 맵에 안전하게 위치 문자열을 합성합니다.
      * 프레젠테이션 계층이 임의 캐스팅 없이 그대로 사용할 수 있도록 도와줍니다.
      */
+    fun toCurrentWeather(weather: WeatherData): WeatherCurrent? {
+        val current = weather.current
+        val weatherCode = current.weatherCode ?: return null
+
+        val temperature = current.temperature2m?.roundToInt()
+        val apparentTemperature = current.apparentTemperature?.roundToInt()
+        val location = weather.raw["location"] as? String ?: ""
+        val hourlyTimes = weather.hourly.time
+        val currentTimeIso = current.time ?: hourlyTimes.firstOrNull()
+        val hourlyTemperatures = weather.hourly.temperature2m
+        val todayMaxTemp = weather.daily.temperatureMax.firstOrNull()
+        val todayMinTemp = weather.daily.temperatureMin.firstOrNull()
+
+        return WeatherCurrent(
+            location = location,
+            temperature = temperature,
+            apparentTemperature = apparentTemperature,
+            weatherCode = weatherCode,
+            currentTimeIso = currentTimeIso,
+            hourlyTimes = hourlyTimes,
+            hourlyTemperatures = hourlyTemperatures,
+            todayMaxTemp = todayMaxTemp,
+            todayMinTemp = todayMinTemp
+        )
+    }
+
     fun enrichCurrentWeather(response: Map<String, Any>, locationAddress: String): Map<String, Any> {
         return try {
             val copy = response.toMutableMap()
@@ -278,3 +395,4 @@ object WeatherMappers {
         "${d.monthValue}.${d.dayOfMonth}"
     } catch (_: Exception) { dateString }
 }
+

@@ -10,29 +10,20 @@ import androidx.navigation.findNavController
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.LayoutNavigationBottomBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherFragmentBinding
-import com.example.kh_studyprojects_weatherapp.presentation.weather.current.CurrentWeatherFragment
+import com.example.kh_studyprojects_weatherapp.presentation.weather.current.WeatherCurrentFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.daily.WeatherDailyFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.hourly.WeatherHourlyForecastFragment
-import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.AdditionalWeatherFragment
-import com.example.kh_studyprojects_weatherapp.presentation.weather.WeatherViewModel
+import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.WeatherAdditionalFragment
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.lifecycle.lifecycleScope
-import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.AdditionalWeatherViewModel
-import com.example.kh_studyprojects_weatherapp.presentation.weather.current.CurrentWeatherViewModel
-import com.example.kh_studyprojects_weatherapp.presentation.weather.daily.WeatherDailyViewModel
-import com.example.kh_studyprojects_weatherapp.presentation.weather.hourly.WeatherHourlyForecastViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 
 /**
- * 날씨 메인 프래그먼트
- * * @author 개발자명
+ * 날씨 메인 프래그먼트 화면입니다.
  * @since 2024.01.01
  * @version 1.0
  */
@@ -40,14 +31,22 @@ import kotlinx.coroutines.cancel
 class WeatherFragment : Fragment() {
 
     private var _binding: WeatherFragmentBinding? = null
-    private val binding get() = _binding!!
+    private val binding: WeatherFragmentBinding
+        get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
 
     private var _navigationBinding: LayoutNavigationBottomBinding? = null
-    private val navigationBinding get() = _navigationBinding!!
+    private val navigationBinding: LayoutNavigationBottomBinding
+        get() = _navigationBinding ?: throw IllegalStateException("Navigation binding is accessed before onCreateView or after onDestroyView")
 
     private val viewModel: WeatherViewModel by activityViewModels()
 
     private lateinit var loadingOverlay: View
+
+    // 자식 Fragment 캐시
+    private var cachedCurrentFragment: WeatherCurrentFragment? = null
+    private var cachedDailyFragment: WeatherDailyFragment? = null
+    private var cachedHourlyFragment: WeatherHourlyForecastFragment? = null
+    private var cachedAdditionalFragment: WeatherAdditionalFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,14 +55,16 @@ class WeatherFragment : Fragment() {
     ): View {
         _binding = WeatherFragmentBinding.inflate(inflater, container, false)
 
-        // include된 네비게이션 바인딩
+        // 포함된 하단 내비게이션 레이아웃을 바인딩
         _navigationBinding = LayoutNavigationBottomBinding.bind(binding.includedNavigationBottom.root)
 
-        // 로딩 오버레이 뷰 참조
+        // 로딩 오버레이 뷰를 캐싱
         loadingOverlay = binding.root.findViewById(R.id.loadingOverlay)
 
-        setupNavigation() // 하단 네비게이션 설정
-        setupChildFragments(savedInstanceState) // 자식 프래그먼트 설정
+        // 하단 네비게이션 동작을 설정
+        setupNavigation()
+        // 최초 생성 시 자식 프래그먼트를 붙임
+        setupChildFragments(savedInstanceState)
 
         return binding.root
     }
@@ -71,32 +72,32 @@ class WeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 당겨서 새로고침 동작
+        // 사용자가 당겨서 새로고침할 때 데이터를 갱신
         binding.swipeRefreshLayout.setOnRefreshListener {
             refreshWeatherData()
         }
 
-        // 초기 진입 로딩 오버레이 표시 (한 번만 보여줌)
+        // 최초 진입 시에만 오버레이를 표시
         if (!viewModel.hasShownInitialOverlay.value) {
             loadingOverlay.visibility = View.VISIBLE
         }
 
-        // ViewModel의 갱신 상태 관찰
+        // 공유 ViewModel에서 새로고침 상태를 관찰
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.isRefreshing.collect { isRefreshing ->
                 binding.swipeRefreshLayout.isRefreshing = isRefreshing
             }
         }
 
-        // 초기 데이터 로드 트리거
+        // 초기 데이터 갱신을 즉시 실행
         viewLifecycleOwner.lifecycleScope.launch {
             refreshWeatherData()
         }
 
-        // 모든 섹션 데이터가 준비되면 로딩 오버레이 숨김
+        // 모든 섹션의 데이터 준비 완료를 확인
         observeInitialLoadingCompletion()
         
-        // 초기 로딩 오버레이 상태 관찰
+        // 초기 오버레이 표시 여부를 추적
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.hasShownInitialOverlay.collect { hasShown ->
                 if (hasShown) {
@@ -107,18 +108,24 @@ class WeatherFragment : Fragment() {
     }
 
     private fun observeInitialLoadingCompletion() {
-        // 자식 프래그먼트들이 트랜잭션을 마치도록 보장
+        // 상태 확인 전에 대기 중인 프래그먼트 트랜잭션을 처리
         childFragmentManager.executePendingTransactions()
 
-        val current = childFragmentManager
-            .findFragmentById(R.id.weather_current_container) as? CurrentWeatherFragment
-        val daily = childFragmentManager
-            .findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment
-        val hourly = childFragmentManager
-            .findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment
+        // 캐시된 Fragment가 없으면 조회 후 캐싱
+        val current = cachedCurrentFragment ?: (childFragmentManager
+            .findFragmentById(R.id.weather_current_container) as? WeatherCurrentFragment)
+            ?.also { cachedCurrentFragment = it }
+
+        val daily = cachedDailyFragment ?: (childFragmentManager
+            .findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment)
+            ?.also { cachedDailyFragment = it }
+
+        val hourly = cachedHourlyFragment ?: (childFragmentManager
+            .findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment)
+            ?.also { cachedHourlyFragment = it }
 
         if (current == null || daily == null || hourly == null) {
-            // 프래그먼트가 아직 준비되지 않은 경우 조금 후 다시 시도
+            // 프래그먼트가 준비되지 않았으면 잠시 후 다시 시도
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(100)
                 observeInitialLoadingCompletion()
@@ -126,10 +133,11 @@ class WeatherFragment : Fragment() {
             return
         }
 
-        // 모든 자식 뷰모델 참조
+        // 각 자식 ViewModel의 상태를 관찰
         viewLifecycleOwner.lifecycleScope.launch {
-            // 각 뷰모델의 데이터 준비 여부를 Boolean Flow로 변환
-            val currentReady = current.viewModelInstance.weatherState.map { it.isNotEmpty() }
+            val currentReady = current.viewModelInstance.uiState.map {
+                it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success
+            }
             val dailyReady = daily.viewModelInstance.weatherItems.map { it.isNotEmpty() }
             val hourlyReady = hourly.viewModelInstance.hourlyForecastItems.map { it.isNotEmpty() }
 
@@ -137,8 +145,7 @@ class WeatherFragment : Fragment() {
                 .collect { allReady ->
                     if (allReady) {
                         loadingOverlay.visibility = View.GONE
-                        viewModel.markInitialOverlayShown()   // 이제부터 다시는 안 보이게 플래그 세팅
-                        // 관찰 종료를 위해 this coroutine 취소
+                        viewModel.markInitialOverlayShown()   // 초기 오버레이가 표시되었음을 기록
                         this.cancel()
                     }
                 }
@@ -146,30 +153,43 @@ class WeatherFragment : Fragment() {
     }
 
     /**
-     * 날씨 데이터 새로고침
+     * 모든 섹션의 날씨 데이터를 새로고침합니다.
      */
     private fun refreshWeatherData() {
         childFragmentManager.executePendingTransactions()
 
-        val current = (childFragmentManager.findFragmentById(R.id.weather_current_container) as? CurrentWeatherFragment)?.viewModelInstance
-        val daily   = (childFragmentManager.findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment)?.viewModelInstance
-        val hourly  = (childFragmentManager.findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment)?.viewModelInstance
-        val addi    = (childFragmentManager.findFragmentById(R.id.weather_additional_container) as? AdditionalWeatherFragment)?.viewModelInstance
+        // 캐시된 Fragment 사용 (없으면 조회 후 캐싱)
+        val current = cachedCurrentFragment ?: (childFragmentManager
+            .findFragmentById(R.id.weather_current_container) as? WeatherCurrentFragment)
+            ?.also { cachedCurrentFragment = it }
 
-        // 1) 실제 새로고침 트리거
-        (current as? CurrentWeatherViewModel)?.refreshWeatherData()
-        (daily   as? WeatherDailyViewModel)?.refreshWeatherData()
-        (hourly  as? WeatherHourlyForecastViewModel)?.refreshWeatherData()
-        (addi    as? AdditionalWeatherViewModel)?.refreshWeatherData()
+        val daily = cachedDailyFragment ?: (childFragmentManager
+            .findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment)
+            ?.also { cachedDailyFragment = it }
+
+        val hourly = cachedHourlyFragment ?: (childFragmentManager
+            .findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment)
+            ?.also { cachedHourlyFragment = it }
+
+        val addi = cachedAdditionalFragment ?: (childFragmentManager
+            .findFragmentById(R.id.weather_additional_container) as? WeatherAdditionalFragment)
+            ?.also { cachedAdditionalFragment = it }
+
+        current?.viewModelInstance?.refreshWeatherData()
+        daily?.viewModelInstance?.refreshWeatherData()
+        hourly?.viewModelInstance?.refreshWeatherData()
+        addi?.viewModelInstance?.refreshWeatherData()
 
 
-        // 2) 로딩 묶어서 스피너/오버레이 제어
+        // 각 섹션의 로딩 상태를 합쳐 새로고침 인디케이터를 제어
         viewLifecycleOwner.lifecycleScope.launch {
             combine(
-                current?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
-                daily?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
-                hourly?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
-                addi?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                current?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
+                    ?: kotlinx.coroutines.flow.flowOf(false),
+                daily?.viewModelInstance?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                hourly?.viewModelInstance?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                addi?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
+                    ?: kotlinx.coroutines.flow.flowOf(false),
             ) { arr -> arr.any { it } }
              .collect { anyLoading ->
                 binding.swipeRefreshLayout.isRefreshing = anyLoading
@@ -178,7 +198,7 @@ class WeatherFragment : Fragment() {
     }
 
     /**
-     * 하단 네비게이션 설정
+     * 하단 네비게이션 버튼을 설정합니다.
      */
     private fun setupNavigation() {
         with(navigationBinding) {
@@ -195,23 +215,27 @@ class WeatherFragment : Fragment() {
     }
 
     /**
-     * 자식 프래그먼트 설정
+     * 최초 생성 시 자식 프래그먼트를 추가합니다.
      */
     private fun setupChildFragments(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
             childFragmentManager.beginTransaction()
-                .replace(R.id.weather_current_container, CurrentWeatherFragment())
+                .replace(R.id.weather_current_container, WeatherCurrentFragment())
                 .replace(R.id.weather_hourly_forecast_fragment, WeatherHourlyForecastFragment())
                 .replace(R.id.weather_daily_container, WeatherDailyFragment())
-                .replace(R.id.weather_additional_container, AdditionalWeatherFragment())
+                .replace(R.id.weather_additional_container, WeatherAdditionalFragment())
                 .commit()
         }
     }
 
-    // ViewBinding 해제
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
         _navigationBinding = null
+        // 캐시 초기화
+        cachedCurrentFragment = null
+        cachedDailyFragment = null
+        cachedHourlyFragment = null
+        cachedAdditionalFragment = null
     }
 }
