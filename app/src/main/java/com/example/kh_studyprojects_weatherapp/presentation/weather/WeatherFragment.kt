@@ -4,12 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.findNavController
 import com.example.kh_studyprojects_weatherapp.R
-import com.example.kh_studyprojects_weatherapp.databinding.LayoutNavigationBottomBinding
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherFragmentBinding
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseNavigationFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.current.WeatherCurrentFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.daily.WeatherDailyFragment
 import com.example.kh_studyprojects_weatherapp.presentation.weather.hourly.WeatherHourlyForecastFragment
@@ -28,15 +26,11 @@ import kotlinx.coroutines.cancel
  * @version 1.0
  */
 @AndroidEntryPoint
-class WeatherFragment : Fragment() {
+class WeatherFragment : BaseNavigationFragment() {
 
     private var _binding: WeatherFragmentBinding? = null
     private val binding: WeatherFragmentBinding
         get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
-
-    private var _navigationBinding: LayoutNavigationBottomBinding? = null
-    private val navigationBinding: LayoutNavigationBottomBinding
-        get() = _navigationBinding ?: throw IllegalStateException("Navigation binding is accessed before onCreateView or after onDestroyView")
 
     private val viewModel: WeatherViewModel by activityViewModels()
 
@@ -55,14 +49,19 @@ class WeatherFragment : Fragment() {
     ): View {
         _binding = WeatherFragmentBinding.inflate(inflater, container, false)
 
-        // 포함된 하단 내비게이션 레이아웃을 바인딩
-        _navigationBinding = LayoutNavigationBottomBinding.bind(binding.includedNavigationBottom.root)
+        // 하단 네비게이션 바인딩 초기화 (BaseNavigationFragment에서 제공)
+        setupNavigationBinding(binding.root)
 
         // 로딩 오버레이 뷰를 캐싱
         loadingOverlay = binding.root.findViewById(R.id.loadingOverlay)
 
-        // 하단 네비게이션 동작을 설정
-        setupNavigation()
+        // 네비게이션 클릭 리스너 설정
+        setupBottomNavigation(
+            weatherAction = R.id.action_weatherFragment_self,
+            settingAction = R.id.action_weatherFragment_to_settingFragment,
+            finedustAction = R.id.action_weatherFragment_to_finedustFragment
+        )
+
         // 최초 생성 시 자식 프래그먼트를 붙임
         setupChildFragments(savedInstanceState)
 
@@ -198,23 +197,6 @@ class WeatherFragment : Fragment() {
     }
 
     /**
-     * 하단 네비게이션 버튼을 설정합니다.
-     */
-    private fun setupNavigation() {
-        with(navigationBinding) {
-            navWeather.setOnClickListener {
-                it.findNavController().navigate(R.id.action_weatherFragment_self)
-            }
-            navSetting.setOnClickListener {
-                it.findNavController().navigate(R.id.action_weatherFragment_to_settingFragment)
-            }
-            navFindust.setOnClickListener {
-                it.findNavController().navigate(R.id.action_weatherFragment_to_finedustFragment)
-            }
-        }
-    }
-
-    /**
      * 최초 생성 시 자식 프래그먼트를 추가합니다.
      */
     private fun setupChildFragments(savedInstanceState: Bundle?) {
@@ -231,7 +213,6 @@ class WeatherFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        _navigationBinding = null
         // 캐시 초기화
         cachedCurrentFragment = null
         cachedDailyFragment = null
