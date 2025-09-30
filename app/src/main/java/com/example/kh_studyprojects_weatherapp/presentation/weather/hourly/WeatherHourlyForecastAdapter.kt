@@ -15,7 +15,25 @@ import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommo
 import com.example.kh_studyprojects_weatherapp.util.ComUtil
 import java.util.*
 
-// RecyclerView 어댑터 클래스
+/**
+ * 시간별 날씨 예보 RecyclerView Adapter
+ *
+ * 가로/세로 두 가지 레이아웃 모드를 지원하는 멀티 뷰타입 어댑터입니다.
+ * 온도에 따른 동적 마진/너비 조정 및 시간별 날씨 아이콘, 옷차림 추천 등을 표시합니다.
+ *
+ * 주요 기능:
+ * - 가로/세로 레이아웃 모드 전환
+ * - 온도 기반 동적 마진/너비 계산
+ * - 날씨 코드 기반 아이콘 표시
+ * - 체감온도 기반 옷차림 아이콘 표시
+ * - DiffUtil을 통한 효율적인 리스트 갱신
+ *
+ * @param context 컨텍스트
+ * @param isVertical 세로 모드 여부 (기본값: false)
+ * @author 김지윤
+ * @since 2024.01.01
+ * @version 1.0
+ */
 class WeatherHourlyForecastAdapter(
     private val context: Context,
     var isVertical: Boolean = false
