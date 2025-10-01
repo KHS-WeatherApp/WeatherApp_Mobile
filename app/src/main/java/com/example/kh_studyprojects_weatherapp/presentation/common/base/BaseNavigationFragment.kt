@@ -3,6 +3,7 @@ package com.example.kh_studyprojects_weatherapp.presentation.common.base
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.LayoutNavigationBottomBinding
@@ -44,25 +45,54 @@ abstract class BaseNavigationFragment : Fragment() {
     /**
      * 하단 네비게이션 버튼 클릭 이벤트 설정
      *
-     * @param weatherAction 날씨 화면으로 이동하는 Navigation Action ID
-     * @param settingAction 설정 화면으로 이동하는 Navigation Action ID
-     * @param finedustAction 미세먼지 화면으로 이동하는 Navigation Action ID
+     * @param weatherDestination 날씨 화면 목적지 ID (R.id.weatherFragment)
+     * @param settingDestination 설정 화면 목적지 ID (R.id.settingFragment)
+     * @param finedustDestination 미세먼지 화면 목적지 ID (R.id.finedustFragment)
      */
     protected fun setupBottomNavigation(
-        @IdRes weatherAction: Int,
-        @IdRes settingAction: Int,
-        @IdRes finedustAction: Int
+        @IdRes weatherDestination: Int,
+        @IdRes settingDestination: Int,
+        @IdRes finedustDestination: Int
     ) {
         navigationBinding.apply {
             navWeather.setOnClickListener {
-                it.findNavController().navigate(weatherAction)
+                navigateToDestination(it, weatherDestination)
             }
             navSetting.setOnClickListener {
-                it.findNavController().navigate(settingAction)
+                navigateToDestination(it, settingDestination)
             }
             navFindust.setOnClickListener {
-                it.findNavController().navigate(finedustAction)
+                navigateToDestination(it, finedustDestination)
             }
+        }
+    }
+
+    /**
+     * 목적지로 안전하게 이동
+     * - 현재 목적지와 동일하면 무시 (중복 방지)
+     * - launchSingleTop으로 단일 인스턴스 유지
+     *
+     * @param view 클릭된 뷰
+     * @param destinationId 이동할 목적지 ID
+     */
+    private fun navigateToDestination(view: View, @IdRes destinationId: Int) {
+        val navController = view.findNavController()
+
+        // 이미 현재 목적지면 무시
+        if (navController.currentDestination?.id == destinationId) {
+            return
+        }
+
+        val navOptions = NavOptions.Builder()
+            .setLaunchSingleTop(true)
+            .setPopUpTo(R.id.main_nav, inclusive = false, saveState = true)
+            .setRestoreState(true)
+            .build()
+
+        try {
+            navController.navigate(destinationId, null, navOptions)
+        } catch (e: IllegalArgumentException) {
+            // 목적지를 찾을 수 없는 경우 무시 (빠른 중복 클릭 방지)
         }
     }
 

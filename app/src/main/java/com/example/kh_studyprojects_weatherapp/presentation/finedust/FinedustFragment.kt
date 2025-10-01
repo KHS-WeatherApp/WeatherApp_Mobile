@@ -33,9 +33,9 @@ class FinedustFragment : BaseNavigationFragment() {
 
         // 네비게이션 클릭 리스너 설정
         setupBottomNavigation(
-            weatherAction = R.id.action_finedustFragment_to_weatherFragment,
-            settingAction = R.id.action_finedustFragment_to_settingFragment,
-            finedustAction = R.id.action_finedustFragment_self
+            weatherDestination = R.id.weatherFragment,
+            settingDestination = R.id.settingFragment,
+            finedustDestination = R.id.finedustFragment
         )
 
         return binding.root

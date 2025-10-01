@@ -30,9 +30,9 @@ class SettingFragment : BaseNavigationFragment() {
 
         // 네비게이션 클릭 리스너 설정
         setupBottomNavigation(
-            weatherAction = R.id.action_settingFragment_to_weatherFragment,
-            settingAction = R.id.action_settingFragment_self,
-            finedustAction = R.id.action_settingFragment_to_finedustFragment
+            weatherDestination = R.id.weatherFragment,
+            settingDestination = R.id.settingFragment,
+            finedustDestination = R.id.finedustFragment
         )
 
         return binding.root

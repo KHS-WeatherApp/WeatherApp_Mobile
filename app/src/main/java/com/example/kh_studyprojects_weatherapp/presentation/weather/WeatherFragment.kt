@@ -57,9 +57,9 @@ class WeatherFragment : BaseNavigationFragment() {
 
         // 네비게이션 클릭 리스너 설정
         setupBottomNavigation(
-            weatherAction = R.id.action_weatherFragment_self,
-            settingAction = R.id.action_weatherFragment_to_settingFragment,
-            finedustAction = R.id.action_weatherFragment_to_finedustFragment
+            weatherDestination = R.id.weatherFragment,
+            settingDestination = R.id.settingFragment,
+            finedustDestination = R.id.finedustFragment
         )
 
         // 최초 생성 시 자식 프래그먼트를 붙임
