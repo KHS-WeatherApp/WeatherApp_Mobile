@@ -12,7 +12,6 @@ import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecast
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
-import com.example.kh_studyprojects_weatherapp.util.ComUtil
 import java.util.*
 
 /**
@@ -84,6 +83,21 @@ class WeatherHourlyForecastAdapter(
         }
     }
 
+    /**
+     * 24시간 형식을 12시간 형식으로 변환
+     *
+     * @param hour 시간 문자열 (예: "15시")
+     * @return 12시간 형식 시간 (예: "3시")
+     */
+    private fun convertTo12HourFormat(hour: String?): String {
+        val hourInt = hour?.replace("시", "")?.toIntOrNull() ?: return ""
+        return when (hourInt) {
+            0 -> "12시"
+            in 1..12 -> "${hourInt}시"
+            else -> "${hourInt - 12}시"
+        }
+    }
+
 
 
     // onCreateViewHolder() 메서드에서 ViewHolder 생성
@@ -143,7 +157,7 @@ class WeatherHourlyForecastAdapter(
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
-                tvHour.text = ComUtil.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
+                tvHour.text = adapter.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
@@ -192,7 +206,7 @@ class WeatherHourlyForecastAdapter(
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
                 tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
-                tvHour.text = ComUtil.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
+                tvHour.text = adapter.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
