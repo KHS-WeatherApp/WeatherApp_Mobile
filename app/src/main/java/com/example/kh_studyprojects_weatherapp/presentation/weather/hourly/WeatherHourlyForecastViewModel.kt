@@ -1,7 +1,7 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
-import com.example.kh_studyprojects_weatherapp.presentation.common.util.DebugLogger
+import com.example.kh_studyprojects_weatherapp.util.DebugLogger
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherMappers
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.BaseLegacyViewModel

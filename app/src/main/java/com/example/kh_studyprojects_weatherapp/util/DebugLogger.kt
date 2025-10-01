@@ -1,4 +1,4 @@
-package com.example.kh_studyprojects_weatherapp.presentation.common.util
+package com.example.kh_studyprojects_weatherapp.util
 
 import android.util.Log
 import com.example.kh_studyprojects_weatherapp.BuildConfig
