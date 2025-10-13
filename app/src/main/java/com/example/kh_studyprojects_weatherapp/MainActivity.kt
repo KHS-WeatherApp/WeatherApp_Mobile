@@ -107,15 +107,9 @@ class MainActivity : AppCompatActivity() {
 
     /** 위치 권한이 없으면 즉시 요청 */
     private fun checkLocationPermission() {
-        if (!hasLocationPermission()) {
+        if (!locationManager.hasLocationPermission()) {
             requestLocationPermission()
         }
-    }
-
-    /** 위치 권한 보유 여부 */
-    private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
     /** 위치 권한 요청 트리거 */
