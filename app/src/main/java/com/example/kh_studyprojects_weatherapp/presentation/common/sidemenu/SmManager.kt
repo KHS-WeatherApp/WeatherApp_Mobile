@@ -206,14 +206,12 @@ class SmManager(
             try {
                 val deviceId = getDeviceId()
                 current.forEachIndexed { index, location ->
-                    try {
-                        favoriteLocationRepository.updateSortOrder(
-                            latitude = location.latitude,
-                            longitude = location.longitude,
-                            deviceId = deviceId,
-                            sortOrder = index
-                        )
-                    } catch (e: Exception) {
+                    favoriteLocationRepository.updateSortOrder(
+                        latitude = location.latitude,
+                        longitude = location.longitude,
+                        deviceId = deviceId,
+                        sortOrder = index
+                    ).onFailure { e ->
                         Log.e("SmManager", "정렬 순서 업데이트 실패: ${location.addressName}", e)
                     }
                 }
@@ -249,27 +247,18 @@ class SmManager(
      */
     fun handleFavoriteLocationDelete(location: FavoriteLocation) {
         lifecycleScope.launch {
-            try {
-                val result = favoriteLocationRepository.deleteFavoriteLocation(
-                    latitude = location.latitude,
-                    longitude = location.longitude,
-                    deviceId = location.deviceId
-                )
-                
-                val isSuccess = result.first
-                val message = result.second
-                
-                if (isSuccess) {
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                    
-                    // 현재 리스트에서 해당 지역 제거
-                    val currentLocations = favoriteLocationAdapter.getCurrentLocations().toMutableList()
-                    currentLocations.remove(location)
-                    favoriteLocationAdapter.updateLocations(currentLocations)
-                } else {
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
+            favoriteLocationRepository.deleteFavoriteLocation(
+                latitude = location.latitude,
+                longitude = location.longitude,
+                deviceId = location.deviceId
+            ).onSuccess { message ->
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+
+                // 현재 리스트에서 해당 지역 제거
+                val currentLocations = favoriteLocationAdapter.getCurrentLocations().toMutableList()
+                currentLocations.remove(location)
+                favoriteLocationAdapter.updateLocations(currentLocations)
+            }.onFailure { e ->
                 Log.e("SmManager", "즐겨찾기 삭제 실패", e)
                 val errorMessage = e.message ?: "삭제 중 오류가 발생했습니다."
                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
@@ -302,17 +291,16 @@ class SmManager(
                 Log.d("SmManager", "어댑터 참조 일치 여부: ${recyclerView.adapter === favoriteLocationAdapter}")
                 
                 Log.d("SmManager", "Repository 호출 시작")
-                val locations = withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     favoriteLocationRepository.getFavoriteLocations(deviceId)
-                }
-                Log.d("SmManager", "Repository 호출 완료")
-                Log.d("SmManager", "즐겨찾기 목록 조회 결과: ${locations?.size ?: 0}개")
-                
-                if (locations != null) {
+                }.onSuccess { locations ->
+                    Log.d("SmManager", "Repository 호출 완료")
+                    Log.d("SmManager", "즐겨찾기 목록 조회 결과: ${locations.size}개")
+
                     if (locations.isNotEmpty()) {
                         Log.d("SmManager", "즐겨찾기 목록 업데이트: ${locations.map { it.addressName }}")
                         favoriteLocationAdapter.updateLocations(locations)
-                        
+
                         // 업데이트 후 어댑터 상태 확인 (UI 스레드에서 실행)
                         withContext(Dispatchers.Main) {
                             delay(100) // 어댑터 업데이트 완료 대기
@@ -323,13 +311,13 @@ class SmManager(
                         Log.d("SmManager", "즐겨찾기 목록이 비어있음")
                         favoriteLocationAdapter.updateLocations(emptyList())
                     }
-                } else {
-                    Log.w("SmManager", "즐겨찾기 목록이 null - 빈 리스트로 설정")
+                }.onFailure { e ->
+                    Log.e("SmManager", "즐겨찾기 목록 새로고침 실패", e)
+                    Log.e("SmManager", "오류 스택 트레이스", e)
                     favoriteLocationAdapter.updateLocations(emptyList())
                 }
             } catch (e: Exception) {
-                Log.e("SmManager", "즐겨찾기 목록 새로고침 실패", e)
-                Log.e("SmManager", "오류 스택 트레이스", e)
+                Log.e("SmManager", "즐겨찾기 목록 새로고침 실패 (외부)", e)
                 favoriteLocationAdapter.updateLocations(emptyList())
             }
         }
@@ -398,19 +386,18 @@ class SmManager(
                 )
 
                 // 즐겨찾기에 추가 (서버에서 중복 체크 수행)
-                val result = favoriteLocationRepository.addFavoriteLocation(favoriteLocation)
-                val isSuccess = result.first
-                val message = result.second
-                
-                if (isSuccess) {
-                    Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
-                    refreshFavoriteLocations() // 즐겨찾기 목록 새로고침
-                } else {
-                    Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
-                }
-                
+                favoriteLocationRepository.addFavoriteLocation(favoriteLocation)
+                    .onSuccess { message ->
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                        refreshFavoriteLocations() // 즐겨찾기 목록 새로고침
+                    }.onFailure { e ->
+                        Log.e("SmManager", "즐겨찾기 추가 실패", e)
+                        val errorMessage = e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다."
+                        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                    }
+
             } catch (e: Exception) {
-                Log.e("SmManager", "즐겨찾기 추가 실패", e)
+                Log.e("SmManager", "즐겨찾기 추가 실패 (외부)", e)
                 val errorMessage = e.message ?: "즐겨찾기 추가 중 오류가 발생했습니다."
                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
             }
