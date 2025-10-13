@@ -22,29 +22,7 @@ abstract class BaseLoadViewModel<T> : ViewModel() {
      */
     protected fun loadInitial(block: suspend () -> Result<T>) {
         if (_uiState.value !is UiState.Initial) return
-
-        viewModelScope.launch {
-            _uiState.value = UiState.Loading
-
-            runCatching { block() }
-                .onSuccess { result ->
-                    result.fold(
-                        onSuccess = { data -> _uiState.value = UiState.Success(data) },
-                        onFailure = { throwable ->
-                            _uiState.value = UiState.Error(
-                                message = throwable.message ?: "알 수 없는 오류가 발생했습니다",
-                                throwable = throwable
-                            )
-                        }
-                    )
-                }
-                .onFailure { throwable ->
-                    _uiState.value = UiState.Error(
-                        message = throwable.message ?: "알 수 없는 오류가 발생했습니다",
-                        throwable = throwable
-                    )
-                }
-        }
+        executeLoad(block)
     }
 
     /**
@@ -52,29 +30,38 @@ abstract class BaseLoadViewModel<T> : ViewModel() {
      * @param block 데이터 로드 로직
      */
     protected fun load(block: suspend () -> Result<T>) {
+        executeLoad(block)
+    }
+
+    /**
+     * 공통 로드 로직
+     * - loadInitial과 load에서 공유하는 에러 처리 로직
+     * @param block 데이터 로드 로직
+     */
+    private fun executeLoad(block: suspend () -> Result<T>) {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
 
             runCatching { block() }
                 .onSuccess { result ->
-                    result.fold(
-                        onSuccess = { data -> _uiState.value = UiState.Success(data) },
-                        onFailure = { throwable ->
-                            _uiState.value = UiState.Error(
-                                message = throwable.message ?: "알 수 없는 오류가 발생했습니다",
-                                throwable = throwable
-                            )
-                        }
+                    _uiState.value = result.fold(
+                        onSuccess = { data -> UiState.Success(data) },
+                        onFailure = { throwable -> createErrorState(throwable) }
                     )
                 }
                 .onFailure { throwable ->
-                    _uiState.value = UiState.Error(
-                        message = throwable.message ?: "알 수 없는 오류가 발생했습니다",
-                        throwable = throwable
-                    )
+                    _uiState.value = createErrorState(throwable)
                 }
         }
     }
+
+    /**
+     * 에러 상태 생성 헬퍼
+     */
+    private fun createErrorState(throwable: Throwable) = UiState.Error(
+        message = throwable.message ?: "알 수 없는 오류가 발생했습니다",
+        throwable = throwable
+    )
 
     /**
      * 에러 상태 초기화
