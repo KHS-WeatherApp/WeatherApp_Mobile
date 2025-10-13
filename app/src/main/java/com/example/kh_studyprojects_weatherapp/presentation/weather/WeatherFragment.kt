@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherFragmentBinding
@@ -41,6 +42,23 @@ class WeatherFragment : BaseNavigationFragment() {
     private var cachedDailyFragment: WeatherDailyFragment? = null
     private var cachedHourlyFragment: WeatherHourlyForecastFragment? = null
     private var cachedAdditionalFragment: WeatherAdditionalFragment? = null
+
+    /**
+     * Fragment를 캐시에서 가져오거나, 없으면 childFragmentManager에서 찾아서 반환합니다.
+     *
+     * @param T Fragment 타입
+     * @param containerId Fragment가 위치한 컨테이너 ID
+     * @param cachedFragment 캐시된 Fragment (nullable)
+     * @param updateCache 캐시를 업데이트하는 람다 함수
+     * @return 찾은 Fragment 또는 null
+     */
+    private inline fun <reified T : Fragment> getOrCacheFragment(
+        containerId: Int,
+        cachedFragment: T?,
+        updateCache: (T) -> Unit
+    ): T? {
+        return cachedFragment ?: (childFragmentManager.findFragmentById(containerId) as? T)?.also(updateCache)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -111,17 +129,9 @@ class WeatherFragment : BaseNavigationFragment() {
         childFragmentManager.executePendingTransactions()
 
         // 캐시된 Fragment가 없으면 조회 후 캐싱
-        val current = cachedCurrentFragment ?: (childFragmentManager
-            .findFragmentById(R.id.weather_current_container) as? WeatherCurrentFragment)
-            ?.also { cachedCurrentFragment = it }
-
-        val daily = cachedDailyFragment ?: (childFragmentManager
-            .findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment)
-            ?.also { cachedDailyFragment = it }
-
-        val hourly = cachedHourlyFragment ?: (childFragmentManager
-            .findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment)
-            ?.also { cachedHourlyFragment = it }
+        val current = getOrCacheFragment(R.id.weather_current_container, cachedCurrentFragment) { cachedCurrentFragment = it }
+        val daily = getOrCacheFragment(R.id.weather_daily_container, cachedDailyFragment) { cachedDailyFragment = it }
+        val hourly = getOrCacheFragment(R.id.weather_hourly_forecast_fragment, cachedHourlyFragment) { cachedHourlyFragment = it }
 
         if (current == null || daily == null || hourly == null) {
             // 프래그먼트가 준비되지 않았으면 잠시 후 다시 시도
@@ -158,21 +168,10 @@ class WeatherFragment : BaseNavigationFragment() {
         childFragmentManager.executePendingTransactions()
 
         // 캐시된 Fragment 사용 (없으면 조회 후 캐싱)
-        val current = cachedCurrentFragment ?: (childFragmentManager
-            .findFragmentById(R.id.weather_current_container) as? WeatherCurrentFragment)
-            ?.also { cachedCurrentFragment = it }
-
-        val daily = cachedDailyFragment ?: (childFragmentManager
-            .findFragmentById(R.id.weather_daily_container) as? WeatherDailyFragment)
-            ?.also { cachedDailyFragment = it }
-
-        val hourly = cachedHourlyFragment ?: (childFragmentManager
-            .findFragmentById(R.id.weather_hourly_forecast_fragment) as? WeatherHourlyForecastFragment)
-            ?.also { cachedHourlyFragment = it }
-
-        val addi = cachedAdditionalFragment ?: (childFragmentManager
-            .findFragmentById(R.id.weather_additional_container) as? WeatherAdditionalFragment)
-            ?.also { cachedAdditionalFragment = it }
+        val current = getOrCacheFragment(R.id.weather_current_container, cachedCurrentFragment) { cachedCurrentFragment = it }
+        val daily = getOrCacheFragment(R.id.weather_daily_container, cachedDailyFragment) { cachedDailyFragment = it }
+        val hourly = getOrCacheFragment(R.id.weather_hourly_forecast_fragment, cachedHourlyFragment) { cachedHourlyFragment = it }
+        val addi = getOrCacheFragment(R.id.weather_additional_container, cachedAdditionalFragment) { cachedAdditionalFragment = it }
 
         current?.viewModelInstance?.refreshWeatherData()
         daily?.viewModelInstance?.refreshWeatherData()
