@@ -13,11 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastFragmentBinding
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class WeatherHourlyForecastFragment : Fragment() {
+class WeatherHourlyForecastFragment : Fragment(), RefreshableFragment {
 
     private var _binding: WeatherHourlyForecastFragmentBinding? = null
     private val binding: WeatherHourlyForecastFragmentBinding
@@ -104,7 +105,7 @@ class WeatherHourlyForecastFragment : Fragment() {
     /**
      * 날씨 데이터 새로고침
      */
-    fun refreshWeatherData() {
+    override fun refreshWeatherData() {
         viewModel.refreshWeatherData()
     }
 

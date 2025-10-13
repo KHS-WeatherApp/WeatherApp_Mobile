@@ -158,22 +158,30 @@ class WeatherFragment : BaseNavigationFragment() {
     }
 
     /**
+     * 모든 자식 Fragment의 날씨 데이터를 새로고침합니다.
+     *
+     * RefreshableFragment 인터페이스를 구현한 모든 자식 Fragment를 찾아서
+     * refreshWeatherData()를 호출합니다.
+     */
+    fun refreshAllWeatherFragments() {
+        childFragmentManager.executePendingTransactions()
+
+        childFragmentManager.fragments
+            .filterIsInstance<com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment>()
+            .forEach { it.refreshWeatherData() }
+    }
+
+    /**
      * 모든 섹션의 날씨 데이터를 새로고침합니다.
      */
     private fun refreshWeatherData() {
-        childFragmentManager.executePendingTransactions()
+        refreshAllWeatherFragments()
 
-        // 캐시된 Fragment 사용 (없으면 조회 후 캐싱)
+        // 캐시된 Fragment 사용 (로딩 상태 관찰용)
         val current = getOrCacheFragment(R.id.weather_current_container, cachedCurrentFragment) { cachedCurrentFragment = it }
         val daily = getOrCacheFragment(R.id.weather_daily_container, cachedDailyFragment) { cachedDailyFragment = it }
         val hourly = getOrCacheFragment(R.id.weather_hourly_forecast_fragment, cachedHourlyFragment) { cachedHourlyFragment = it }
         val addi = getOrCacheFragment(R.id.weather_additional_container, cachedAdditionalFragment) { cachedAdditionalFragment = it }
-
-        current?.viewModelInstance?.refreshWeatherData()
-        daily?.viewModelInstance?.refreshWeatherData()
-        hourly?.viewModelInstance?.refreshWeatherData()
-        addi?.viewModelInstance?.refreshWeatherData()
-
 
         // 각 섹션의 로딩 상태를 합쳐 새로고침 인디케이터를 제어
         viewLifecycleOwner.lifecycleScope.launch {

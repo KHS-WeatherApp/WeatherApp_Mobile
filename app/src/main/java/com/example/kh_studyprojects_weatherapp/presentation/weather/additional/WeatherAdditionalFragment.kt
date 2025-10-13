@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherAdditionalFragmentBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherAdditional
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
  * - 미세먼지, 초미세먼지, UV 지수, 강수량, 일출/일몰 시간을 노출
  */
 @AndroidEntryPoint
-class WeatherAdditionalFragment : Fragment() {
+class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
     private var _binding: WeatherAdditionalFragmentBinding? = null
     private val binding: WeatherAdditionalFragmentBinding
         get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
@@ -229,7 +230,7 @@ class WeatherAdditionalFragment : Fragment() {
     /**
      * 날씨 데이터 새로고침
      */
-    fun refreshWeatherData() {
+    override fun refreshWeatherData() {
         viewModel.refreshWeatherData()
     }
 

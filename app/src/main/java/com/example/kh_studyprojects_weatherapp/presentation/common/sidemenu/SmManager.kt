@@ -1084,26 +1084,25 @@ class SmManager(
         val currentFragment = navController.currentDestination?.label?.toString()
 
         if (currentFragment == "weatherFragment") {
-            val weatherFragment = activity.supportFragmentManager
-                .findFragmentById(com.example.kh_studyprojects_weatherapp.R.id.fragmentContainerView)
-                ?.childFragmentManager
-                ?.fragments
-                ?.firstOrNull { it is WeatherFragment }
-
-            weatherFragment?.childFragmentManager?.fragments?.forEach { fragment ->
-                when (fragment) {
-                    is WeatherCurrentFragment -> fragment.refreshWeatherData()
-                    is WeatherHourlyForecastFragment -> fragment.refreshWeatherData()
-                    is WeatherDailyFragment -> fragment.refreshWeatherData()
-                    is WeatherAdditionalFragment -> fragment.refreshWeatherData()
-                }
-            }
+            val weatherFragment = findWeatherFragment()
+            weatherFragment?.refreshAllWeatherFragments()
 
             Toast.makeText(context, "현재 위치의 날씨 정보를 새로고침합니다.", Toast.LENGTH_SHORT).show()
         } else {
             navController.navigate(com.example.kh_studyprojects_weatherapp.R.id.weatherFragment)
             Toast.makeText(context, "날씨 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    /**
+     * WeatherFragment를 찾아서 반환합니다.
+     */
+    private fun findWeatherFragment(): WeatherFragment? {
+        return activity.supportFragmentManager
+            .findFragmentById(com.example.kh_studyprojects_weatherapp.R.id.fragmentContainerView)
+            ?.childFragmentManager
+            ?.fragments
+            ?.firstOrNull { it is WeatherFragment } as? WeatherFragment
     }
 
     /**

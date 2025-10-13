@@ -11,12 +11,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherDailyIncludeBinding
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment
 import kotlinx.coroutines.launch
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
-class WeatherDailyFragment : Fragment() {
+class WeatherDailyFragment : Fragment(), RefreshableFragment {
     private var _binding: WeatherDailyIncludeBinding? = null
     private val binding: WeatherDailyIncludeBinding
         get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
@@ -85,7 +86,7 @@ class WeatherDailyFragment : Fragment() {
     /**
      * 날씨 데이터 새로고침
      */
-    fun refreshWeatherData() {
+    override fun refreshWeatherData() {
         viewModel.refreshWeatherData()
     }
 

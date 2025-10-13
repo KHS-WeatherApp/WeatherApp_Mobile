@@ -10,11 +10,12 @@ import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherCurrentFragmentBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCurrent
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class WeatherCurrentFragment : Fragment() {
+class WeatherCurrentFragment : Fragment(), RefreshableFragment {
     private var _binding: WeatherCurrentFragmentBinding? = null
     private val binding: WeatherCurrentFragmentBinding
         get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
@@ -128,7 +129,7 @@ class WeatherCurrentFragment : Fragment() {
         }
     }
 
-    fun refreshWeatherData() {
+    override fun refreshWeatherData() {
         viewModel.refreshWeatherData()
     }
 
