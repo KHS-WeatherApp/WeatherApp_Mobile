@@ -45,14 +45,16 @@ abstract class BaseNavigationFragment : Fragment() {
     /**
      * 하단 네비게이션 버튼 클릭 이벤트 설정
      *
-     * @param weatherDestination 날씨 화면 목적지 ID (R.id.weatherFragment)
-     * @param settingDestination 설정 화면 목적지 ID (R.id.settingFragment)
-     * @param finedustDestination 미세먼지 화면 목적지 ID (R.id.finedustFragment)
+     * 기본값으로 표준 네비게이션 구조를 제공하므로 파라미터 없이 호출 가능합니다.
+     *
+     * @param weatherDestination 날씨 화면 목적지 ID (기본값: R.id.weatherFragment)
+     * @param settingDestination 설정 화면 목적지 ID (기본값: R.id.settingFragment)
+     * @param finedustDestination 미세먼지 화면 목적지 ID (기본값: R.id.finedustFragment)
      */
     protected fun setupBottomNavigation(
-        @IdRes weatherDestination: Int,
-        @IdRes settingDestination: Int,
-        @IdRes finedustDestination: Int
+        @IdRes weatherDestination: Int = R.id.weatherFragment,
+        @IdRes settingDestination: Int = R.id.settingFragment,
+        @IdRes finedustDestination: Int = R.id.finedustFragment
     ) {
         navigationBinding.apply {
             navWeather.setOnClickListener {

@@ -32,11 +32,7 @@ class FinedustFragment : BaseNavigationFragment() {
         setupNavigationBinding(binding.root)
 
         // 네비게이션 클릭 리스너 설정
-        setupBottomNavigation(
-            weatherDestination = R.id.weatherFragment,
-            settingDestination = R.id.settingFragment,
-            finedustDestination = R.id.finedustFragment
-        )
+        setupBottomNavigation()
 
         return binding.root
     }

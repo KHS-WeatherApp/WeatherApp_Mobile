@@ -74,11 +74,7 @@ class WeatherFragment : BaseNavigationFragment() {
         loadingOverlay = binding.root.findViewById(R.id.loadingOverlay)
 
         // 네비게이션 클릭 리스너 설정
-        setupBottomNavigation(
-            weatherDestination = R.id.weatherFragment,
-            settingDestination = R.id.settingFragment,
-            finedustDestination = R.id.finedustFragment
-        )
+        setupBottomNavigation()
 
         // 최초 생성 시 자식 프래그먼트를 붙임
         setupChildFragments(savedInstanceState)
