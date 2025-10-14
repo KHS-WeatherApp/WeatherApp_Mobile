@@ -53,22 +53,37 @@ import com.example.kh_studyprojects_weatherapp.presentation.common.location.Loca
 import kotlin.math.roundToInt
 
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherData
+
+/**
+ * 애니메이션 관련 상수
+ */
+private object AnimationConstants {
+    const val MIN_SEARCH_HEIGHT = 100 // 검색창 최소 높이 (px)
+    const val MIN_HEIGHT_PX = 60 // 애니메이션 최소 높이 (px)
+    const val EXPANSION_THRESHOLD = 50 // 확장 감지 임계값 (px)
+    const val DRAG_THRESHOLD = 100f // 드래그 임계값 (px)
+    const val ANIMATION_DURATION_NORMAL = 300L // 일반 애니메이션 지속 시간 (ms)
+    const val ANIMATION_DURATION_FAST = 200L // 빠른 애니메이션 지속 시간 (ms)
+    const val FADE_IN_DURATION = 200L // 페이드인 애니메이션 지속 시간 (ms)
+    const val KEYBOARD_SHOW_DELAY = 100L // 키보드 표시 지연 시간 (ms)
+}
+
 /**
  * 사이드메뉴 전체를 관리하는 통합 Manager 클래스
- * 
+ *
  * 검색, 즐겨찾기, 애니메이션 등의 모든 기능을 담당합니다.
  * MainActivity와 하위 컴포넌트들 간의 중재자 역할을 수행합니다.
- * 
+ *
  * 주요 기능:
  * - 검색 기능 (카카오 API 연동, 무한 스크롤)
  * - 즐겨찾기 관리 (추가, 삭제, 편집)
  * - 애니메이션 (검색창 확장/축소, 드래그)
  * - 윈도우 인셋 처리
  * - 날씨 데이터 동기화
- * 
+ *
  * @author 김효동
  * @since 2025.08.26
- * @version 2.0 (통합 버전)
+ * @version 2.1 (리팩토링: 중복 제거 및 상수화)
  */
 class SmManager(
     private val context: Context,
@@ -608,64 +623,93 @@ class SmManager(
     // ==================== 애니메이션 기능 ====================
 
     /**
-     * 검색창을 위로 확장하는 애니메이션을 실행합니다.
+     * 검색창 최대 높이를 계산합니다.
      */
-    private fun animateSearchContainerUp(searchContainer: View, favoriteHeader: View) {
+    private fun calculateMaxHeight(searchContainer: View, favoriteHeader: View): Int {
         val currentHeight = searchContainer.height
         val searchContainerTop = searchContainer.top
         val favoriteHeaderTop = favoriteHeader.top
         val distanceToCover = searchContainerTop - favoriteHeaderTop
         val rawTarget = currentHeight + distanceToCover + favoriteHeader.height
         val parentHeight = (searchContainer.parent as? View)?.height ?: rawTarget
-        val minHeightPx = maxOf(searchContainer.minimumHeight, 60)
-        val targetHeight = rawTarget.coerceIn(minHeightPx, parentHeight)
+        val minHeightPx = maxOf(searchContainer.minimumHeight, AnimationConstants.MIN_HEIGHT_PX)
+        return rawTarget.coerceIn(minHeightPx, parentHeight)
+    }
 
-        Log.d(
-            "SmManagerDrag",
-            "animateUp start: sc.h=${currentHeight}, sc.top=${searchContainerTop}, sc.bottom=${searchContainer.bottom}, parent.h=${parentHeight}, ref.top=${favoriteHeaderTop}, ref.h=${favoriteHeader.height}, dist=${distanceToCover}, rawTarget=${rawTarget}, clampedTarget=${targetHeight}"
-        )
+    /**
+     * 검색창 높이 애니메이션 공통 함수
+     *
+     * @param searchContainer 애니메이션 대상 뷰
+     * @param targetHeight 목표 높이
+     * @param duration 애니메이션 지속 시간 (ms)
+     * @param onAnimationEnd 애니메이션 종료 시 실행할 콜백
+     */
+    private fun animateSearchContainerHeight(
+        searchContainer: View,
+        targetHeight: Int,
+        duration: Long = AnimationConstants.ANIMATION_DURATION_NORMAL,
+        onAnimationEnd: () -> Unit = {}
+    ) {
+        val currentHeight = searchContainer.height
 
-        searchContainer.post {
-            val heightAnimator = ValueAnimator.ofInt(currentHeight, targetHeight)
-            heightAnimator.duration = 300
-            heightAnimator.interpolator = DecelerateInterpolator()
+        val heightAnimator = ValueAnimator.ofInt(currentHeight, targetHeight).apply {
+            this.duration = duration
+            interpolator = DecelerateInterpolator()
 
-            heightAnimator.addUpdateListener { animator ->
-                val params = searchContainer.layoutParams
-                if (params is ViewGroup.LayoutParams) {
-                    val newHeight = animator.animatedValue as Int
-                    params.height = newHeight
+            addUpdateListener { animator ->
+                (searchContainer.layoutParams as? ViewGroup.LayoutParams)?.let { params ->
+                    params.height = animator.animatedValue as Int
                     searchContainer.layoutParams = params
                     searchContainer.requestLayout()
                 }
             }
 
-                    heightAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                binding.sideMenuContent.llSearchResultsContainer.visibility = View.VISIBLE
-                binding.sideMenuContent.llSearchResultsContainer.alpha = 0f
-                binding.sideMenuContent.llSearchResultsContainer.animate()
-                    .alpha(1f)
-                    .setDuration(200)
-                    .start()
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    onAnimationEnd()
+                }
+            })
+        }
 
-                binding.sideMenuContent.etSearchLocation.requestFocus()
+        heightAnimator.start()
+    }
 
-                binding.sideMenuContent.etSearchLocation.postDelayed({
-                    val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
-                    imm.showSoftInput(binding.sideMenuContent.etSearchLocation, InputMethodManager.SHOW_IMPLICIT)
-                    Log.d(
-                        "SmManagerDrag",
-                        "animateUp end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
-                    )
-                    setDrawerLockForSearch(true)
-                    isSearchContainerExpanded = true
-                    setDrawerTouchEnabled(false) // 확장된 상태에서는 터치 차단
-                }, 100)
+    /**
+     * 검색 결과를 표시하고 검색창에 포커스를 줍니다.
+     */
+    private fun showSearchResultsAndFocus() {
+        binding.sideMenuContent.llSearchResultsContainer.visibility = View.VISIBLE
+        binding.sideMenuContent.llSearchResultsContainer.alpha = 0f
+        binding.sideMenuContent.llSearchResultsContainer.animate()
+            .alpha(1f)
+            .setDuration(AnimationConstants.FADE_IN_DURATION)
+            .start()
+
+        binding.sideMenuContent.etSearchLocation.requestFocus()
+
+        binding.sideMenuContent.etSearchLocation.postDelayed({
+            val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
+            imm.showSoftInput(binding.sideMenuContent.etSearchLocation, InputMethodManager.SHOW_IMPLICIT)
+            setDrawerLockForSearch(true)
+            isSearchContainerExpanded = true
+            setDrawerTouchEnabled(false)
+        }, AnimationConstants.KEYBOARD_SHOW_DELAY)
+    }
+
+    /**
+     * 검색창을 위로 확장하는 애니메이션을 실행합니다.
+     */
+    private fun animateSearchContainerUp(searchContainer: View, favoriteHeader: View) {
+        val targetHeight = calculateMaxHeight(searchContainer, favoriteHeader)
+
+        searchContainer.post {
+            animateSearchContainerHeight(
+                searchContainer = searchContainer,
+                targetHeight = targetHeight,
+                duration = AnimationConstants.ANIMATION_DURATION_NORMAL
+            ) {
+                showSearchResultsAndFocus()
             }
-        })
-
-            heightAnimator.start()
         }
     }
 
@@ -694,13 +738,13 @@ class SmManager(
                     if (isDragging) {
                         val deltaY = startY - event.rawY
                         val newHeight = (startHeight + deltaY).toInt()
-                        val minHeight = 100
+                        val minHeight = AnimationConstants.MIN_SEARCH_HEIGHT
                         val parentHeight = (searchContainer.parent as? View)?.height ?: Int.MAX_VALUE
                         val maxHeight = parentHeight
                         val clampedHeight = newHeight.coerceIn(minHeight, maxHeight)
-                        
+
                         // 검색창이 원본 높이보다 늘어났는지 확인
-                        val isExpanded = clampedHeight > originalHeight + 50 // 50px 여유값
+                        val isExpanded = clampedHeight > originalHeight + AnimationConstants.EXPANSION_THRESHOLD
                         if (isExpanded != isSearchContainerExpanded) {
                             isSearchContainerExpanded = isExpanded
                             setDrawerTouchEnabled(!isExpanded) // 확장되었으면 터치 차단, 접혔으면 터치 허용
@@ -724,18 +768,15 @@ class SmManager(
                     if (isDragging) {
                         isDragging = false
                         val deltaY = startY - event.rawY
-                        val threshold = 100f
                         Log.d(
                             "SmManagerDrag",
                             "drag UP: deltaY=${deltaY}, sc.h.now=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}"
                         )
 
-                        if (deltaY > threshold) {
-                            animateToMaxHeight(searchContainer, favoriteHeader)
-                        } else if (deltaY < -threshold) {
-                            animateToMinHeight(searchContainer)
-                        } else {
-                            animateToOriginalHeight(searchContainer, startHeight)
+                        when {
+                            deltaY > AnimationConstants.DRAG_THRESHOLD -> animateToMaxHeight(searchContainer, favoriteHeader)
+                            deltaY < -AnimationConstants.DRAG_THRESHOLD -> animateToMinHeight(searchContainer)
+                            else -> animateToOriginalHeight(searchContainer, startHeight)
                         }
                     }
                     true
@@ -745,133 +786,65 @@ class SmManager(
         }
     }
 
-    // 검색창을 최대 높이로 확장하는 애니메이션
+    /**
+     * 검색창을 최대 높이로 확장하는 애니메이션
+     */
     private fun animateToMaxHeight(searchContainer: View, favoriteHeader: View) {
-        val currentHeight = searchContainer.height
-        val searchContainerTop = searchContainer.top
-        val favoriteHeaderTop = favoriteHeader.top
-        val distanceToCover = searchContainerTop - favoriteHeaderTop
-        val rawTarget = currentHeight + distanceToCover + favoriteHeader.height
-        val parentHeight = (searchContainer.parent as? View)?.height ?: rawTarget
-        val minHeightPx = maxOf(searchContainer.minimumHeight, 60)
-        val targetHeight = rawTarget.coerceIn(minHeightPx, parentHeight)
-        Log.d(
-            "SmManagerDrag",
-            "animateToMax start: sc.h=${currentHeight}, sc.top=${searchContainerTop}, sc.bottom=${searchContainer.bottom}, parent.h=${parentHeight}, ref.top=${favoriteHeaderTop}, ref.h=${favoriteHeader.height}, dist=${distanceToCover}, rawTarget=${rawTarget}, clampedTarget=${targetHeight}"
-        )
+        val targetHeight = calculateMaxHeight(searchContainer, favoriteHeader)
 
-        val heightAnimator = ValueAnimator.ofInt(currentHeight, targetHeight)
-        heightAnimator.duration = 200
-        heightAnimator.interpolator = DecelerateInterpolator()
-
-        heightAnimator.addUpdateListener { animator ->
-            val params = searchContainer.layoutParams
-            if (params is ViewGroup.LayoutParams) {
-                params.height = animator.animatedValue as Int
-                searchContainer.layoutParams = params
-                searchContainer.requestLayout()
-            }
+        animateSearchContainerHeight(
+            searchContainer = searchContainer,
+            targetHeight = targetHeight,
+            duration = AnimationConstants.ANIMATION_DURATION_FAST
+        ) {
+            showSearchResultsAndFocus()
         }
-
-        heightAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                binding.sideMenuContent.llSearchResultsContainer.visibility = View.VISIBLE
-                binding.sideMenuContent.llSearchResultsContainer.alpha = 0f
-                binding.sideMenuContent.llSearchResultsContainer.animate()
-                    .alpha(1f)
-                    .setDuration(200)
-                    .start()
-
-                binding.sideMenuContent.etSearchLocation.requestFocus()
-
-                binding.sideMenuContent.etSearchLocation.postDelayed({
-                    val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
-                    imm.showSoftInput(binding.sideMenuContent.etSearchLocation, InputMethodManager.SHOW_IMPLICIT)
-                    Log.d(
-                        "SmManagerDrag",
-                        "animateToMax end: sc.h=${searchContainer.height}, sc.top=${searchContainer.top}, sc.bottom=${searchContainer.bottom}, results.vis=${binding.sideMenuContent.llSearchResultsContainer.visibility}"
-                    )
-                    setDrawerLockForSearch(true)
-                    isSearchContainerExpanded = true
-                    setDrawerTouchEnabled(false) // 확장된 상태에서는 터치 차단
-                }, 100)
-            }
-        })
-
-        heightAnimator.start()
     }
 
-    // 검색창을 최소 높이로 축소하는 애니메이션
+    /**
+     * 검색창을 최소 높이로 축소하는 애니메이션
+     */
     private fun animateToMinHeight(searchContainer: View) {
-        val currentHeight = searchContainer.height
-        val minHeight = 100
+        animateSearchContainerHeight(
+            searchContainer = searchContainer,
+            targetHeight = AnimationConstants.MIN_SEARCH_HEIGHT,
+            duration = AnimationConstants.ANIMATION_DURATION_FAST
+        ) {
+            binding.sideMenuContent.llSearchResultsContainer.visibility = View.GONE
 
-        val heightAnimator = ValueAnimator.ofInt(currentHeight, minHeight)
-        heightAnimator.duration = 200
-        heightAnimator.interpolator = DecelerateInterpolator()
+            val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
+            imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
 
-        heightAnimator.addUpdateListener { animator ->
-            val params = searchContainer.layoutParams
-            if (params is ViewGroup.LayoutParams) {
-                params.height = animator.animatedValue as Int
+            binding.sideMenuContent.etSearchLocation.clearFocus()
+
+            (searchContainer.layoutParams as? ViewGroup.LayoutParams)?.let { params ->
+                params.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 searchContainer.layoutParams = params
                 searchContainer.requestLayout()
             }
+
+            setDrawerLockForSearch(false)
+            isSearchContainerExpanded = false
+            setDrawerTouchEnabled(true)
         }
-
-        heightAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                binding.sideMenuContent.llSearchResultsContainer.visibility = View.GONE
-
-                val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
-                imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
-
-                binding.sideMenuContent.etSearchLocation.clearFocus()
-
-                val params = searchContainer.layoutParams
-                if (params is ViewGroup.LayoutParams) {
-                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                    searchContainer.layoutParams = params
-                    searchContainer.requestLayout()
-                }
-                setDrawerLockForSearch(false)
-                isSearchContainerExpanded = false
-                setDrawerTouchEnabled(true) // 접힌 상태에서는 터치 허용
-            }
-        })
-
-        heightAnimator.start()
     }
 
-    // 검색창을 원본 높이로 복원하는 애니메이션
+    /**
+     * 검색창을 원본 높이로 복원하는 애니메이션
+     */
     private fun animateToOriginalHeight(searchContainer: View, originalHeight: Int) {
-        val currentHeight = searchContainer.height
-
-        val heightAnimator = ValueAnimator.ofInt(currentHeight, originalHeight)
-        heightAnimator.duration = 200
-        heightAnimator.interpolator = DecelerateInterpolator()
-
-        heightAnimator.addUpdateListener { animator ->
-            val params = searchContainer.layoutParams
-            if (params is ViewGroup.LayoutParams) {
-                params.height = animator.animatedValue as Int
-                searchContainer.layoutParams = params
-                searchContainer.requestLayout()
+        animateSearchContainerHeight(
+            searchContainer = searchContainer,
+            targetHeight = originalHeight,
+            duration = AnimationConstants.ANIMATION_DURATION_FAST
+        ) {
+            // 원본 높이로 돌아갔을 때 상태 업데이트
+            val isExpanded = searchContainer.height > originalHeight + AnimationConstants.EXPANSION_THRESHOLD
+            if (isExpanded != isSearchContainerExpanded) {
+                isSearchContainerExpanded = isExpanded
+                setDrawerTouchEnabled(!isExpanded)
             }
         }
-
-        heightAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                // 원본 높이로 돌아갔을 때 상태 업데이트
-                val isExpanded = searchContainer.height > originalHeight + 50
-                if (isExpanded != isSearchContainerExpanded) {
-                    isSearchContainerExpanded = isExpanded
-                    setDrawerTouchEnabled(!isExpanded)
-                }
-            }
-        })
-
-        heightAnimator.start()
     }
 
     /**
@@ -892,46 +865,31 @@ class SmManager(
         })
     }
 
-    // 검색창 초기화 애니메이션
+    /**
+     * 검색창 초기화 애니메이션
+     */
     private fun resetSearchContainer(searchContainer: View, @Suppress("UNUSED_PARAMETER") favoriteHeader: View) {
-        val currentHeight = searchContainer.height
-        val originalHeight = ViewGroup.LayoutParams.WRAP_CONTENT
+        animateSearchContainerHeight(
+            searchContainer = searchContainer,
+            targetHeight = 0,
+            duration = AnimationConstants.ANIMATION_DURATION_NORMAL
+        ) {
+            binding.sideMenuContent.llSearchResultsContainer.visibility = View.GONE
+            binding.sideMenuContent.etSearchLocation.setText("")
+            binding.sideMenuContent.etSearchLocation.clearFocus()
 
-        val heightAnimator = ValueAnimator.ofInt(currentHeight, 0)
-        heightAnimator.duration = 300
-        heightAnimator.interpolator = DecelerateInterpolator()
-
-        heightAnimator.addUpdateListener { animator ->
-            val params = searchContainer.layoutParams
-            if (params is ViewGroup.LayoutParams) {
-                params.height = animator.animatedValue as Int
+            (searchContainer.layoutParams as? ViewGroup.LayoutParams)?.let { params ->
+                params.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 searchContainer.layoutParams = params
                 searchContainer.requestLayout()
             }
+
+            val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
+            imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
+            setDrawerLockForSearch(false)
+            isSearchContainerExpanded = false
+            setDrawerTouchEnabled(true)
         }
-
-        heightAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                binding.sideMenuContent.llSearchResultsContainer.visibility = View.GONE
-                binding.sideMenuContent.etSearchLocation.setText("")
-                binding.sideMenuContent.etSearchLocation.clearFocus()
-
-                val params = searchContainer.layoutParams
-                if (params is ViewGroup.LayoutParams) {
-                    params.height = originalHeight
-                    searchContainer.layoutParams = params
-                    searchContainer.requestLayout()
-                }
-
-                val imm = binding.root.context.getSystemService(InputMethodManager::class.java)
-                imm.hideSoftInputFromWindow(binding.sideMenuContent.etSearchLocation.windowToken, 0)
-                setDrawerLockForSearch(false)
-                isSearchContainerExpanded = false
-                setDrawerTouchEnabled(true) // 사이드메뉴가 닫힐 때 터치 허용
-            }
-        })
-
-        heightAnimator.start()
     }
 
     // ==================== 기타 기능 ====================
