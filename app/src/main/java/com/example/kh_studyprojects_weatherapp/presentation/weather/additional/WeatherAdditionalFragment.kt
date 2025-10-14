@@ -92,7 +92,8 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
                 val hour12 = if (time.hour % 12 == 0) 12 else time.hour % 12
                 val amPm = if (time.hour < 12) "AM" else "PM"
                 String.format("%02d:%02d%s", hour12, time.minute, amPm)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.w("AdditionalWeather", "시간 포맷팅 실패: $raw", e)
                 null
             }
 

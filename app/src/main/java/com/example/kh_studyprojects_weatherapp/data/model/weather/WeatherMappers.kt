@@ -148,16 +148,17 @@ object WeatherMappers {
             // 1) Remove trailing 'Z' if present and parse
             val noZ = if (s.endsWith("Z", ignoreCase = true)) s.dropLast(1) else s
             LocalDateTime.parse(noZ)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
             try {
                 java.time.OffsetDateTime.parse(s).toLocalDateTime()
-            } catch (_: Exception) {
+            } catch (e2: Exception) {
                 try {
                     // Last resort: if it contains seconds-less, append :00
                     val patched = if (s.matches(Regex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}Z"))) s.replace("Z", ":00") else s
                     val noZ = patched.replace("Z", "")
                     LocalDateTime.parse(noZ)
-                } catch (_: Exception) {
+                } catch (e3: Exception) {
+                    Log.w("WeatherMappers", "날짜 파싱 실패: $raw", e3)
                     null
                 }
             }
@@ -281,7 +282,8 @@ object WeatherMappers {
             val copy = response.toMutableMap()
             copy["location"] = locationAddress
             copy
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.w("WeatherMappers", "날씨 응답 복사 실패, 기본값 반환", e)
             mapOf("location" to locationAddress)
         }
     }
@@ -345,7 +347,8 @@ object WeatherMappers {
                         weatherCode = hourlyCodes.getOrNull(idx) ?: 0,
                         apparent_temperature = "${hourlyApparentTemps.getOrNull(idx) ?: 0.0}°",
                     )
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    Log.w("WeatherMappers", "시간별 예보 데이터 생성 실패: $timeStr", e)
                     null
                 }
             } ?: emptyList()
@@ -388,11 +391,17 @@ object WeatherMappers {
             java.time.DayOfWeek.SATURDAY -> "토"
             java.time.DayOfWeek.SUNDAY -> "일"
         }
-    } catch (_: Exception) { "?" }
+    } catch (e: Exception) {
+        Log.w("WeatherMappers", "요일 포맷팅 실패: $dateString", e)
+        "?"
+    }
 
     private fun formatDateKorean(dateString: String): String = try {
         val d = java.time.LocalDate.parse(dateString)
         "${d.monthValue}.${d.dayOfMonth}"
-    } catch (_: Exception) { dateString }
+    } catch (e: Exception) {
+        Log.w("WeatherMappers", "날짜 포맷팅 실패: $dateString", e)
+        dateString
+    }
 }
 
