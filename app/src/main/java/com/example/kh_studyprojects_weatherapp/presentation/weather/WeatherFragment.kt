@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
 
 /**
  * 날씨 메인 프래그먼트 화면입니다.
@@ -42,6 +43,9 @@ class WeatherFragment : BaseNavigationFragment() {
     private var cachedDailyFragment: WeatherDailyFragment? = null
     private var cachedHourlyFragment: WeatherHourlyForecastFragment? = null
     private var cachedAdditionalFragment: WeatherAdditionalFragment? = null
+
+    // 메모리 누수 방지: 로딩 상태 관찰 Job
+    private var refreshLoadingJob: Job? = null
 
     /**
      * Fragment를 캐시에서 가져오거나, 없으면 childFragmentManager에서 찾아서 반환합니다.
@@ -202,8 +206,11 @@ class WeatherFragment : BaseNavigationFragment() {
         val hourly = getOrCacheFragment(R.id.weather_hourly_forecast_fragment, cachedHourlyFragment) { cachedHourlyFragment = it }
         val addi = getOrCacheFragment(R.id.weather_additional_container, cachedAdditionalFragment) { cachedAdditionalFragment = it }
 
+        // ✅ 메모리 누수 방지: 이전 관찰 Job 취소
+        refreshLoadingJob?.cancel()
+
         // 각 섹션의 로딩 상태를 합쳐 새로고침 인디케이터를 제어
-        viewLifecycleOwner.lifecycleScope.launch {
+        refreshLoadingJob = viewLifecycleOwner.lifecycleScope.launch {
             combine(
                 current?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
                     ?: kotlinx.coroutines.flow.flowOf(false),
@@ -234,6 +241,9 @@ class WeatherFragment : BaseNavigationFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // ✅ 메모리 누수 방지: Job 취소
+        refreshLoadingJob?.cancel()
+        refreshLoadingJob = null
         _binding = null
         // 캐시 초기화
         cachedCurrentFragment = null
