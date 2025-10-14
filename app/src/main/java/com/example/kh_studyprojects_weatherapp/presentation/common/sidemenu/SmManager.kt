@@ -306,9 +306,8 @@ class SmManager(
                 Log.d("SmManager", "어댑터 참조 일치 여부: ${recyclerView.adapter === favoriteLocationAdapter}")
                 
                 Log.d("SmManager", "Repository 호출 시작")
-                withContext(Dispatchers.IO) {
-                    favoriteLocationRepository.getFavoriteLocations(deviceId)
-                }.onSuccess { locations ->
+                favoriteLocationRepository.getFavoriteLocations(deviceId)
+                    .onSuccess { locations ->
                     Log.d("SmManager", "Repository 호출 완료")
                     Log.d("SmManager", "즐겨찾기 목록 조회 결과: ${locations.size}개")
 
@@ -498,13 +497,11 @@ class SmManager(
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
             try {
-                val response = withContext(Dispatchers.IO) {
-                    geocodingRepository.searchByAddress(
-                        query = trimmedQuery,
-                        page = 1,
-                        size = 30
-                    )
-                }
+                val response = geocodingRepository.searchByAddress(
+                    query = trimmedQuery,
+                    page = 1,
+                    size = 30
+                )
 
                 if (response.documents.isEmpty()) {
                     searchResultAdapter.clearSearchResults()
@@ -547,13 +544,11 @@ class SmManager(
 
         lifecycleScope.launch {
             try {
-                val response = withContext(Dispatchers.IO) {
-                    geocodingRepository.searchByAddress(
-                        query = currentSearchQuery,
-                        page = currentSearchPage,
-                        size = 30
-                    )
-                }
+                val response = geocodingRepository.searchByAddress(
+                    query = currentSearchQuery,
+                    page = currentSearchPage,
+                    size = 30
+                )
 
                 if (response.documents.isNotEmpty()) {
                     showLoadingIndicator(false)
@@ -961,9 +956,7 @@ class SmManager(
             try {
                 val loc = locationManager.getCurrentLocation()
                 if (loc != null) {
-                    val result = withContext(Dispatchers.IO) {
-                        weatherRepository.getWeatherInfo(loc.latitude, loc.longitude)
-                    }
+                    val result = weatherRepository.getWeatherInfo(loc.latitude, loc.longitude)
                     result.onSuccess { weatherData ->
                         try {
                             val temperature = weatherData.current.temperature2m?.roundToInt()
