@@ -316,9 +316,8 @@ class SmManager(
                         Log.d("SmManager", "즐겨찾기 목록 업데이트: ${locations.map { it.addressName }}")
                         favoriteLocationAdapter.updateLocations(locations)
 
-                        // 업데이트 후 어댑터 상태 확인 (UI 스레드에서 실행)
-                        withContext(Dispatchers.Main) {
-                            delay(100) // 어댑터 업데이트 완료 대기
+                        // 업데이트 후 어댑터 상태 확인 (RecyclerView.post 사용)
+                        recyclerView.post {
                             Log.d("SmManager", "업데이트 후 어댑터 아이템 개수: ${favoriteLocationAdapter.itemCount}")
                             Log.d("SmManager", "업데이트 후 RecyclerView 어댑터 아이템 개수: ${recyclerView.adapter?.itemCount}")
                         }
