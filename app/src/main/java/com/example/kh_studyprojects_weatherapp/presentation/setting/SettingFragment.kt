@@ -15,7 +15,8 @@ class SettingFragment : BaseNavigationFragment() {
 
     // 메인 레이아웃 바인딩
     private var _binding: SettingFragmentBinding? = null
-    private val binding get() = _binding!!
+    private val binding: SettingFragmentBinding
+        get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
 
     override fun onCreateView(
         inflater: LayoutInflater,

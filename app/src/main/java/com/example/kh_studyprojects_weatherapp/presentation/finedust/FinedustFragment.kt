@@ -15,7 +15,8 @@ class FinedustFragment : BaseNavigationFragment() {
 
     // 메인 레이아웃 바인딩
     private var _binding: FinedustFragmentBinding? = null
-    private val binding get() = _binding!!
+    private val binding: FinedustFragmentBinding
+        get() = _binding ?: throw IllegalStateException("Fragment binding is accessed before onCreateView or after onDestroyView")
 
     /**
      * Fragment의 View를 생성하고 초기화하는 메서드
