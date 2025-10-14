@@ -44,8 +44,11 @@ class WeatherFragment : BaseNavigationFragment() {
     private var cachedHourlyFragment: WeatherHourlyForecastFragment? = null
     private var cachedAdditionalFragment: WeatherAdditionalFragment? = null
 
-    // 메모리 누수 방지: 로딩 상태 관찰 Job
+    // 메모리 누수 방지: 각 Flow 관찰 Job들
     private var refreshLoadingJob: Job? = null
+    private var isRefreshingObserverJob: Job? = null
+    private var overlayObserverJob: Job? = null
+    private var initialLoadingObserverJob: Job? = null
 
     /**
      * Fragment를 캐시에서 가져오거나, 없으면 childFragmentManager에서 찾아서 반환합니다.
@@ -99,23 +102,23 @@ class WeatherFragment : BaseNavigationFragment() {
             loadingOverlay.visibility = View.VISIBLE
         }
 
-        // 공유 ViewModel에서 새로고침 상태를 관찰
-        viewLifecycleOwner.lifecycleScope.launch {
+        // ✅ 공유 ViewModel에서 새로고침 상태를 관찰 (이전 Job 취소)
+        isRefreshingObserverJob?.cancel()
+        isRefreshingObserverJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModel.isRefreshing.collect { isRefreshing ->
                 binding.swipeRefreshLayout.isRefreshing = isRefreshing
             }
         }
 
-        // 초기 데이터 갱신을 즉시 실행
-        viewLifecycleOwner.lifecycleScope.launch {
-            refreshWeatherData()
-        }
+        // ✅ 초기 데이터 갱신을 즉시 실행 (불필요한 launch 제거)
+        refreshWeatherData()
 
         // 모든 섹션의 데이터 준비 완료를 확인
         observeInitialLoadingCompletion()
-        
-        // 초기 오버레이 표시 여부를 추적
-        viewLifecycleOwner.lifecycleScope.launch {
+
+        // ✅ 초기 오버레이 표시 여부를 추적 (이전 Job 취소)
+        overlayObserverJob?.cancel()
+        overlayObserverJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModel.hasShownInitialOverlay.collect { hasShown ->
                 if (hasShown) {
                     loadingOverlay.visibility = View.GONE
@@ -161,8 +164,11 @@ class WeatherFragment : BaseNavigationFragment() {
             return
         }
 
+        // ✅ 메모리 누수 방지: 이전 관찰 Job 취소
+        initialLoadingObserverJob?.cancel()
+
         // 각 자식 ViewModel의 상태를 관찰
-        viewLifecycleOwner.lifecycleScope.launch {
+        initialLoadingObserverJob = viewLifecycleOwner.lifecycleScope.launch {
             val currentReady = current.viewModelInstance.uiState.map {
                 it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success
             }
@@ -241,9 +247,17 @@ class WeatherFragment : BaseNavigationFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // ✅ 메모리 누수 방지: Job 취소
+        // ✅ 메모리 누수 방지: 모든 Job 취소
         refreshLoadingJob?.cancel()
+        isRefreshingObserverJob?.cancel()
+        overlayObserverJob?.cancel()
+        initialLoadingObserverJob?.cancel()
+
         refreshLoadingJob = null
+        isRefreshingObserverJob = null
+        overlayObserverJob = null
+        initialLoadingObserverJob = null
+
         _binding = null
         // 캐시 초기화
         cachedCurrentFragment = null
