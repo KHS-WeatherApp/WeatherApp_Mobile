@@ -1,6 +1,7 @@
 ﻿package com.example.kh_studyprojects_weatherapp.presentation.weather.current
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -106,7 +107,7 @@ class WeatherCurrentFragment : Fragment(), RefreshableFragment {
                 binding.dailyMinMaxTemp.text = "최고 : ${tMax}° / 최저 : ${tMin}°"
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("WeatherCurrent", "날씨 데이터 처리 중 오류", e)
         }
     }
 

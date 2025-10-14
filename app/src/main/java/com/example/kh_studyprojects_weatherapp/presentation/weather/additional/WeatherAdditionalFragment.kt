@@ -122,8 +122,7 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
                 updateUVProgress(uvIndex)
             }
         } catch (e: Exception) {
-            Log.e("AdditionalWeather", "추가 날씨 데이터 처리 중 오류: ${e.message}")
-            e.printStackTrace()
+            Log.e("AdditionalWeather", "추가 날씨 데이터 처리 중 오류", e)
         }
     }
 
