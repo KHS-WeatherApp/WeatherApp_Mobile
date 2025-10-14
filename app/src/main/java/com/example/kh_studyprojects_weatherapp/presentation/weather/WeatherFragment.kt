@@ -120,7 +120,25 @@ class WeatherFragment : BaseNavigationFragment() {
         }
     }
 
-    private fun observeInitialLoadingCompletion() {
+    /**
+     * 초기 로딩 완료를 감지합니다.
+     *
+     * @param retryCount 재시도 횟수 (최대 30회 = 3초)
+     */
+    private fun observeInitialLoadingCompletion(retryCount: Int = 0) {
+        // 최대 재시도 횟수 초과 시 타임아웃 처리
+        if (retryCount >= 30) {
+            android.util.Log.e("WeatherFragment", "Fragment 초기화 타임아웃 (${retryCount}회 재시도)")
+            loadingOverlay.visibility = View.GONE
+            viewModel.markInitialOverlayShown()
+            android.widget.Toast.makeText(
+                requireContext(),
+                "데이터 로딩에 실패했습니다. 새로고침해주세요.",
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
         // 상태 확인 전에 대기 중인 프래그먼트 트랜잭션을 처리
         childFragmentManager.executePendingTransactions()
 
@@ -131,9 +149,10 @@ class WeatherFragment : BaseNavigationFragment() {
 
         if (current == null || daily == null || hourly == null) {
             // 프래그먼트가 준비되지 않았으면 잠시 후 다시 시도
+            android.util.Log.d("WeatherFragment", "Fragment 초기화 대기 중... (${retryCount + 1}/30)")
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(100)
-                observeInitialLoadingCompletion()
+                observeInitialLoadingCompletion(retryCount + 1)  // 재시도 카운터 증가
             }
             return
         }
