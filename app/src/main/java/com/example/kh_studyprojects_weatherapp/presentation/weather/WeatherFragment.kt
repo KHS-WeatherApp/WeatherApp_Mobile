@@ -15,6 +15,8 @@ import com.example.kh_studyprojects_weatherapp.presentation.weather.hourly.Weath
 import com.example.kh_studyprojects_weatherapp.presentation.weather.additional.WeatherAdditionalFragment
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -43,12 +45,6 @@ class WeatherFragment : BaseNavigationFragment() {
     private var cachedDailyFragment: WeatherDailyFragment? = null
     private var cachedHourlyFragment: WeatherHourlyForecastFragment? = null
     private var cachedAdditionalFragment: WeatherAdditionalFragment? = null
-
-    // 메모리 누수 방지: 각 Flow 관찰 Job들
-    private var refreshLoadingJob: Job? = null
-    private var isRefreshingObserverJob: Job? = null
-    private var overlayObserverJob: Job? = null
-    private var initialLoadingObserverJob: Job? = null
 
     /**
      * Fragment를 캐시에서 가져오거나, 없으면 childFragmentManager에서 찾아서 반환합니다.
@@ -102,29 +98,32 @@ class WeatherFragment : BaseNavigationFragment() {
             loadingOverlay.visibility = View.VISIBLE
         }
 
-        // ✅ 공유 ViewModel에서 새로고침 상태를 관찰 (이전 Job 취소)
-        isRefreshingObserverJob?.cancel()
-        isRefreshingObserverJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.isRefreshing.collect { isRefreshing ->
-                binding.swipeRefreshLayout.isRefreshing = isRefreshing
+        // ✅ repeatOnLifecycle로 메모리 누수 방지
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // 공유 ViewModel에서 새로고침 상태를 관찰
+                launch {
+                    viewModel.isRefreshing.collect { isRefreshing ->
+                        binding.swipeRefreshLayout.isRefreshing = isRefreshing
+                    }
+                }
+
+                // 초기 오버레이 표시 여부를 추적
+                launch {
+                    viewModel.hasShownInitialOverlay.collect { hasShown ->
+                        if (hasShown) {
+                            loadingOverlay.visibility = View.GONE
+                        }
+                    }
+                }
             }
         }
 
-        // ✅ 초기 데이터 갱신을 즉시 실행 (불필요한 launch 제거)
+        // ✅ 초기 데이터 갱신을 즉시 실행
         refreshWeatherData()
 
         // 모든 섹션의 데이터 준비 완료를 확인
         observeInitialLoadingCompletion()
-
-        // ✅ 초기 오버레이 표시 여부를 추적 (이전 Job 취소)
-        overlayObserverJob?.cancel()
-        overlayObserverJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.hasShownInitialOverlay.collect { hasShown ->
-                if (hasShown) {
-                    loadingOverlay.visibility = View.GONE
-                }
-            }
-        }
     }
 
     /**
@@ -164,25 +163,24 @@ class WeatherFragment : BaseNavigationFragment() {
             return
         }
 
-        // ✅ 메모리 누수 방지: 이전 관찰 Job 취소
-        initialLoadingObserverJob?.cancel()
-
         // 각 자식 ViewModel의 상태를 관찰
-        initialLoadingObserverJob = viewLifecycleOwner.lifecycleScope.launch {
-            val currentReady = current.viewModelInstance.uiState.map {
-                it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success
-            }
-            val dailyReady = daily.viewModelInstance.weatherItems.map { it.isNotEmpty() }
-            val hourlyReady = hourly.viewModelInstance.hourlyForecastItems.map { it.isNotEmpty() }
-
-            combine(currentReady, dailyReady, hourlyReady) { c, d, h -> c && d && h }
-                .collect { allReady ->
-                    if (allReady) {
-                        loadingOverlay.visibility = View.GONE
-                        viewModel.markInitialOverlayShown()   // 초기 오버레이가 표시되었음을 기록
-                        this.cancel()
-                    }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val currentReady = current.viewModelInstance.uiState.map {
+                    it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success
                 }
+                val dailyReady = daily.viewModelInstance.weatherItems.map { it.isNotEmpty() }
+                val hourlyReady = hourly.viewModelInstance.hourlyForecastItems.map { it.isNotEmpty() }
+
+                combine(currentReady, dailyReady, hourlyReady) { c, d, h -> c && d && h }
+                    .collect { allReady ->
+                        if (allReady) {
+                            loadingOverlay.visibility = View.GONE
+                            viewModel.markInitialOverlayShown()   // 초기 오버레이가 표시되었음을 기록
+                            this.cancel()
+                        }
+                    }
+            }
         }
     }
 
@@ -212,22 +210,21 @@ class WeatherFragment : BaseNavigationFragment() {
         val hourly = getOrCacheFragment(R.id.weather_hourly_forecast_fragment, cachedHourlyFragment) { cachedHourlyFragment = it }
         val addi = getOrCacheFragment(R.id.weather_additional_container, cachedAdditionalFragment) { cachedAdditionalFragment = it }
 
-        // ✅ 메모리 누수 방지: 이전 관찰 Job 취소
-        refreshLoadingJob?.cancel()
-
         // 각 섹션의 로딩 상태를 합쳐 새로고침 인디케이터를 제어
-        refreshLoadingJob = viewLifecycleOwner.lifecycleScope.launch {
-            combine(
-                current?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
-                    ?: kotlinx.coroutines.flow.flowOf(false),
-                daily?.viewModelInstance?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
-                hourly?.viewModelInstance?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
-                addi?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
-                    ?: kotlinx.coroutines.flow.flowOf(false),
-            ) { arr -> arr.any { it } }
-             .collect { anyLoading ->
-                binding.swipeRefreshLayout.isRefreshing = anyLoading
-             }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                combine(
+                    current?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
+                        ?: kotlinx.coroutines.flow.flowOf(false),
+                    daily?.viewModelInstance?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                    hourly?.viewModelInstance?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                    addi?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
+                        ?: kotlinx.coroutines.flow.flowOf(false),
+                ) { arr -> arr.any { it } }
+                    .collect { anyLoading ->
+                        binding.swipeRefreshLayout.isRefreshing = anyLoading
+                    }
+            }
         }
     }
 
@@ -247,17 +244,7 @@ class WeatherFragment : BaseNavigationFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // ✅ 메모리 누수 방지: 모든 Job 취소
-        refreshLoadingJob?.cancel()
-        isRefreshingObserverJob?.cancel()
-        overlayObserverJob?.cancel()
-        initialLoadingObserverJob?.cancel()
-
-        refreshLoadingJob = null
-        isRefreshingObserverJob = null
-        overlayObserverJob = null
-        initialLoadingObserverJob = null
-
+        // repeatOnLifecycle 사용으로 자동 취소되므로 수동 취소 불필요
         _binding = null
         // 캐시 초기화
         cachedCurrentFragment = null
