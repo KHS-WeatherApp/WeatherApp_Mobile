@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kh_studyprojects_weatherapp.R
 import com.example.kh_studyprojects_weatherapp.data.api.kakao.SearchDocument
@@ -35,12 +36,19 @@ class SmSearchResultAdapter : RecyclerView.Adapter<SmSearchResultAdapter.SearchR
     /**
      * 검색 결과를 업데이트합니다.
      * 기존 결과를 새로운 결과로 교체합니다.
-     * 
+     * DiffUtil을 사용하여 효율적으로 갱신합니다.
+     *
      * @param results 새로운 검색 결과 목록
      */
     fun updateSearchResults(results: List<SearchDocument>) {
-        searchResults = results.toMutableList()
-        notifyDataSetChanged()
+        val oldList = searchResults
+        val newList = results.toMutableList()
+
+        val diffCallback = SearchResultDiffCallback(oldList, newList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        searchResults = newList
+        diffResult.dispatchUpdatesTo(this)
     }
 
     /**
@@ -59,21 +67,23 @@ class SmSearchResultAdapter : RecyclerView.Adapter<SmSearchResultAdapter.SearchR
      * 검색 결과를 초기화합니다.
      */
     fun clearSearchResults() {
+        val oldSize = searchResults.size
         searchResults.clear()
-        notifyDataSetChanged()
+        notifyItemRangeRemoved(0, oldSize)
     }
 
     /**
      * 로딩 상태를 설정합니다.
-     * 
+     *
      * @param loading 로딩 중 여부
      */
     fun setLoading(loading: Boolean) {
         // 로딩 상태는 단순하게 처리
         if (loading) {
             // 로딩 중일 때는 빈 목록 표시
+            val oldSize = searchResults.size
             searchResults.clear()
-            notifyDataSetChanged()
+            notifyItemRangeRemoved(0, oldSize)
         }
     }
 
@@ -90,6 +100,33 @@ class SmSearchResultAdapter : RecyclerView.Adapter<SmSearchResultAdapter.SearchR
     }
 
     override fun getItemCount(): Int = searchResults.size
+
+    /**
+     * DiffUtil 콜백 클래스
+     * 검색 결과의 변경사항을 효율적으로 계산합니다.
+     */
+    private class SearchResultDiffCallback(
+        private val oldList: List<SearchDocument>,
+        private val newList: List<SearchDocument>
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+            // 주소명과 좌표로 같은 아이템인지 판단
+            return oldItem.addressName == newItem.addressName &&
+                    oldItem.x == newItem.x &&
+                    oldItem.y == newItem.y
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            // 모든 내용이 같은지 확인
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
+    }
 
     /**
      * 검색 결과 아이템을 표시하는 ViewHolder

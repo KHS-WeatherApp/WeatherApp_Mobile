@@ -64,14 +64,14 @@ class SmFavoriteLocationAdapter(
      */
     fun toggleEditMode() {
         isEditMode = !isEditMode
-        notifyDataSetChanged()
+        notifyItemRangeChanged(0, itemCount, PAYLOAD_EDIT_MODE_CHANGED)
     }
-    
+
     /**
      * 편집 모드 활성 상태를 반환합니다.
      */
     fun isEditModeEnabled(): Boolean = isEditMode
-    
+
     /**
      * 편집 모드를 초기화합니다.
      * 편집 모드를 비활성화하고 일반 모드로 돌아갑니다.
@@ -79,8 +79,12 @@ class SmFavoriteLocationAdapter(
     fun resetEditMode() {
         if (isEditMode) {
             isEditMode = false
-            notifyDataSetChanged()
+            notifyItemRangeChanged(0, itemCount, PAYLOAD_EDIT_MODE_CHANGED)
         }
+    }
+
+    companion object {
+        private const val PAYLOAD_EDIT_MODE_CHANGED = "EDIT_MODE_CHANGED"
     }
     
     /**
@@ -172,6 +176,18 @@ class SmFavoriteLocationAdapter(
         holder.bind(locations[position])
     }
 
+    override fun onBindViewHolder(holder: FavoriteLocationViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            // payload가 없으면 전체 바인딩
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            // payload가 있으면 편집 모드 UI만 업데이트
+            if (payloads.contains(PAYLOAD_EDIT_MODE_CHANGED)) {
+                holder.updateEditModeUI(isEditMode, locations[position])
+            }
+        }
+    }
+
     override fun getItemCount(): Int = locations.size
 
     override fun getItemId(position: Int): Long {
@@ -201,7 +217,7 @@ class SmFavoriteLocationAdapter(
 
         /**
          * 즐겨찾기 지역 데이터를 바인딩합니다.
-         * 
+         *
          * @param location 바인딩할 즐겨찾기 지역 정보
          */
         fun bind(location: FavoriteLocation) {
@@ -209,10 +225,10 @@ class SmFavoriteLocationAdapter(
             val displayName =
                 location.region3depthHName?.takeIf { it.isNotBlank() }
                 ?: location.region3depthName?.takeIf { it.isNotBlank() }
-                ?: location.region2depthName?.takeIf { it.isNotBlank() } 
+                ?: location.region2depthName?.takeIf { it.isNotBlank() }
                 ?: location.region1depthName?.takeIf { it.isNotBlank() }
             binding.tvLocationName.text = displayName
-            
+
             // tvLocationAddress: 전체 주소 그대로 표시
             binding.tvLocationAddress.text = location.addressName
 
@@ -220,7 +236,18 @@ class SmFavoriteLocationAdapter(
             loadWeatherData(location, binding)
 
             // 편집 모드에 따른 UI 변경
-            if (isEditMode) {
+            updateEditModeUI(isEditMode, location)
+        }
+
+        /**
+         * 편집 모드 UI만 업데이트합니다.
+         * 날씨 데이터나 주소 정보는 재로딩하지 않습니다.
+         *
+         * @param editMode 편집 모드 여부
+         * @param location 위치 정보 (클릭 리스너용)
+         */
+        fun updateEditModeUI(editMode: Boolean, location: FavoriteLocation) {
+            if (editMode) {
                 // 편집 모드: 삭제 버튼 표시, 아이템 클릭 비활성화, 아이콘 변경
                 binding.ivDelete.visibility = android.view.View.VISIBLE
                 binding.ivLocationIcon.setImageResource(com.example.kh_studyprojects_weatherapp.R.drawable.ic_current_menubar2)
