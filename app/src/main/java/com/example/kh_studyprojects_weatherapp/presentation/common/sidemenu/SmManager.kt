@@ -1059,9 +1059,11 @@ class SmManager(
      * 앱 정보 다이얼로그 표시
      */
     private fun showAboutDialog() {
+        val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName
+
         AlertDialog.Builder(context)
             .setTitle("앱 정보")
-            .setMessage("날씨 앱 v2.0\n\n날씨 정보와 미세먼지 정보를 제공하는 앱입니다.")
+            .setMessage("날씨 앱 v$versionName\n\n날씨 정보와 미세먼지 정보를 제공하는 앱입니다.")
             .setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
             .show()
     }

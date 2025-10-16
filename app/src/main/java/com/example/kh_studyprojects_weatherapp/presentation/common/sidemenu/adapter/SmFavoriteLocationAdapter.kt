@@ -221,17 +221,19 @@ class SmFavoriteLocationAdapter(
 
             // 편집 모드에 따른 UI 변경
             if (isEditMode) {
-                // 편집 모드: 삭제 버튼 표시, 아이템 클릭 비활성화
+                // 편집 모드: 삭제 버튼 표시, 아이템 클릭 비활성화, 아이콘 변경
                 binding.ivDelete.visibility = android.view.View.VISIBLE
+                binding.ivLocationIcon.setImageResource(com.example.kh_studyprojects_weatherapp.R.drawable.ic_current_menubar2)
                 binding.root.setOnClickListener(null)
-                
+
                 // 삭제 버튼 클릭 리스너
                 binding.ivDelete.setOnClickListener {
                     onDeleteClick(location)
                 }
             } else {
-                // 일반 모드: 삭제 버튼 숨김, 아이템 클릭 활성화
+                // 일반 모드: 삭제 버튼 숨김, 아이템 클릭 활성화, 아이콘 원래대로
                 binding.ivDelete.visibility = android.view.View.GONE
+                binding.ivLocationIcon.setImageResource(android.R.drawable.ic_menu_mylocation)
                 binding.root.setOnClickListener {
                     onLocationClick(location)
                 }

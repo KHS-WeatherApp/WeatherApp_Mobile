@@ -10,6 +10,7 @@
 
     <!-- 위치 아이콘 -->
     <ImageView
+        android:id="@+id/ivLocationIcon"
         android:layout_width="@dimen/dp_24"
         android:layout_height="@dimen/dp_24"
         android:layout_gravity="center_vertical"
