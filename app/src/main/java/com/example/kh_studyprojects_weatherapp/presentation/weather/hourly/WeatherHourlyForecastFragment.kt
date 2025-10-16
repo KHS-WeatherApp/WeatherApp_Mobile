@@ -67,7 +67,7 @@ class WeatherHourlyForecastFragment : Fragment(), RefreshableFragment {
                 binding.clHourly02.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             }
             adapter.isVertical = isChecked // 어댑터의 레이아웃 모드(isVertical)를 업데이트
-            adapter.notifyDataSetChanged() // 어댑터에 데이터 변경 알림을 보내서 RecyclerView를 갱신
+            adapter.notifyItemRangeChanged(0, adapter.itemCount) // 범위 지정 갱신으로 성능 개선
         }
 
         // 데이터 관찰 및 어댑터에 제출
