@@ -87,6 +87,72 @@ sealed class WeatherDailyViewHolder(
         }
     }
 
+    /**
+     * 시간별 예보의 온도 선 너비를 설정하는 공통 헬퍼 함수
+     *
+     * @param tempLine 온도 선 뷰
+     * @param temperature 온도 값
+     * @param minTempRange 최소 온도 범위
+     * @param maxTempRange 최대 온도 범위
+     */
+    protected fun setupHourlyTempLine(
+        tempLine: View,
+        temperature: Double,
+        minTempRange: Double,
+        maxTempRange: Double
+    ) {
+        tempLine.post {
+            // 최소폭 (56dp)
+            val minWidthPx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 56f, tempLine.context.resources.displayMetrics
+            ).toInt()
+
+            // 최대폭 (120dp)
+            val maxWidthPx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 120f, tempLine.context.resources.displayMetrics
+            ).toInt()
+
+            // 온도 → 비율 계산
+            val adjustedTemp = temperature.coerceIn(minTempRange, maxTempRange)
+            val tempOffset = (adjustedTemp - minTempRange).toFloat()
+            val widthRatioLinear = tempOffset / (maxTempRange - minTempRange).toFloat()
+
+            // 곡선화
+            val widthRatio = (1 - Math.pow((1 - widthRatioLinear).toDouble(), 2.0)).toFloat()
+
+            // 최소~최대 폭 안에서 자연스럽게 비율로 계산
+            val finalWidth = (minWidthPx + (maxWidthPx - minWidthPx) * widthRatio).toInt()
+
+            val lp = tempLine.layoutParams
+            lp.width = finalWidth
+            tempLine.layoutParams = lp
+        }
+    }
+
+    /**
+     * 시간별 예보의 강수 확률/강수량 표시를 설정하는 공통 헬퍼 함수
+     *
+     * @param hourBinding 시간별 예보 아이템 바인딩
+     * @param probability 강수 확률 (예: "30%")
+     * @param precipitation 강수량 (예: "1.5mm")
+     */
+    protected fun setupHourlyPrecipitation(
+        hourBinding: ItemWeatherDailyTohourlyForecastTimeBinding,
+        probability: String?,
+        precipitation: String?
+    ) {
+        val prob = probability?.replace("%", "")?.toIntOrNull() ?: 0
+        if (prob >= 5) {
+            hourBinding.hourlyProbability.text = probability
+            hourBinding.hourlyPrecipitation.text = if (precipitation != "0.0mm") (" • $precipitation") else ""
+            hourBinding.hourlyProbability.visibility = View.VISIBLE
+            hourBinding.hourlyPrecipitation.visibility = if (hourBinding.hourlyPrecipitation.text == "") View.GONE else View.VISIBLE
+        } else {
+            hourBinding.hourlyPrecipitation.visibility = View.GONE
+            hourBinding.hourlyProbability.visibility = View.GONE
+        }
+    }
+
     class Today(
         private val binding: ItemWeatherDailyTodayBinding
     ) : WeatherDailyViewHolder(binding) {
@@ -263,47 +329,11 @@ sealed class WeatherDailyViewHolder(
                 hourBinding.hourlyClothingIcon.setImageResource(WeatherCommon.getClothingIcon(apparent_temperature))
 
                 // 온도 선 설정
-                val tempLine = hourBinding.hourlyTempLine
-                tempLine.post {
-                    // 최소폭 (예: 56dp)
-                    val minWidthPx = TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, 56f, tempLine.context.resources.displayMetrics
-                    ).toInt()
+                setupHourlyTempLine(hourBinding.hourlyTempLine, temperature, minTempRange, maxTempRange)
 
-                    // 최대폭 (예: 120dp)
-                    val maxWidthPx = TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, 120f, tempLine.context.resources.displayMetrics
-                    ).toInt()
+                // 강수 확률/강수량 설정
+                setupHourlyPrecipitation(hourBinding, hourData.probability, hourData.precipitation)
 
-                    // 온도 → 비율 계산
-                    val baseTemp = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
-                    val adjustedTemp = baseTemp.coerceIn(minTempRange, maxTempRange)
-                    val tempOffset = (adjustedTemp - minTempRange).toFloat()
-                    val widthRatioLinear = tempOffset / (maxTempRange - minTempRange).toFloat()
-
-                    // 곡선화 (원하면)
-                    val widthRatio = (1 - Math.pow((1 - widthRatioLinear).toDouble(), 2.0)).toFloat()
-
-                    // 🚀 최소~최대 폭 안에서 자연스럽게 비율로 계산
-                    val finalWidth = (minWidthPx + (maxWidthPx - minWidthPx) * widthRatio).toInt()
-
-                    //Log.d("온도 계산", "minWidthPx=$minWidthPx maxWidthPx=$maxWidthPx ,, minTempRange=$minTempRange, maxTempRange=$maxTempRange, temp=$adjustedTemp , width=$finalWidth")
-
-                    val lp = tempLine.layoutParams
-                    lp.width = finalWidth
-                    tempLine.layoutParams = lp
-                }
-
-                val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
-                if (prob >= 5) {
-                    hourBinding.hourlyProbability.text = hourData.probability
-                    hourBinding.hourlyPrecipitation.text = if (hourData.precipitation != "0.0mm") (" • "+hourData.precipitation) else ""
-                    hourBinding.hourlyProbability.visibility = View.VISIBLE
-                    hourBinding.hourlyPrecipitation.visibility = if(hourBinding.hourlyPrecipitation.text == "") View.GONE else View.VISIBLE
-                } else {
-                    hourBinding.hourlyPrecipitation.visibility = View.GONE
-                    hourBinding.hourlyProbability.visibility = View.GONE
-                }
                 container.addView(view)
             }
         }
@@ -453,47 +483,11 @@ sealed class WeatherDailyViewHolder(
                 hourBinding.hourlyClothingIcon.setImageResource(WeatherCommon.getClothingIcon(temperature))
 
                 // 온도 선 설정
-                val tempLine = hourBinding.hourlyTempLine
-                tempLine.post {
-                    // 최소폭 (예: 56dp)
-                    val minWidthPx = TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, 56f, tempLine.context.resources.displayMetrics
-                    ).toInt()
+                setupHourlyTempLine(hourBinding.hourlyTempLine, temperature, minTempRange, maxTempRange)
 
-                    // 최대폭 (예: 120dp)
-                    val maxWidthPx = TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, 120f, tempLine.context.resources.displayMetrics
-                    ).toInt()
+                // 강수 확률/강수량 설정
+                setupHourlyPrecipitation(hourBinding, hourData.probability, hourData.precipitation)
 
-                    // 온도 → 비율 계산
-                    val baseTemp = hourData.temperature?.replace("°", "")?.toDoubleOrNull() ?: 0.0
-                    val adjustedTemp = baseTemp.coerceIn(minTempRange, maxTempRange)
-                    val tempOffset = (adjustedTemp - minTempRange).toFloat()
-                    val widthRatioLinear = tempOffset / (maxTempRange - minTempRange).toFloat()
-
-                    // 곡선화 (원하면)
-                    val widthRatio = (1 - Math.pow((1 - widthRatioLinear).toDouble(), 2.0)).toFloat()
-
-                    // 🚀 최소~최대 폭 안에서 자연스럽게 비율로 계산
-                    val finalWidth = (minWidthPx + (maxWidthPx - minWidthPx) * widthRatio).toInt()
-
-                    //Log.d("온도 계산", "minWidthPx=$minWidthPx maxWidthPx=$maxWidthPx ,, minTempRange=$minTempRange, maxTempRange=$maxTempRange, temp=$adjustedTemp , width=$finalWidth")
-
-                    val lp = tempLine.layoutParams
-                    lp.width = finalWidth
-                    tempLine.layoutParams = lp
-                }
-
-                val prob = hourData.probability?.replace("%", "")?.toIntOrNull() ?: 0
-                if (prob >= 5) {
-                    hourBinding.hourlyProbability.text = hourData.probability
-                    hourBinding.hourlyPrecipitation.text = if (hourData.precipitation != "0.0mm") (" • "+hourData.precipitation) else ""
-                    hourBinding.hourlyProbability.visibility = View.VISIBLE
-                    hourBinding.hourlyPrecipitation.visibility = if(hourBinding.hourlyPrecipitation.text == "") View.GONE else View.VISIBLE
-                } else {
-                    hourBinding.hourlyPrecipitation.visibility = View.GONE
-                    hourBinding.hourlyProbability.visibility = View.GONE
-                }
                 container.addView(view)
             }
         }
