@@ -10,12 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherAdditionalFragmentBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherAdditional
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.collectUiState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 /**
  * 추가 날씨 정보를 표시하는 프래그먼트
@@ -62,24 +61,8 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
      * ViewModel의 UiState를 관찰하고 상태에 따라 UI를 업데이트
      */
     private fun setupWeatherDataObserver() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.uiState.collect { state ->
-                when (state) {
-                    is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Initial -> {
-                        // 초기 상태 - 아무것도 하지 않음
-                    }
-                    is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading -> {
-                        // 로딩 상태 처리 (필요시 로딩 UI 표시)
-                    }
-                    is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success -> {
-                        updateUI(state.data)
-                    }
-                    is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Error -> {
-                        // 에러 처리 (필요시 에러 UI 표시)
-                        Log.e("AdditionalWeather", "데이터 로드 실패: ${state.message}")
-                    }
-                }
-            }
+        collectUiState(viewModel) { data ->
+            updateUI(data)
         }
     }
 

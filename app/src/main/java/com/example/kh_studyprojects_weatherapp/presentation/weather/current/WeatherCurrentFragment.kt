@@ -7,13 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherCurrentFragmentBinding
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCurrent
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.collectUiState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class WeatherCurrentFragment : Fragment(), RefreshableFragment {
@@ -40,24 +39,8 @@ class WeatherCurrentFragment : Fragment(), RefreshableFragment {
     }
 
     private fun setupWeatherDataObserver() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.uiState.collect { state ->
-                when (state) {
-                    is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Initial -> {
-                        // 초기 상태 - 아무것도 하지 않음
-                    }
-                    is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading -> {
-                        // 로딩 상태 처리 (필요시 로딩 UI 표시)
-                    }
-                    is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success -> {
-                        updateUI(state.data)
-                    }
-                    is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Error -> {
-                        // 에러 처리 (필요시 에러 UI 표시)
-                        // Toast나 Snackbar로 에러 메시지 표시 가능
-                    }
-                }
-            }
+        collectUiState(viewModel) { data ->
+            updateUI(data)
         }
     }
 
