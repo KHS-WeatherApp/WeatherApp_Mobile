@@ -88,9 +88,11 @@ class WeatherCurrentFragment : Fragment(), RefreshableFragment {
         val yesterdayTemp = findYesterdayTemperature(currentTime, model.hourlyTimes, model.hourlyTemperatures) ?: return
 
         val diff = currentTemp - yesterdayTemp
+        Log.d("WeatherCurrent", "어제 비교 - 현재: $currentTemp, 어제: $yesterdayTemp, 차이: $diff")
+
         binding.WeatherDiff.text = when {
-            diff > 0 -> "어제보다 ${diff.toInt()}° 따뜻해요"
-            diff < 0 -> "어제보다 ${-diff.toInt()}° 추워요"
+            diff >= 1.0 -> "어제보다 ${diff.toInt()}° 따뜻해요"
+            diff <= -1.0 -> "어제보다 ${-diff.toInt()}° 추워요"
             else -> "어제와 비슷해요"
         }
     }
@@ -112,11 +114,19 @@ class WeatherCurrentFragment : Fragment(), RefreshableFragment {
     ): Double? {
         // 현재 시간의 인덱스 찾기
         val currentIndex = hourlyTimes.indexOfFirst { it.startsWith(currentTimeIso.substring(0, 13)) }
-        if (currentIndex == -1) return null
+        Log.d("WeatherCurrent", "어제 온도 찾기 - currentTime: $currentTimeIso, currentIndex: $currentIndex, hourlyTimes size: ${hourlyTimes.size}")
+
+        if (currentIndex == -1) {
+            Log.w("WeatherCurrent", "현재 시간을 hourlyTimes에서 찾을 수 없음")
+            return null
+        }
 
         // 24시간 전 = 인덱스 -24
         val yesterdayIndex = currentIndex - 24
-        return hourlyTemperatures.getOrNull(yesterdayIndex)
+        val yesterdayTemp = hourlyTemperatures.getOrNull(yesterdayIndex)
+        Log.d("WeatherCurrent", "yesterdayIndex: $yesterdayIndex, yesterdayTemp: $yesterdayTemp")
+
+        return yesterdayTemp
     }
 
     /**
