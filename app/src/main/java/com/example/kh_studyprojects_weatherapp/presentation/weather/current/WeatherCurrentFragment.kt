@@ -55,7 +55,7 @@ class WeatherCurrentFragment : Fragment(), RefreshableFragment {
             model.apparentTemperature?.let { temp ->
                 binding.apparentTemperature.text = "체감온도 : ${temp}°"
                 binding.RecommendClothesIcon.setImageResource(WeatherCommon.getClothingIcon(temp.toDouble()))
-                binding.RecommendClothes.text = "추천 옷: ${getClothingText(temp.toDouble())}"
+                binding.RecommendClothes.text = "추천 옷: ${WeatherCommon.getClothingText(temp.toDouble())}"
             }
             binding.CurrentTemp.text = model.temperature?.let { "${it}°" } ?: "N/A"
             binding.currentWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(model.weatherCode))
@@ -91,18 +91,6 @@ class WeatherCurrentFragment : Fragment(), RefreshableFragment {
             }
         } catch (e: Exception) {
             Log.e("WeatherCurrent", "날씨 데이터 처리 중 오류", e)
-        }
-    }
-
-    private fun getClothingText(temperature: Double): String {
-        return when {
-            temperature >= 28 -> "반팔"
-            temperature >= 23 -> "얇은 셔츠"
-            temperature >= 20 -> "얇은 가디건"
-            temperature >= 17 -> "맨투맨"
-            temperature >= 12 -> "자켓"
-            temperature >= 9 -> "코트"
-            else -> "패딩"
         }
     }
 

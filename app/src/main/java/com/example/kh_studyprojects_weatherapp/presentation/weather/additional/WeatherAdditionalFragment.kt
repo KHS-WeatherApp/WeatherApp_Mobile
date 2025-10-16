@@ -17,6 +17,54 @@ import com.example.kh_studyprojects_weatherapp.presentation.common.base.collectU
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
+ * 대기질 상태별 색상 코드 (환경부 기준)
+ */
+private object AirQualityColors {
+    const val GOOD = "#0048c6"         // 파랑 - 좋음
+    const val MODERATE = "#90e990"     // 초록 - 보통
+    const val UNHEALTHY = "#fcb80c"    // 주황 - 나쁨
+    const val HAZARDOUS = "#fc2407"    // 빨강 - 매우나쁨
+}
+
+/**
+ * 미세먼지(PM10) 농도 기준 (환경부 고시)
+ */
+private object PM10Standards {
+    const val GOOD = 30.0          // 좋음
+    const val MODERATE = 80.0      // 보통
+    const val UNHEALTHY = 150.0    // 나쁨
+}
+
+/**
+ * 초미세먼지(PM2.5) 농도 기준 (환경부 고시)
+ */
+private object PM25Standards {
+    const val GOOD = 15.0          // 좋음
+    const val MODERATE = 35.0      // 보통
+    const val UNHEALTHY = 75.0     // 나쁨
+}
+
+/**
+ * UV 지수 기준 (WHO)
+ */
+private object UVIndexStandards {
+    const val LOW = 2.0            // 낮음
+    const val MODERATE = 5.0       // 보통
+    const val HIGH = 7.0           // 높음
+    const val VERY_HIGH = 10.0     // 매우높음
+}
+
+/**
+ * 강수량 기준 (기상청)
+ */
+private object PrecipitationStandards {
+    const val VERY_LIGHT = 5.0     // 매우 적음
+    const val LIGHT = 10.0         // 적음
+    const val MODERATE = 20.0      // 보통
+    const val HEAVY = 80.0         // 많음
+}
+
+/**
  * 추가 날씨 정보를 표시하는 프래그먼트
  * - 미세먼지, 초미세먼지, UV 지수, 강수량, 일출/일몰 시간을 노출
  */
@@ -118,10 +166,10 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
     private fun updateFineDustProgress(value: Double) {
         Log.d("AdditionalWeather", "미세먼지 값: $value")
         val progress = when {
-            value <= 30 -> Triple(value, "좋음", "#0048c6")    // 파랑색
-            value <= 80 -> Triple(value, "보통", "#90e990")    // 초록색
-            value <= 150 -> Triple(value, "나쁨", "#fcb80c")   // 주황색
-            else -> Triple(value, "매우나쁨", "#fc2407")      // 빨간색
+            value <= PM10Standards.GOOD -> Triple(value, "좋음", AirQualityColors.GOOD)
+            value <= PM10Standards.MODERATE -> Triple(value, "보통", AirQualityColors.MODERATE)
+            value <= PM10Standards.UNHEALTHY -> Triple(value, "나쁨", AirQualityColors.UNHEALTHY)
+            else -> Triple(value, "매우나쁨", AirQualityColors.HAZARDOUS)
         }
         
         // 프로그레스를 단계별 범위로 조정
@@ -152,10 +200,10 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
     private fun updateUltraFineDustProgress(value: Double) {
         Log.d("AdditionalWeather", "초미세먼지 값: $value")
         val progress = when {
-            value <= 15 -> Triple(value, "좋음", "#0048c6")    // 파랑색
-            value <= 35 -> Triple(value, "보통", "#90e990")    // 초록색
-            value <= 75 -> Triple(value, "나쁨", "#fcb80c")   // 주황색
-            else -> Triple(value, "매우나쁨", "#fc2407")      // 빨간색
+            value <= PM25Standards.GOOD -> Triple(value, "좋음", AirQualityColors.GOOD)
+            value <= PM25Standards.MODERATE -> Triple(value, "보통", AirQualityColors.MODERATE)
+            value <= PM25Standards.UNHEALTHY -> Triple(value, "나쁨", AirQualityColors.UNHEALTHY)
+            else -> Triple(value, "매우나쁨", AirQualityColors.HAZARDOUS)
         }
         
         //프로그레스 바의 진행률 변경 - 적절한 범위로 조정
@@ -185,11 +233,11 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
      */
     private fun updateUVProgress(value: Double) {
         val progress = when {
-            value <= 2 -> Pair(20, "낮음")     // 0-2: 낮음
-            value <= 5 -> Pair(40, "보통")     // 3-5: 보통
-            value <= 7 -> Pair(60, "높음")     // 6-7: 높음
-            value <= 10 -> Pair(80, "매우높음") // 8-10: 매우높음
-            else -> Pair(100, "위험")          // 11 이상: 위험
+            value <= UVIndexStandards.LOW -> Pair(20, "낮음")
+            value <= UVIndexStandards.MODERATE -> Pair(40, "보통")
+            value <= UVIndexStandards.HIGH -> Pair(60, "높음")
+            value <= UVIndexStandards.VERY_HIGH -> Pair(80, "매우높음")
+            else -> Pair(100, "위험")
         }
         binding.uvIndexLevel.text = progress.second
 
@@ -202,11 +250,11 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
      */
     private fun updatePrecipitationProgress(value: Double): String {
         return when {
-            value < 5 -> "매우 적음"    // 0~5 mm 미만
-            value < 10 -> "적음"       // 5~10 mm
-            value < 20 -> "보통"       // 10~20 mm
-            value < 80 -> "많음"       // 20~80 mm
-            else -> "집중호우"         // 80 mm 이상
+            value < PrecipitationStandards.VERY_LIGHT -> "매우 적음"
+            value < PrecipitationStandards.LIGHT -> "적음"
+            value < PrecipitationStandards.MODERATE -> "보통"
+            value < PrecipitationStandards.HEAVY -> "많음"
+            else -> "집중호우"
         }
     }
 

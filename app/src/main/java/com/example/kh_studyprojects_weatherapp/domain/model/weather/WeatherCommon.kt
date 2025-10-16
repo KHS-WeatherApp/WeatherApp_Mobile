@@ -52,8 +52,24 @@ object WeatherCommon {
     }
 
     /**
+     * 온도에 따른 추천 옷 텍스트를 반환
+     *
+     * @param temperature 온도
+     * @return 추천 옷 텍스트
+     */
+    fun getClothingText(temperature: Double): String = when {
+        temperature >= 28 -> "반팔"
+        temperature >= 23 -> "얇은 셔츠"
+        temperature >= 20 -> "얇은 가디건"
+        temperature >= 17 -> "맨투맨"
+        temperature >= 12 -> "자켓"
+        temperature >= 9 -> "코트"
+        else -> "패딩"
+    }
+
+    /**
      * 온도에 따른 배경 리소스 ID를 반환
-     * 
+     *
      * @param temperature 온도
      * @return 배경 리소스 ID
      */
