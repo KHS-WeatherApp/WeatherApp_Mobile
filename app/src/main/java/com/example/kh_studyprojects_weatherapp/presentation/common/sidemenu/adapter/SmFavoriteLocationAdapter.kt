@@ -10,6 +10,8 @@ import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommo
 import com.example.kh_studyprojects_weatherapp.domain.repository.weather.WeatherRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
@@ -33,6 +35,14 @@ class SmFavoriteLocationAdapter(
     private var locations: List<FavoriteLocation> = emptyList()
     private val locationIdToWeather: MutableMap<String, Pair<Int?, Int?>> = mutableMapOf()
     private var isEditMode = false
+
+    /**
+     * 구조화된 CoroutineScope
+     * - SupervisorJob: 하나의 코루틴 실패가 다른 코루틴에 영향을 주지 않음
+     * - Dispatchers.Main: UI 업데이트를 위한 메인 스레드
+     * - onDetachedFromRecyclerView()에서 자동으로 취소됨
+     */
+    private val adapterScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     /**
      * 즐겨찾기 지역 목록을 업데이트합니다.
@@ -89,47 +99,59 @@ class SmFavoriteLocationAdapter(
     
     /**
      * 날씨 데이터를 로딩합니다.
-     * 
+     *
+     * 구조화된 동시성을 사용하여 생명주기 관리:
+     * - adapterScope 사용으로 Adapter 제거 시 자동 취소
+     * - ViewHolder 재활용 문제 해결을 위한 cacheKey 검증
+     *
      * @param location 날씨 데이터를 가져올 위치 정보
-     * @param binding ViewHolder의 바인딩 객체
+     * @param holder ViewHolder (재활용 검증용)
      */
-    private fun loadWeatherData(location: FavoriteLocation, binding: ItemFavoriteLocationBinding) {
+    private fun loadWeatherData(location: FavoriteLocation, holder: FavoriteLocationViewHolder) {
         weatherRepository?.let { repo ->
             val cacheKey = "${location.deviceId}:${location.latitude}:${location.longitude}"
             val cached = locationIdToWeather[cacheKey]
             if (cached != null) {
                 val (temp, code) = cached
-                binding.tvTemperature.text = temp?.let { "${it}°" } ?: "N/A"
-                code?.let { binding.ivWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(it)) }
+                holder.binding.tvTemperature.text = temp?.let { "${it}°" } ?: "N/A"
+                code?.let { holder.binding.ivWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(it)) }
                 return
             }
 
-            CoroutineScope(Dispatchers.IO).launch {
+            // 구조화된 스코프 사용
+            adapterScope.launch {
                 try {
-                    val result = repo.getWeatherInfo(location.latitude, location.longitude)
+                    // IO 스레드에서 네트워크 호출
+                    val result = withContext(Dispatchers.IO) {
+                        repo.getWeatherInfo(location.latitude, location.longitude)
+                    }
+
                     result.onSuccess { weatherData ->
-                        withContext(Dispatchers.Main) {
+                        // ViewHolder가 재활용되었는지 확인
+                        if (holder.currentCacheKey == cacheKey) {
                             val tempInt = weatherData.current.temperature2m?.roundToInt()
-                            binding.tvTemperature.text = tempInt?.let { "${it}°" } ?: "N/A"
+                            holder.binding.tvTemperature.text = tempInt?.let { "${it}°" } ?: "N/A"
 
                             val weatherCode = weatherData.current.weatherCode ?: 0
-                            binding.ivWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
+                            holder.binding.ivWeatherIcon.setImageResource(WeatherCommon.getWeatherIcon(weatherCode))
                             locationIdToWeather[cacheKey] = Pair(tempInt, weatherCode)
                         }
                     }.onFailure { exception ->
-                        withContext(Dispatchers.Main) {
-                            binding.tvTemperature.text = "오류"
+                        // ViewHolder가 재활용되었는지 확인
+                        if (holder.currentCacheKey == cacheKey) {
+                            holder.binding.tvTemperature.text = "오류"
                         }
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        binding.tvTemperature.text = "오류"
+                    // ViewHolder가 재활용되었는지 확인
+                    if (holder.currentCacheKey == cacheKey) {
+                        holder.binding.tvTemperature.text = "오류"
                     }
                 }
             }
         } ?: run {
             // WeatherRepository가 없으면 기본값 표시
-            binding.tvTemperature.text = "N/A"
+            holder.binding.tvTemperature.text = "N/A"
         }
     }
     
@@ -209,11 +231,26 @@ class SmFavoriteLocationAdapter(
     }
 
     /**
+     * RecyclerView에서 Adapter가 분리될 때 호출됩니다.
+     * 모든 진행 중인 코루틴을 취소하여 메모리 누수를 방지합니다.
+     */
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        adapterScope.cancel()
+    }
+
+    /**
      * 즐겨찾기 지역 아이템을 표시하는 ViewHolder
      */
     inner class FavoriteLocationViewHolder(
-        private val binding: ItemFavoriteLocationBinding
+        val binding: ItemFavoriteLocationBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+
+        /**
+         * ViewHolder가 재활용되었는지 확인하기 위한 캐시 키
+         * 코루틴이 완료되었을 때 현재 ViewHolder가 여전히 같은 데이터를 표시하는지 검증
+         */
+        var currentCacheKey: String? = null
 
         /**
          * 즐겨찾기 지역 데이터를 바인딩합니다.
@@ -221,6 +258,9 @@ class SmFavoriteLocationAdapter(
          * @param location 바인딩할 즐겨찾기 지역 정보
          */
         fun bind(location: FavoriteLocation) {
+            // 현재 ViewHolder의 캐시 키 업데이트 (재활용 검증용)
+            currentCacheKey = "${location.deviceId}:${location.latitude}:${location.longitude}"
+
             // tvLocationName: 동/읍/면 한글명 → 동/읍/면 → 구/군 → 시/도 순으로 우선 표시
             val displayName =
                 location.region3depthHName?.takeIf { it.isNotBlank() }
@@ -232,8 +272,8 @@ class SmFavoriteLocationAdapter(
             // tvLocationAddress: 전체 주소 그대로 표시
             binding.tvLocationAddress.text = location.addressName
 
-            // 날씨 데이터 로딩 시작
-            loadWeatherData(location, binding)
+            // 날씨 데이터 로딩 시작 (ViewHolder 전달)
+            loadWeatherData(location, this)
 
             // 편집 모드에 따른 UI 변경
             updateEditModeUI(isEditMode, location)
