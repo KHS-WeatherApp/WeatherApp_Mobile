@@ -12,7 +12,7 @@ import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecast
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastItemVerticalBinding
 import com.example.kh_studyprojects_weatherapp.data.model.weather.WeatherHourlyForecastDto
 import com.example.kh_studyprojects_weatherapp.domain.model.weather.WeatherCommon
-import java.util.*
+import java.time.LocalDateTime
 
 /**
  * 시간별 날씨 예보 RecyclerView Adapter
@@ -52,8 +52,8 @@ class WeatherHourlyForecastAdapter(
     // ViewHolder 재사용을 위한 설정
     init {
         setHasStableIds(true)
-        // 현재 시간 설정
-        currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        // 현재 시간 설정 (java.time API 사용)
+        currentHour = LocalDateTime.now().hour
     }
 
     // submitList를 오버라이드하여 최저 온도 업데이트
