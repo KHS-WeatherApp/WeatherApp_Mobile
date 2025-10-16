@@ -42,13 +42,13 @@ object WeatherCommon {
      * @return 옷 아이콘 리소스 ID
      */
     fun getClothingIcon(temperature: Double): Int = when {
-        temperature >= 28 -> R.drawable.clothing_icon_hawaiianshirt
-        temperature >= 23 -> R.drawable.clothing_icon_hawaiianshirt
-        temperature >= 20 -> R.drawable.clothing_icon_hawaiianshirt
-        temperature >= 17 -> R.drawable.clothing_icon_hawaiianshirt
-        temperature >= 12 -> R.drawable.clothing_icon_hawaiianshirt
-        temperature >= 9 -> R.drawable.clothing_icon_hawaiianshirt
-        else -> R.drawable.clothing_icon_hawaiianshirt
+        temperature >= 28 -> R.drawable.clothing_icon_hawaiianshirt //반팔
+        temperature >= 23 -> R.drawable.clothing_icon_hawaiianshirt // 얇은 셔츠
+        temperature >= 20 -> R.drawable.clothing_icon_hawaiianshirt // 얇은 가디건
+        temperature >= 17 -> R.drawable.clothing_icon_hawaiianshirt // 맨 투맨
+        temperature >= 12 -> R.drawable.clothing_icon_hawaiianshirt // 자켓
+        temperature >= 9 -> R.drawable.clothing_icon_hawaiianshirt  // 코트
+        else -> R.drawable.clothing_icon_hawaiianshirt // 패딩
     }
 
     /**
