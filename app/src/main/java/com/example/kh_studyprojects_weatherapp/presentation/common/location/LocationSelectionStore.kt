@@ -26,17 +26,23 @@ interface LocationSelectionStore {
  * 프로세스 메모리에만 저장하는 간단한 구현체입니다.
  * 앱을 재시작하면 값이 초기화됩니다.
  */
-class InMemoryLocationSelectionStore @Inject constructor() : LocationSelectionStore {
+class InMemoryLocationSelectionStore @Inject constructor(
+    private val effectiveLocationResolver: dagger.Lazy<EffectiveLocationResolver>
+) : LocationSelectionStore {
     // 현재 선택된 위치를 보관하는 내부 상태
     private val _selectedLocation = MutableStateFlow<SelectedLocation?>(null)
     override val selectedLocation: StateFlow<SelectedLocation?> = _selectedLocation
 
     override fun setSelectedLocation(location: SelectedLocation) {
         _selectedLocation.value = location
+        // 위치 변경 시 캐시 무효화
+        effectiveLocationResolver.get().invalidateCache()
     }
 
     override fun clearSelectedLocation() {
         _selectedLocation.value = null
+        // 위치 해제 시 캐시 무효화
+        effectiveLocationResolver.get().invalidateCache()
     }
 }
 
