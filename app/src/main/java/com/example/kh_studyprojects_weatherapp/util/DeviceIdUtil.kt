@@ -22,7 +22,7 @@ object DeviceIdUtil {
      * @return 디바이스 고유 식별자
      */
     fun getDeviceId(context: Context): String {
-        val androidId = Settings.Secure.getString(context.contentResolver,Settings.Secure.ANDROID_ID)
+        val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
         val result = androidId ?: "unknown"
         Log.d("DeviceIdUtil", "ANDROID_ID 사용: $result")
         return result
