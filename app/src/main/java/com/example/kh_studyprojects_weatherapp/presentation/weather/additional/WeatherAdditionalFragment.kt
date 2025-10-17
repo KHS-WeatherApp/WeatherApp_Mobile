@@ -102,7 +102,16 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initializeProgressBars()
         setupWeatherDataObserver()
+    }
+
+    /**
+     * 프로그레스 바 초기 설정
+     */
+    private fun initializeProgressBars() {
+        binding.fineDustProgressBar.max = 100
+        binding.ultraFineDustProgressBar.max = 100
     }
 
     /**
@@ -117,7 +126,7 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
     @SuppressLint("DefaultLocale")
     private fun updateUI(additional: WeatherAdditional) {
         try {
-            fun formatToAmPm(raw: String): String? = try {
+            fun formatToAmPm(raw: String): String = try {
                 val timePart = raw.substringAfter('T', raw)
                 val time = java.time.LocalTime.parse(timePart)
                 val hour12 = if (time.hour % 12 == 0) 12 else time.hour % 12
@@ -125,11 +134,11 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
                 String.format("%02d:%02d%s", hour12, time.minute, amPm)
             } catch (e: Exception) {
                 Log.w("AdditionalWeather", "시간 포맷팅 실패: $raw", e)
-                null
+                "--:--"
             }
 
-            additional.sunrise?.let { formatToAmPm(it) }?.let { binding.sunriseTime.text = it }
-            additional.sunset?.let { formatToAmPm(it) }?.let { binding.sunsetTime.text = it }
+            binding.sunriseTime.text = additional.sunrise?.let { formatToAmPm(it) } ?: "--:--"
+            binding.sunsetTime.text = additional.sunset?.let { formatToAmPm(it) } ?: "--:--"
 
             additional.precipitation?.let { precipitation ->
                 val precipitationText = updatePrecipitationProgress(precipitation)
@@ -141,12 +150,10 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
             }
 
             additional.pm10?.let { pm10 ->
-                binding.fineDustLevel.text = "${pm10.toInt()} μg/m³"
                 updateFineDustProgress(pm10)
             }
 
             additional.pm2_5?.let { pm25 ->
-                binding.ultraFineDustLevel.text = "${pm25.toInt()} μg/m³"
                 updateUltraFineDustProgress(pm25)
             }
 
@@ -160,37 +167,68 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
 
 
     /**
+     * 대기질 수치에 따른 진행률, 상태, 색상을 계산하는 공통 함수
+     * @param value 측정값
+     * @param goodThreshold 좋음 기준값
+     * @param moderateThreshold 보통 기준값
+     * @param unhealthyThreshold 나쁨 기준값
+     * @return Pair<진행률(0-100), 색상>
+     */
+    private fun calculateAirQualityProgress(
+        value: Double,
+        goodThreshold: Double,
+        moderateThreshold: Double,
+        unhealthyThreshold: Double
+    ): Pair<Int, String> {
+        // 상태별 색상 결정
+        val color = when {
+            value <= goodThreshold -> AirQualityColors.GOOD
+            value <= moderateThreshold -> AirQualityColors.MODERATE
+            value <= unhealthyThreshold -> AirQualityColors.UNHEALTHY
+            else -> AirQualityColors.HAZARDOUS
+        }
+
+        // 4단계 범위로 진행률 계산 (각 단계마다 25%씩 할당)
+        val progressValue = when {
+            value <= goodThreshold ->
+                (value / goodThreshold * 25).toInt()
+            value <= moderateThreshold ->
+                (25 + (value - goodThreshold) / (moderateThreshold - goodThreshold) * 25).toInt()
+            value <= unhealthyThreshold ->
+                (50 + (value - moderateThreshold) / (unhealthyThreshold - moderateThreshold) * 25).toInt()
+            else ->
+                (75 + (value - unhealthyThreshold) / (unhealthyThreshold * 0.5) * 25).toInt().coerceAtMost(100)
+        }
+
+        return Pair(progressValue, color)
+    }
+
+    /**
      * 미세먼지(PM10) 수치에 따른 진행률과 상태를 업데이트
      * @param value 미세먼지 수치
      */
     private fun updateFineDustProgress(value: Double) {
         Log.d("AdditionalWeather", "미세먼지 값: $value")
-        val progress = when {
-            value <= PM10Standards.GOOD -> Triple(value, "좋음", AirQualityColors.GOOD)
-            value <= PM10Standards.MODERATE -> Triple(value, "보통", AirQualityColors.MODERATE)
-            value <= PM10Standards.UNHEALTHY -> Triple(value, "나쁨", AirQualityColors.UNHEALTHY)
-            else -> Triple(value, "매우나쁨", AirQualityColors.HAZARDOUS)
+
+        val (progressValue, color) = calculateAirQualityProgress(
+            value,
+            PM10Standards.GOOD,
+            PM10Standards.MODERATE,
+            PM10Standards.UNHEALTHY
+        )
+
+        // 상태 텍스트 결정
+        val statusText = when {
+            value <= PM10Standards.GOOD -> "좋음"
+            value <= PM10Standards.MODERATE -> "보통"
+            value <= PM10Standards.UNHEALTHY -> "나쁨"
+            else -> "매우나쁨"
         }
-        
-        // 프로그레스를 단계별 범위로 조정
-        /*  적절한 진행률 계산: 실제 미세먼지 값을 0-100 범위로 매핑
-            미세먼지: 0-30 → 0-25%, 30-80 → 25-50%, 80-150 → 50-75%, 150+ → 75-100%
-            초미세먼지: 0-15 → 0-25%, 15-35 → 25-50%, 35-75 → 50-75%, 75+ → 75-100%
-        */
-        binding.fineDustProgressBar.max = 100
-        val progressValue = when {
-            value <= 15 -> (value / 15 * 25).toInt()      // 0-15 → 0-25
-            value <= 35 -> (25 + (value - 15) / 20 * 25).toInt()  // 15-35 → 25-50
-            value <= 75 -> (50 + (value - 35) / 40 * 25).toInt() // 35-75 → 50-75
-            else -> (75 + (value - 75) / 25 * 25).toInt().coerceAtMost(100) // 75+ → 75-100
-        }
+
         binding.fineDustProgressBar.progress = progressValue
-        
-        // 프로그레스 바의 색상 변경
-        binding.fineDustProgressBar.progressTintList = ColorStateList.valueOf(
-            Color.parseColor(
-            progress.third
-        ))
+        binding.fineDustProgressBar.progressTintList = ColorStateList.valueOf(Color.parseColor(color))
+        binding.fineDustProgressBar.contentDescription = "미세먼지 ${value.toInt()} μg/m³, $statusText"
+        binding.fineDustLevel.text = "${value.toInt()} μg/m³ ($statusText)"
     }
 
     /**
@@ -199,32 +237,26 @@ class WeatherAdditionalFragment : Fragment(), RefreshableFragment {
      */
     private fun updateUltraFineDustProgress(value: Double) {
         Log.d("AdditionalWeather", "초미세먼지 값: $value")
-        val progress = when {
-            value <= PM25Standards.GOOD -> Triple(value, "좋음", AirQualityColors.GOOD)
-            value <= PM25Standards.MODERATE -> Triple(value, "보통", AirQualityColors.MODERATE)
-            value <= PM25Standards.UNHEALTHY -> Triple(value, "나쁨", AirQualityColors.UNHEALTHY)
-            else -> Triple(value, "매우나쁨", AirQualityColors.HAZARDOUS)
+
+        val (progressValue, color) = calculateAirQualityProgress(
+            value,
+            PM25Standards.GOOD,
+            PM25Standards.MODERATE,
+            PM25Standards.UNHEALTHY
+        )
+
+        // 상태 텍스트 결정
+        val statusText = when {
+            value <= PM25Standards.GOOD -> "좋음"
+            value <= PM25Standards.MODERATE -> "보통"
+            value <= PM25Standards.UNHEALTHY -> "나쁨"
+            else -> "매우나쁨"
         }
-        
-        //프로그레스 바의 진행률 변경 - 적절한 범위로 조정
-        /*  적절한 진행률 계산: 실제 미세먼지 값을 0-100 범위로 매핑
-            미세먼지: 0-30 → 0-25%, 30-80 → 25-50%, 80-150 → 50-75%, 150+ → 75-100%
-            초미세먼지: 0-15 → 0-25%, 15-35 → 25-50%, 35-75 → 50-75%, 75+ → 75-100%
-        */
-        binding.ultraFineDustProgressBar.max = 100
-        val progressValue = when {
-            value <= 15 -> (value / 15 * 25).toInt()      // 0-15 → 0-25
-            value <= 35 -> (25 + (value - 15) / 20 * 25).toInt()  // 15-35 → 25-50
-            value <= 75 -> (50 + (value - 35) / 40 * 25).toInt() // 35-75 → 50-75
-            else -> (75 + (value - 75) / 25 * 25).toInt().coerceAtMost(100) // 75+ → 75-100
-        }
+
         binding.ultraFineDustProgressBar.progress = progressValue
-        
-        // 프로그레스 바의 색상 변경
-        binding.ultraFineDustProgressBar.progressTintList = ColorStateList.valueOf(
-            Color.parseColor(
-                progress.third
-            ))
+        binding.ultraFineDustProgressBar.progressTintList = ColorStateList.valueOf(Color.parseColor(color))
+        binding.ultraFineDustProgressBar.contentDescription = "초미세먼지 ${value.toInt()} μg/m³, $statusText"
+        binding.ultraFineDustLevel.text = "${value.toInt()} μg/m³ ($statusText)"
     }
 
     /**
