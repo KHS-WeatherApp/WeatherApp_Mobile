@@ -109,6 +109,15 @@ class WeatherHourlyForecastAdapter(
     }
 
     /**
+     * 온도 문자열을 Double로 안전하게 변환
+     * @param temperatureStr 온도 문자열
+     * @return 변환된 온도 값 (실패 시 0.0)
+     */
+    private fun parseTemperature(temperatureStr: String?): Double {
+        return temperatureStr?.toDoubleOrNull() ?: 0.0
+    }
+
+    /**
      * 온도에 따른 마진을 계산하는 공통 메서드
      * @param temp 현재 온도
      * @return 계산된 마진 값 (px)
@@ -138,14 +147,14 @@ class WeatherHourlyForecastAdapter(
                 val binding = WeatherHourlyForecastItemVerticalBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
-                VerticalViewHolder(binding, context, this)
+                VerticalViewHolder(binding, this)
             }
             else -> {
                 // 가로 모드 레이아웃 바인딩 생성 및 ViewHolder 반환
                 val binding = WeatherHourlyForecastItemHorizontalBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
-                HorizontalViewHolder(binding, context, this)
+                HorizontalViewHolder(binding, this)
             }
         }
     }
@@ -180,11 +189,10 @@ class WeatherHourlyForecastAdapter(
     // ViewHolder 클래스들에서 layoutParams 캐싱
     class HorizontalViewHolder(
         private val binding: WeatherHourlyForecastItemHorizontalBinding,
-        private val context: Context,
         private val adapter: WeatherHourlyForecastAdapter
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        // 레이아웃 파라미터 캐싱
+        // 레이아웃 파라미터 캐싱 (타입 안전성)
         private val temperatureLayoutParams = binding.temperature.layoutParams as ConstraintLayout.LayoutParams
 
         // bindItems() 메서드에서 아이템 데이터를 바인딩
@@ -206,8 +214,10 @@ class WeatherHourlyForecastAdapter(
                     imgClothes.setImageResource(WeatherCommon.getClothingIcon(apparentTemp))
                 }
 
+                // 온도 변환 (공통 함수 사용)
+                val temperatureDouble = adapter.parseTemperature(item.temperature)
+
                 // 온도에 따른 마진 및 배경 설정
-                val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
                 temperatureLayoutParams.topMargin = adapter.calculateMarginForTemperature(temperatureDouble)
                 temperature.requestLayout()  // 레이아웃 재계산 요청
                 temperature.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperatureDouble))
@@ -218,12 +228,11 @@ class WeatherHourlyForecastAdapter(
     // 세로 모드 ViewHolder 클래스
     class VerticalViewHolder(
         private val binding: WeatherHourlyForecastItemVerticalBinding,
-        private val context: Context,
         private val adapter: WeatherHourlyForecastAdapter
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        // 레이아웃 파라미터 캐싱
-        private val vi01LayoutParams = binding.vi01.layoutParams
+        // 레이아웃 파라미터 캐싱 (타입 안전성)
+        private val vi01LayoutParams = binding.vi01.layoutParams as ViewGroup.LayoutParams
 
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
@@ -243,8 +252,10 @@ class WeatherHourlyForecastAdapter(
                     imgClothes.setImageResource(WeatherCommon.getClothingIcon(apparentTemp))
                 }
 
+                // 온도 변환 (공통 함수 사용)
+                val temperatureDouble = adapter.parseTemperature(item.temperature)
+
                 // 온도에 따른 너비 및 배경 설정
-                val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
                 vi01LayoutParams.width = adapter.calculateWidthForTemperature(temperatureDouble)
                 vi01.requestLayout()  // 레이아웃 재계산 요청
                 temperature.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperatureDouble))
