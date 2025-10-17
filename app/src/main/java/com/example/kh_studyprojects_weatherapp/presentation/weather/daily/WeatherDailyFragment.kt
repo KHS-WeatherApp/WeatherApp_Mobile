@@ -6,15 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherDailyIncludeBinding
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment
-import kotlinx.coroutines.launch
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.collectUiState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class WeatherDailyFragment : Fragment(), RefreshableFragment {
@@ -50,25 +46,20 @@ class WeatherDailyFragment : Fragment(), RefreshableFragment {
 
         // RecyclerView 설정
         binding.weatherDailyRecyclerView.apply {
-            //adapter = this@WeatherDailyFragment.weatherDailyAdapter
             layoutManager = LinearLayoutManager(context)
             adapter = weatherDailyAdapter
         }
 
-        // ViewModel의 데이터 관찰 - combine으로 두 Flow를 효율적으로 수집
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                kotlinx.coroutines.flow.combine(
-                    viewModel.weatherItems,
-                    viewModel.currentApiTime
-                ) { items, apiTime ->
-                    items to apiTime
-                }.collect { (items, apiTime) ->
-                    apiTime?.let { time ->
-                        weatherDailyAdapter.submitListWithTime(items, time)
-                    }
-                }
-            }
+        // UiState 기반 데이터 관찰
+        setupWeatherDataObserver()
+    }
+
+    /**
+     * ViewModel의 UiState를 관찰하고 상태에 따라 UI를 업데이트
+     */
+    private fun setupWeatherDataObserver() {
+        collectUiState(viewModel) { data ->
+            weatherDailyAdapter.submitListWithTime(data.weatherItems, data.currentApiTime)
         }
     }
 

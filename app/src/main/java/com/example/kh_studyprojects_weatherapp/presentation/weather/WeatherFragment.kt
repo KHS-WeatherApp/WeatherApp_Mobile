@@ -163,14 +163,18 @@ class WeatherFragment : BaseNavigationFragment() {
             return
         }
 
-        // 각 자식 ViewModel의 상태를 관찰
+        // 각 자식 ViewModel의 상태를 관찰 (UiState 기반)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val currentReady = current.viewModelInstance.uiState.map {
                     it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success
                 }
-                val dailyReady = daily.viewModelInstance.weatherItems.map { it.isNotEmpty() }
-                val hourlyReady = hourly.viewModelInstance.hourlyForecastItems.map { it.isNotEmpty() }
+                val dailyReady = daily.viewModelInstance.uiState.map {
+                    it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success
+                }
+                val hourlyReady = hourly.viewModelInstance.uiState.map {
+                    it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Success
+                }
 
                 combine(currentReady, dailyReady, hourlyReady) { c, d, h -> c && d && h }
                     .collect { allReady ->
@@ -210,14 +214,16 @@ class WeatherFragment : BaseNavigationFragment() {
         val hourly = getOrCacheFragment(R.id.weather_hourly_forecast_fragment, cachedHourlyFragment) { cachedHourlyFragment = it }
         val addi = getOrCacheFragment(R.id.weather_additional_container, cachedAdditionalFragment) { cachedAdditionalFragment = it }
 
-        // 각 섹션의 로딩 상태를 합쳐 새로고침 인디케이터를 제어
+        // 각 섹션의 로딩 상태를 합쳐 새로고침 인디케이터를 제어 (UiState 기반)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 combine(
                     current?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
                         ?: kotlinx.coroutines.flow.flowOf(false),
-                    daily?.viewModelInstance?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
-                    hourly?.viewModelInstance?.isLoading ?: kotlinx.coroutines.flow.flowOf(false),
+                    daily?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
+                        ?: kotlinx.coroutines.flow.flowOf(false),
+                    hourly?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
+                        ?: kotlinx.coroutines.flow.flowOf(false),
                     addi?.viewModelInstance?.uiState?.map { it is com.example.kh_studyprojects_weatherapp.presentation.common.base.UiState.Loading }
                         ?: kotlinx.coroutines.flow.flowOf(false),
                 ) { arr -> arr.any { it } }

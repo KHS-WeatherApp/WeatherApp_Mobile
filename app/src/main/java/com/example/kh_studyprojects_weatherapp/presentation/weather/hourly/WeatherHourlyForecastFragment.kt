@@ -1,21 +1,17 @@
 package com.example.kh_studyprojects_weatherapp.presentation.weather.hourly
 
 import android.os.Bundle
-import android.widget.Toast
 import com.example.kh_studyprojects_weatherapp.util.DebugLogger
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kh_studyprojects_weatherapp.databinding.WeatherHourlyForecastFragmentBinding
 import com.example.kh_studyprojects_weatherapp.presentation.common.base.RefreshableFragment
+import com.example.kh_studyprojects_weatherapp.presentation.common.base.collectUiState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class WeatherHourlyForecastFragment : Fragment(), RefreshableFragment {
@@ -70,35 +66,22 @@ class WeatherHourlyForecastFragment : Fragment(), RefreshableFragment {
             adapter.notifyItemRangeChanged(0, adapter.itemCount) // 범위 지정 갱신으로 성능 개선
         }
 
-        // 데이터 관찰 및 어댑터에 제출
-        observeViewModel()
-
-        // 데이터 가져오기
-        viewModel.refreshWeatherData()
-
         // 루트 뷰를 반환하여 Fragment의 UI를 화면에 표시
         return root
     }
 
-    // 뷰모델 관찰
-    private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // 시간별 예보 데이터 수신
-                launch {
-                    viewModel.hourlyForecastItems.collect { items ->
-                        adapter.submitList(items)
-                    }
-                }
-                // 에러 처리
-                launch {
-                    viewModel.error.collect { error ->
-                        error?.let {
-                            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // UiState 기반 데이터 관찰
+        setupWeatherDataObserver()
+    }
+
+    /**
+     * ViewModel의 UiState를 관찰하고 상태에 따라 UI를 업데이트
+     */
+    private fun setupWeatherDataObserver() {
+        collectUiState(viewModel) { data ->
+            adapter.submitList(data.hourlyForecastItems)
         }
     }
 
