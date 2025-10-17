@@ -29,7 +29,7 @@ import java.time.LocalDateTime
  *
  * @param context 컨텍스트
  * @param isVertical 세로 모드 여부 (기본값: false)
- * @author 김지윤
+ * @author 김효동
  * @since 2024.01.01
  * @version 1.0
  */
@@ -42,6 +42,11 @@ class WeatherHourlyForecastAdapter(
     private var minTemperature: Double = 0.0
     // 현재 시간을 저장하는 프로퍼티
     private var currentHour: Int = 0
+
+    // 리소스 값 캐싱
+    private val dp5: Int by lazy { context.resources.getDimensionPixelSize(R.dimen.dp_5) }
+    private val dp30: Int by lazy { context.resources.getDimensionPixelSize(R.dimen.dp_30) }
+    private val dp0: Int by lazy { context.resources.getDimensionPixelSize(R.dimen.dp_0) }
 
     // 뷰 타입 상수
     companion object {
@@ -71,31 +76,56 @@ class WeatherHourlyForecastAdapter(
     override fun getItemViewType(position: Int): Int =
         if (isVertical) VIEW_TYPE_VERTICAL else VIEW_TYPE_HORIZONTAL
 
-    // 시간에 따른 AM/PM 텍스트를 반환하는 메서드
-    private fun getAmPmText(hour: String?): String {
-        // 시간 문자열에서 숫자만 추출
+    /**
+     * 시간에 따른 AM/PM 텍스트를 반환하는 메서드
+     * @param hour 시간 (12시간 형식, 예: "6", "12")
+     * @param amPm DTO에서 가져온 AM/PM 값 ("오전" 또는 "오후")
+     * @return 표시할 라벨 ("오전", "오후", "내일", 또는 빈 문자열)
+     */
+    private fun getAmPmText(hour: String?, amPm: String?): String {
+        // "시" 제거하고 숫자만 추출
         val hourInt = hour?.replace("시", "")?.toIntOrNull() ?: return ""
+
+        // 12시(자정 또는 정오), 6시(오전 또는 오후)만 라벨 표시
         return when (hourInt) {
-            0 -> if (currentHour == 0) "오전" else "내일"
-            6 -> "오전"
-            12, 18 -> "오후"
-            else -> ""
+            12 -> {
+                // 12시: 오전이면 자정(0시), 오후면 정오(12시)
+                when (amPm) {
+                    "오전" -> if (currentHour == 0) "오전" else "내일"  // 자정
+                    "오후" -> "오후"  // 정오
+                    else -> ""
+                }
+            }
+            6 -> {
+                // 6시: 오전/오후 구분
+                when (amPm) {
+                    "오전" -> "오전"
+                    "오후" -> "오후"
+                    else -> ""
+                }
+            }
+            else -> ""  // 나머지 시간은 표시 안 함
         }
     }
 
     /**
-     * 24시간 형식을 12시간 형식으로 변환
-     *
-     * @param hour 시간 문자열 (예: "15시")
-     * @return 12시간 형식 시간 (예: "3시")
+     * 온도에 따른 마진을 계산하는 공통 메서드
+     * @param temp 현재 온도
+     * @return 계산된 마진 값 (px)
      */
-    private fun convertTo12HourFormat(hour: String?): String {
-        val hourInt = hour?.replace("시", "")?.toIntOrNull() ?: return ""
-        return when (hourInt) {
-            0 -> "12시"
-            in 1..12 -> "${hourInt}시"
-            else -> "${hourInt - 12}시"
-        }
+    private fun calculateMarginForTemperature(temp: Double): Int {
+        val tempDiff = temp - minTemperature
+        return dp0 + (tempDiff * dp5).toInt()
+    }
+
+    /**
+     * 온도에 따른 너비를 계산하는 공통 메서드
+     * @param temp 현재 온도
+     * @return 계산된 너비 값 (px)
+     */
+    private fun calculateWidthForTemperature(temp: Double): Int {
+        val tempDiff = temp - minTemperature
+        return dp30 + (tempDiff * dp5).toInt()
     }
 
 
@@ -136,9 +166,14 @@ class WeatherHourlyForecastAdapter(
             return oldItem.tvHour == newItem.tvHour
         }
 
-        // 아이템 내용 비교
+        // 아이템 내용 비교 - UI에 영향을 주는 필드만 비교
         override fun areContentsTheSame(oldItem: WeatherHourlyForecastDto, newItem: WeatherHourlyForecastDto): Boolean {
-            return oldItem == newItem
+            return oldItem.tvHour == newItem.tvHour &&
+                    oldItem.temperature == newItem.temperature &&
+                    oldItem.probability == newItem.probability &&
+                    oldItem.precipitation == newItem.precipitation &&
+                    oldItem.weatherCode == newItem.weatherCode &&
+                    oldItem.apparent_temperature == newItem.apparent_temperature
         }
     }
 
@@ -151,13 +186,13 @@ class WeatherHourlyForecastAdapter(
 
         // 레이아웃 파라미터 캐싱
         private val temperatureLayoutParams = binding.temperature.layoutParams as ConstraintLayout.LayoutParams
-        private val resources = context.resources
 
         // bindItems() 메서드에서 아이템 데이터를 바인딩
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
-                tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
-                tvHour.text = adapter.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
+                // DTO에서 가져온 AM/PM 값 사용 (0, 6, 12, 18시에만 표시)
+                tvAmPm.text = adapter.getAmPmText(item.tvHour, item.tvAmPm)
+                tvHour.text = "${item.tvHour}시"  // 시간에 "시" 붙이기
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
@@ -165,31 +200,18 @@ class WeatherHourlyForecastAdapter(
                 // 날씨 코드에 따른 이미지 설정
                 imgWeather.setImageResource(WeatherCommon.getWeatherIcon(item.weatherCode))
 
-                // 체감온도에 따른 옷 아이콘 설정
-                val apparentTemp = item.apparent_temperature?.toDoubleOrNull() ?: 0.0
-                imgClothes.setImageResource(WeatherCommon.getClothingIcon(apparentTemp))
+                // 체감온도에 따른 옷 아이콘 설정 (null 안전하게 처리)
+                val apparentTemp = item.apparent_temperature?.toDoubleOrNull()
+                if (apparentTemp != null) {
+                    imgClothes.setImageResource(WeatherCommon.getClothingIcon(apparentTemp))
+                }
 
-                // 온도에 따른 마진 설정
+                // 온도에 따른 마진 및 배경 설정
                 val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
-                temperatureLayoutParams.topMargin = getMarginForTemperature(temperatureDouble)
-                temperature.layoutParams = temperatureLayoutParams
-
-                // 온도 배경 설정
+                temperatureLayoutParams.topMargin = adapter.calculateMarginForTemperature(temperatureDouble)
+                temperature.requestLayout()  // 레이아웃 재계산 요청
                 temperature.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperatureDouble))
             }
-        }
-
-        // 온도에 따른 마진을 설정하는 메서드
-        private fun getMarginForTemperature(temp: Double): Int {
-            // 어댑터에서 저장된 최저 온도 사용
-            val minTemp = adapter.minTemperature
-            // 온도 차이 계산
-            val tempDiff = temp - minTemp
-            // 기본 마진 (최저 온도일 때의 마진)
-            val baseMargin = resources.getDimensionPixelSize(R.dimen.dp_0)
-            // 온도 차이에 따른 추가 마진 계산 (1도당 5dp)
-            val additionalMargin = (tempDiff * resources.getDimensionPixelSize(R.dimen.dp_5)).toInt()
-            return baseMargin + additionalMargin
         }
     }
 
@@ -201,12 +223,13 @@ class WeatherHourlyForecastAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // 레이아웃 파라미터 캐싱
-        private val resources = context.resources
+        private val vi01LayoutParams = binding.vi01.layoutParams
 
         fun bindItems(item: WeatherHourlyForecastDto) {
             binding.apply {
-                tvAmPm.text = adapter.getAmPmText(item.tvHour)  // AM/PM 텍스트 설정
-                tvHour.text = adapter.convertTo12HourFormat(item.tvHour)  // 12시간 형식으로 변환
+                // DTO에서 가져온 AM/PM 값 사용 (0, 6, 12, 18시에만 표시)
+                tvAmPm.text = adapter.getAmPmText(item.tvHour, item.tvAmPm)
+                tvHour.text = "${item.tvHour}시"  // 시간에 "시" 붙이기
                 probability.text = item.probability         // 강수 확률 텍스트 설정
                 precipitation.text = item.precipitation     // 강수량 텍스트 설정
                 temperature.text = "${item.temperature}°"   // 온도 텍스트 설정
@@ -214,23 +237,16 @@ class WeatherHourlyForecastAdapter(
                 // 날씨 코드에 따른 이미지 설정
                 imgWeather.setImageResource(WeatherCommon.getWeatherIcon(item.weatherCode))
 
-                // 체감온도에 따른 옷 아이콘 설정
-                val apparentTemp = item.apparent_temperature?.toDoubleOrNull() ?: 0.0
-                imgClothes.setImageResource(WeatherCommon.getClothingIcon(apparentTemp))
+                // 체감온도에 따른 옷 아이콘 설정 (null 안전하게 처리)
+                val apparentTemp = item.apparent_temperature?.toDoubleOrNull()
+                if (apparentTemp != null) {
+                    imgClothes.setImageResource(WeatherCommon.getClothingIcon(apparentTemp))
+                }
 
-                // item.temperature를 Double로 변환하여 마진 설정
+                // 온도에 따른 너비 및 배경 설정
                 val temperatureDouble = item.temperature?.toDoubleOrNull() ?: 0.0
-                val layoutParams = vi01.layoutParams
-
-                // 온도 넓이 속성 - 최저 온도 기준으로 상대적 넓이 계산
-                val minTemp = adapter.minTemperature
-                val tempDiff = temperatureDouble - minTemp
-                val baseWidth = resources.getDimensionPixelSize(R.dimen.dp_30)  // 기본 넓이
-                val additionalWidth = (tempDiff * resources.getDimensionPixelSize(R.dimen.dp_5)).toInt()  // 온도당 5dp 추가
-                layoutParams.width = baseWidth + additionalWidth
-                vi01.layoutParams = layoutParams
-
-                // 온도 배경 설정
+                vi01LayoutParams.width = adapter.calculateWidthForTemperature(temperatureDouble)
+                vi01.requestLayout()  // 레이아웃 재계산 요청
                 temperature.setBackgroundResource(WeatherCommon.getBackgroundForTemperature(temperatureDouble))
             }
         }
