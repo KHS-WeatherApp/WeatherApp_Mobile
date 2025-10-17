@@ -181,7 +181,6 @@ class WeatherFragment : BaseNavigationFragment() {
                         if (allReady) {
                             loadingOverlay.visibility = View.GONE
                             viewModel.markInitialOverlayShown()   // 초기 오버레이가 표시되었음을 기록
-                            this.cancel()
                         }
                     }
             }

@@ -76,7 +76,11 @@ class MainActivity : AppCompatActivity() {
         window.apply {
             statusBarColor = Color.TRANSPARENT
             navigationBarColor = Color.WHITE
-            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        }
+
+        // 네비게이션 바 라이트 모드 설정 (최신 API 사용)
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightNavigationBars = true
         }
 
         // 뷰 바인딩 설정
