@@ -206,9 +206,9 @@ sealed class WeatherDailyViewHolder(
                     imageClothing.setImageResource(WeatherCommon.getClothingIcon(avgTemp))
                 }
 
-                // 오후 10시(22시) 이후라면 더보기 버튼 숨김
-                //val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-                dayExpandMore24Btn.visibility = if (currentApiHour >= 22) View.GONE else View.VISIBLE
+                // 오후 11시(23시) 이후라면 더보기 버튼을 보이지 않게만 처리 (자리는 유지)
+                // GONE -> 레이아웃이 밀리는 문제 발생, INVISIBLE 로 교체
+                //dayExpandMore24Btn.visibility = if (currentApiHour >= 23) View.INVISIBLE else View.VISIBLE
 
                 // 클릭 리스너 설정
                 val toggleListener = View.OnClickListener {
