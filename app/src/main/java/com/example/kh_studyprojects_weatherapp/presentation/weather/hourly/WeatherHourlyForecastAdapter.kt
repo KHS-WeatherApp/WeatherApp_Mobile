@@ -57,8 +57,18 @@ class WeatherHourlyForecastAdapter(
     // ViewHolder 재사용을 위한 설정
     init {
         setHasStableIds(true)
-        // 현재 시간 설정 (java.time API 사용)
+        // 기본값은 기기 현재 시간. 이후 Fragment에서 API 시간으로 덮어씀
         currentHour = LocalDateTime.now().hour
+    }
+
+    // API에서 전달된 현재 시간(ISO)으로 현재 시각을 설정
+    fun setCurrentApiTime(timeIso: String?) {
+        currentHour = try {
+            val src = timeIso?.trim()
+            if (src.isNullOrEmpty()) LocalDateTime.now().hour else LocalDateTime.parse(src.replace("Z", "")).hour
+        } catch (e: Exception) {
+            LocalDateTime.now().hour
+        }
     }
 
     // submitList를 오버라이드하여 최저 온도 업데이트

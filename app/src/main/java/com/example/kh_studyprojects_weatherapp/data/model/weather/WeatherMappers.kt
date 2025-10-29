@@ -192,7 +192,9 @@ object WeatherMappers {
         val apparentTemps = asDoubleList(hourlyData["apparent_temperature"] as? List<*>, fallbackSize = times.size)
 
         // 3) 현재 시각(분/초/나노 0 처리) 이후의 첫 인덱스 계산
-        val now = LocalDateTime.now()
+        //    - 가능한 경우 API의 current.time을 기준으로 사용하고, 없을 때만 기기 시간을 사용
+        val apiCurrentTime = (response["current"] as? Map<*, *>)?.get("time")?.toString()
+        val now = apiCurrentTime?.let { parseToLocalDateTime(it) } ?: LocalDateTime.now()
         val currentHourStart = now.withMinute(0).withSecond(0).withNano(0)
 
         val currentIndex = times.indexOfFirst { time ->

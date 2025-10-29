@@ -55,7 +55,8 @@ class WeatherHourlyForecastViewModel @Inject constructor(
             }
             WeatherHourlyForecastUiData(
                 hourlyForecastItems = items,
-                locationInfo = locationInfo
+                locationInfo = locationInfo,
+                currentApiTime = response.current.time ?: ""
             )
         }
     }

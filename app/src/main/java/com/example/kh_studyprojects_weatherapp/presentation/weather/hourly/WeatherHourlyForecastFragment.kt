@@ -81,6 +81,8 @@ class WeatherHourlyForecastFragment : Fragment(), RefreshableFragment {
      */
     private fun setupWeatherDataObserver() {
         collectUiState(viewModel) { data ->
+            // API가 제공한 현재 시간으로 어댑터의 기준 시각 설정 후 리스트 반영
+            adapter.setCurrentApiTime(data.currentApiTime)
             adapter.submitList(data.hourlyForecastItems)
         }
     }
