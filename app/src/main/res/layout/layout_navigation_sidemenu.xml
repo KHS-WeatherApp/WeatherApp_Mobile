@@ -251,7 +251,8 @@
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:layout_marginHorizontal="@dimen/dp_8"/>
+                android:layout_marginHorizontal="@dimen/dp_8"
+                android:layout_marginBottom="70dp"/>
         </LinearLayout>
 
         <!-- 검색창 영역 (오버레이) -->
