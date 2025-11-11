@@ -4,8 +4,8 @@ import java.io.FileInputStream
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt.android)
-    kotlin("kapt")
 }
 
 val localProperties = Properties()
@@ -96,14 +96,10 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.48.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
-    implementation("androidx.hilt:hilt-navigation-fragment:1.1.0")
+    implementation("com.google.dagger:hilt-android:2.56")
+    ksp("com.google.dagger:hilt-android-compiler:2.56")
+    implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
 
     // Location
     implementation("com.google.android.gms:play-services-location:21.1.0")
-}
-
-kapt {
-    correctErrorTypes = true
 }
