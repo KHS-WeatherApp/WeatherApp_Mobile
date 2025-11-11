@@ -4,8 +4,8 @@ import java.io.FileInputStream
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.hilt.android)
     kotlin("kapt")
-    id("com.google.dagger.hilt.android")
 }
 
 val localProperties = Properties()
@@ -32,7 +32,8 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BACKEND_BASE_URL", "\"http://192.168.10.82:8080\"") // 김효동 - 회사
+            buildConfigField("String", "BACKEND_BASE_URL", "\"http://192.168.10.84:8080\"") // 김효동 - 회사
+//            buildConfigField("String", "BACKEND_BASE_URL", "\"http://172.25.192.1:8080\"") // 김효동 -
 //            buildConfigField("String", "BACKEND_BASE_URL", "\"http://172.30.1.53:8080\"") // 김지윤
             buildConfigField("String", "BACKEND_EMULATOR_BASE_URL", "\"http://10.0.2.2:8080\"") // 에뮬레이터에서 접속용 서버 주소
             buildConfigField("Boolean", "ENABLE_BACKEND_HTTP_LOGGING", "true")
@@ -76,6 +77,11 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
+    // Fragment 및 Lifecycle 명시적 버전 지정 (Navigation과 호환성 확보)
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson.converter)
     implementation(libs.gson)
@@ -89,13 +95,12 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    // Hilt
     implementation("com.google.dagger:hilt-android:2.48.1")
     kapt("com.google.dagger:hilt-android-compiler:2.48.1")
     implementation("androidx.hilt:hilt-navigation-fragment:1.1.0")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-
+    // Location
     implementation("com.google.android.gms:play-services-location:21.1.0")
 }
 

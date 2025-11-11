@@ -65,7 +65,7 @@
                 android:layout_height="@dimen/dp_16"
                 android:layout_gravity="center_vertical"
                 android:src="@android:drawable/ic_menu_info_details"
-                android:tint="@android:color/white"
+                app:tint="@android:color/white"
                 android:layout_marginEnd="@dimen/dp_4" />
 
             <TextView
@@ -104,7 +104,7 @@
             android:layout_height="@dimen/dp_24"
             android:layout_gravity="center_vertical"
             android:src="@android:drawable/ic_menu_mylocation"
-            android:tint="@android:color/white"
+            app:tint="@android:color/white"
             android:layout_marginEnd="@dimen/dp_12" />
 
         <!-- 지역 정보 -->
@@ -228,7 +228,7 @@
                         android:layout_height="@dimen/dp_16"
                         android:layout_gravity="center_vertical"
                         android:src="@android:drawable/ic_menu_edit"
-                        android:tint="@android:color/white"
+                        app:tint="@android:color/white"
                         android:layout_marginEnd="@dimen/dp_4" />
 
                     <TextView
@@ -297,7 +297,7 @@
                     android:layout_height="@dimen/dp_20"
                     android:layout_marginEnd="@dimen/dp_8"
                     android:src="@android:drawable/ic_menu_search"
-                    android:tint="@android:color/darker_gray" />
+                    app:tint="@android:color/darker_gray" />
 
                 <!-- 검색 입력창 -->
                 <EditText
@@ -323,7 +323,7 @@
                     android:layout_height="@dimen/dp_20"
                     android:layout_marginStart="@dimen/dp_8"
                     android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    android:tint="@android:color/darker_gray"
+                    app:tint="@android:color/darker_gray"
                     android:visibility="gone"
                     android:clickable="true"
                     android:focusable="true" />

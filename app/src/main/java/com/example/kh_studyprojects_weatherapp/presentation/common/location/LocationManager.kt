@@ -1,6 +1,7 @@
 ﻿package com.example.kh_studyprojects_weatherapp.presentation.common.location
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -70,6 +71,7 @@ class LocationManager @Inject constructor(
     }
 
     /** 마지막/현재 위치 한 번 조회 (고정 수집) */
+    @SuppressLint("MissingPermission")
     private suspend fun getLastLocation(): Location? = suspendCancellableCoroutine { continuation ->
         try {
             if (!hasLocationPermission()) {

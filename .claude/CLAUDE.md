@@ -458,3 +458,66 @@ refactor: WeatherRepository 캐싱 로직 개선
 - [ ] 네이밍 규칙을 준수했는가?
 - [ ] 불필요한 로그나 주석이 제거되었는가?
 - [ ] API 키가 하드코딩되지 않았는가?
+
+---
+
+## Skills (자동화 템플릿)
+
+프로젝트에서 반복되는 작업을 자동화하는 skill 템플릿입니다.
+
+### 사용 가능한 Skills
+
+#### 1. **create-feature-module** (새 기능 모듈 생성)
+- **용도**: Clean Architecture 전체 레이어를 한 번에 생성
+- **사용법**: `/create-feature-module [기능명]`
+- **예시**: `/create-feature-module alerts`
+- **생성 파일**:
+  - Domain: Model, Repository Interface
+  - Data: API Service, DTO, Mapper, Repository Impl, Hilt Module
+  - Presentation: Fragment, ViewModel
+- **절감 시간**: 약 1.5시간 → 5분
+
+#### 2. **add-api-endpoint** (API 엔드포인트 추가)
+- **용도**: 기존 기능에 새 API 메서드 추가
+- **사용법**: `/add-api-endpoint [기능명] [메서드명]`
+- **예시**: `/add-api-endpoint weather getWeeklyForecast`
+- **수행 작업**:
+  - API Service 메서드 추가
+  - Request/Response DTO 생성
+  - Repository 메서드 구현
+  - ViewModel 연동
+- **절감 시간**: 약 30분 → 3분
+
+#### 3. **complete-fragment-integration** (Fragment 완성)
+- **용도**: 미완성 Fragment를 Clean Architecture로 통합
+- **사용법**: `/complete-fragment-integration [기능명]`
+- **예시**: `/complete-fragment-integration finedust`
+- **적용 대상**:
+  - FinedustFragment (현재 Fragment만 있음)
+  - SettingFragment (현재 Fragment만 있음)
+- **수행 작업**:
+  - Domain/Data 레이어 생성
+  - ViewModel 생성 및 주입
+  - StateFlow 기반 상태 관리 구현
+- **절감 시간**: 약 1시간 → 10분
+
+### Skill 파일 위치
+```
+.claude/
+├── CLAUDE.md
+└── skills/
+    ├── create-feature-module.md
+    ├── add-api-endpoint.md
+    └── complete-fragment-integration.md
+```
+
+### 주요 수정 사항 (2025.11.07)
+- **서브폴더 구조 적용**: 실제 프로젝트와 동일하게 `domain/repository/{기능명}/`, `data/repository/{기능명}/` 구조 사용
+- **RepositoryImpl 개선**: `override val TAG` 추가, `safeApiCallWithTransform` → `apiCall` 파라미터명 통일
+- **ViewModel 옵션 제공**: BaseLoadViewModel 사용(옵션 A) vs ViewModel 직접 상속(옵션 B)
+- **캐싱 로직 개선**: `isCacheValid()`, `updateCache()` 헬퍼 메서드 분리
+
+### 다음에 할 작업
+- [ ] Finedust 모듈 완성 (`/complete-fragment-integration finedust`)
+- [ ] Setting 모듈 완성 (`/complete-fragment-integration setting`)
+- [ ] 새 기능 추가 시 skill 활용
