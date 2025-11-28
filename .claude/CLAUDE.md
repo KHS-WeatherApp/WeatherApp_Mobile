@@ -9,14 +9,16 @@
 ## 핵심 기술 스택
 
 ### 언어 및 버전
-- **Kotlin**: 1.9.x (KSP 지원)
+- **Kotlin**: 2.1.20 (KSP 지원)
+- **KSP**: 2.1.20-1.0.32
+- **Android Gradle Plugin**: 8.13.1
 - **Android API**: min 30, target 34, compile 34
 - **Java**: 17
 
 ### 주요 라이브러리
-- **네트워크**: Retrofit 2, OkHttp3, Gson
-- **의존성 주입**: Dagger Hilt 2.48.1
-- **UI**: AndroidX Navigation, Material Design, ConstraintLayout, RecyclerView
+- **네트워크**: Retrofit 2.9.0, OkHttp3 4.12.0, Gson 2.10.1
+- **의존성 주입**: Dagger Hilt 2.56
+- **UI**: AndroidX Navigation 2.7.7, Material Design 1.11.0, ConstraintLayout 2.1.4, RecyclerView 1.3.2
 - **비동기**: Kotlin Coroutines, StateFlow, Lifecycle 2.7.0
 - **위치**: Google Play Services Location 21.1.0
 - **바인딩**: ViewBinding, DataBinding
@@ -511,7 +513,15 @@ refactor: WeatherRepository 캐싱 로직 개선
     └── complete-fragment-integration.md
 ```
 
-### 주요 수정 사항 (2025.11.07)
+### 주요 수정 사항
+
+#### 2025.11.12
+- **Kotlin 버전 업그레이드**: 2.1.20 (KSP 2.1.20-1.0.32)
+- **Hilt 버전 업그레이드**: 2.56
+- **AGP 버전 업그레이드**: 8.13.1
+- **라이브러리 버전 명시**: 모든 주요 라이브러리 버전을 libs.versions.toml에서 관리
+
+#### 2025.11.07
 - **서브폴더 구조 적용**: 실제 프로젝트와 동일하게 `domain/repository/{기능명}/`, `data/repository/{기능명}/` 구조 사용
 - **RepositoryImpl 개선**: `override val TAG` 추가, `safeApiCallWithTransform` → `apiCall` 파라미터명 통일
 - **ViewModel 옵션 제공**: BaseLoadViewModel 사용(옵션 A) vs ViewModel 직접 상속(옵션 B)
